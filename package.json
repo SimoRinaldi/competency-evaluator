@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
+    "start:docker-db": "docker compose -f ./docker-compose.yaml up -d",
     "start:api": "nx serve api",
     "start:ui": "nx serve ui"
   },
