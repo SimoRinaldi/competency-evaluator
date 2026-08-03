@@ -1,8 +1,8 @@
-import { UserRole } from "@server/users";
+import type { UserRole } from '@server/users';
 
 export interface JwtPayload {
-    sub: number;
-    email: string;
-    role: UserRole;
-    name: string;
+  sub: number;
+  email: string;
+  role: UserRole;
+  name: string;
 }
