@@ -1,6 +1,6 @@
 import { NotFoundException, Injectable, UnauthorizedException } from '@nestjs/common';
-import type { ServerUsersService } from '@server/users';
-import type { JwtService } from '@nestjs/jwt';
+import { ServerUsersService } from '@server/users';
+import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import type { AuthenticatedUser } from './interfaces/authenticated-user.interface';
 import type { AuthResponse } from './interfaces/auth-response.interface';

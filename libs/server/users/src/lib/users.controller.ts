@@ -12,7 +12,7 @@ import {
   ValidationPipe,
   UseGuards,
 } from '@nestjs/common';
-import type { ServerUsersService } from './users.service';
+import { ServerUsersService } from './users.service';
 import { ApiTags, ApiBody, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import type { CreateUserDto } from './dto/create-user.dto';
 import type { UpdateUserDto } from './dto/update-user.dto';
