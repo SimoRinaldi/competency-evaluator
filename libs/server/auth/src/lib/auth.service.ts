@@ -24,7 +24,7 @@ export class ServerAuthService {
       throw new UnauthorizedException('Credentials not valid!');
     }
 
-    const { passwordHash, ...result } = user;
+    const { passwordHash: _passwordHash, ...result } = user;
     return result;
   }
 
@@ -36,7 +36,7 @@ export class ServerAuthService {
   async register(dto: RegisterDto): Promise<AuthResponse> {
     const user = await this.usersService.create(dto);
 
-    const { passwordHash, ...result } = user;
+    const { passwordHash: _passwordHash, ...result } = user;
     return this.login(result);
   }
 }
