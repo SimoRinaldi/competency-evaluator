@@ -1,26 +1,74 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { CreateSubCompetencyDto } from './dto/create-sub-competency.dto';
 import { UpdateSubCompetencyDto } from './dto/update-sub-competency.dto';
+import { SubCompetencyEntity } from './entities/sub-competency.entity';
+import { SubCompetencyRepository } from './sub-competency.repository';
 
 @Injectable()
 export class SubCompetencyService {
-  create(createSubCompetencyDto: CreateSubCompetencyDto) {
-    return 'This action adds a new subCompetency';
+  constructor(
+    private readonly subCompetencyRepository: SubCompetencyRepository
+  ) {}
+
+  async getOneSubCompetency(id: number): Promise<SubCompetencyEntity> {
+    const subCompetency = await this.subCompetencyRepository.findById(id);
+
+    if (!subCompetency)
+      throw new NotFoundException(`SubCompetency with id ${id} not found`);
+
+    return subCompetency;
   }
 
-  findAll() {
-    return `This action returns all subCompetency`;
+  async getSubCompetencies(): Promise<SubCompetencyEntity[]> {
+    const subCompetencies = await this.subCompetencyRepository.findAll();
+
+    if (subCompetencies && subCompetencies.length === 0) {
+      throw new NotFoundException(`No sub-competencies found.`);
+    }
+    return subCompetencies;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} subCompetency`;
+  async create(dto: CreateSubCompetencyDto): Promise<SubCompetencyEntity> {
+    const existing = dto.title
+      ? await this.subCompetencyRepository.findByTitle(dto.title)
+      : null;
+
+    if (existing) {
+      throw new ConflictException('Title already in use');
+    }
+
+    return this.subCompetencyRepository.createOne(dto);
   }
 
-  update(id: number, updateSubCompetencyDto: UpdateSubCompetencyDto) {
-    return `This action updates a #${id} subCompetency`;
+  async update(
+    id: number,
+    dto: UpdateSubCompetencyDto
+  ): Promise<SubCompetencyEntity> {
+    if (dto.title) {
+      const existing = await this.subCompetencyRepository.findByTitle(
+        dto.title
+      );
+      if (existing && existing.id !== id) {
+        throw new ConflictException('Title already in use');
+      }
+    }
+
+    const updated = await this.subCompetencyRepository.updateOne(id, dto);
+    if (!updated) {
+      throw new NotFoundException(`SubCompetency with id ${id} not found`);
+    }
+
+    return updated;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} subCompetency`;
+  async removeSubCompetency(id: number): Promise<void> {
+    const deleted = await this.subCompetencyRepository.deleteOne(id);
+    if (!deleted) {
+      throw new NotFoundException(`SubCompetency with id ${id} not found`);
+    }
   }
 }

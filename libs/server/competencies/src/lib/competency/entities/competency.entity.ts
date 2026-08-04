@@ -16,8 +16,7 @@ export class CompetencyEntity {
     type: 'varchar',
     length: 255,
     nullable: false,
-    unique: true,
-    default: 'Unknown',
+    unique: true
   })
   title!: string;
 
