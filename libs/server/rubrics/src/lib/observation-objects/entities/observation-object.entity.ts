@@ -1,4 +1,5 @@
-import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm';                                                        
+import {Column, Entity, PrimaryGeneratedColumn, OneToMany} from 'typeorm';    
+import { Indicator } from '../../indicators/entities/indicator.entity'                                                    
                                                                                                            
 @Entity('observation_object')                                                                          
 export class ObservationObject {                                                                       
@@ -6,5 +7,8 @@ export class ObservationObject {
     id: number;                                                                                         
                                                                                                                                                   
     @Column({type: 'text', nullable: true})                                                            
-    description: string;                                      
+    description: string;          
+    
+    @OneToMany(() => Indicator, (indicator) => indicator.observationObject)
+    indicators: Indicator[];
 }                                           
