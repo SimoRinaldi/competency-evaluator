@@ -6,10 +6,10 @@ import {
   JoinColumn,
 } from 'typeorm';
 import type { Relation } from 'typeorm';
-import { Competency } from '../../competency/entities/competency.entity';
+import { CompetencyEntity } from '../../competency/entities/competency.entity';
 
 @Entity('sub_competencies')
-export class SubCompetency {
+export class SubCompetencyEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
@@ -49,9 +49,9 @@ export class SubCompetency {
   @Column({ type: 'int', nullable: false })
   competency_id!: number;
 
-  @ManyToOne(() => Competency, (competency) => competency.id, {
+  @ManyToOne(() => CompetencyEntity, (competency) => competency.id, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'competency_id' })
-  competency?: Relation<Competency>;
+  competency?: Relation<CompetencyEntity>;
 }

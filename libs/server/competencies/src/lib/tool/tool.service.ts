@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { CreateToolDto } from './dto/create-tool.dto';
 import { UpdateToolDto } from './dto/update-tool.dto';
-import { Tool } from './entities/tool.entity';
+import { ToolEntity } from './entities/tool.entity';
 import { ToolRepository } from './tool.repository';
 
 @Injectable()
@@ -13,7 +13,7 @@ export class ToolService {
   // Injecting the repository
   constructor(private readonly toolRepository: ToolRepository) {}
 
-  async getOneTool(id: number): Promise<Tool> {
+  async getOneTool(id: number): Promise<ToolEntity> {
     const tool = await this.toolRepository.findById(id);
 
     if (!tool) throw new NotFoundException(`Tool with id ${id} not found`);
@@ -21,7 +21,7 @@ export class ToolService {
     return tool;
   }
 
-  async getTools(): Promise<Tool[]> {
+  async getTools(): Promise<ToolEntity[]> {
     const tools = await this.toolRepository.findAll();
 
     if (tools && tools.length === 0) {
@@ -30,7 +30,7 @@ export class ToolService {
     return tools;
   }
 
-  async create(dto: CreateToolDto): Promise<Tool> {
+  async create(dto: CreateToolDto): Promise<ToolEntity> {
     const existing = dto.name
       ? await this.toolRepository.findByName(dto.name)
       : null;
@@ -42,7 +42,7 @@ export class ToolService {
     return this.toolRepository.createOne(dto);
   }
 
-  async update(id: number, dto: UpdateToolDto): Promise<Tool> {
+  async update(id: number, dto: UpdateToolDto): Promise<ToolEntity> {
     if (dto.name) {
       const existing = await this.toolRepository.findByName(dto.name);
       if (existing && existing.id !== id) {

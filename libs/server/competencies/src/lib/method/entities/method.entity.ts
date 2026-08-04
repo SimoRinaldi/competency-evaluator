@@ -1,1 +1,1 @@
-export class Method {}
+export class MethodEntity {}

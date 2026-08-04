@@ -1,1 +1,1 @@
-export class Skill {}
+export class SkillEntity {}
