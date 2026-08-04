@@ -1,26 +1,66 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { CreateMethodDto } from './dto/create-method.dto';
 import { UpdateMethodDto } from './dto/update-method.dto';
+import { MethodEntity } from './entities/method.entity';
+import { MethodRepository } from './method.repository';
 
 @Injectable()
 export class MethodService {
-  create(createMethodDto: CreateMethodDto) {
-    return 'This action adds a new method';
+  constructor(private readonly methodRepository: MethodRepository) {}
+
+  async getOneMethod(id: number): Promise<MethodEntity> {
+    const method = await this.methodRepository.findById(id);
+
+    if (!method) throw new NotFoundException(`Method with id ${id} not found`);
+
+    return method;
   }
 
-  findAll() {
-    return `This action returns all method`;
+  async getMethods(): Promise<MethodEntity[]> {
+    const methods = await this.methodRepository.findAll();
+
+    if (methods && methods.length === 0) {
+      throw new NotFoundException(`No methods found.`);
+    }
+    return methods;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} method`;
+  async create(dto: CreateMethodDto): Promise<MethodEntity> {
+    const existing = dto.name
+      ? await this.methodRepository.findByName(dto.name)
+      : null;
+
+    if (existing) {
+      throw new ConflictException('Name already in use');
+    }
+
+    return this.methodRepository.createOne(dto);
   }
 
-  update(id: number, updateMethodDto: UpdateMethodDto) {
-    return `This action updates a #${id} method`;
+  async update(id: number, dto: UpdateMethodDto): Promise<MethodEntity> {
+    if (dto.name) {
+      const existing = await this.methodRepository.findByName(dto.name);
+      if (existing && existing.id !== id) {
+        throw new ConflictException('Name already in use');
+      }
+    }
+
+    const updated = await this.methodRepository.updateOne(id, dto);
+    if (!updated) {
+      throw new NotFoundException(`Method with id ${id} not found`);
+    }
+
+    return updated;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} method`;
+  async removeMethod(id: number): Promise<void> {
+    const deleted = await this.methodRepository.deleteOne(id);
+    if (!deleted) {
+      throw new NotFoundException(`Method with id ${id} not found`);
+    }
   }
 }

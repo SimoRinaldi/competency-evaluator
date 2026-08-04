@@ -46,7 +46,7 @@ export class ToolController {
     schema: {
       type: 'object',
       properties: {
-        name: { type: 'string', example: 'Git' },
+        name: { type: 'string', example: '' },
       },
       required: ['name'],
     },
@@ -63,7 +63,7 @@ export class ToolController {
     schema: {
       type: 'object',
       properties: {
-        name: { type: 'string', example: 'Git' },
+        name: { type: 'string', example: '' },
       },
     },
   })

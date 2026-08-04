@@ -1,42 +1,84 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  ParseIntPipe,
+  ValidationPipe,
+  UseGuards,
 } from '@nestjs/common';
+import { ApiTags, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
+import { JwtAuthGuard, Roles, RolesGuard } from '@server/security';
+import { UserRole } from '@server/users';
 import { MethodService } from './method.service';
 import { CreateMethodDto } from './dto/create-method.dto';
 import { UpdateMethodDto } from './dto/update-method.dto';
 
-@Controller('method')
+@ApiTags('Methods APIs')
+@Controller('methods')
 export class MethodController {
   constructor(private readonly methodService: MethodService) {}
 
-  @Post()
-  create(@Body() createMethodDto: CreateMethodDto) {
-    return this.methodService.create(createMethodDto);
+  @Get() // GET /methods
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
+  @ApiBearerAuth()
+  getMethods() {
+    return this.methodService.getMethods();
   }
 
-  @Get()
-  findAll() {
-    return this.methodService.findAll();
+  @Get(':id') // GET /methods/:id
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
+  @ApiBearerAuth()
+  getOneMethod(@Param('id', ParseIntPipe) id: number) {
+    return this.methodService.getOneMethod(id);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.methodService.findOne(+id);
+  @Post() // POST /methods
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', example: '' },
+      },
+      required: ['name'],
+    },
+  })
+  create(@Body(ValidationPipe) method: CreateMethodDto) {
+    return this.methodService.create(method);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMethodDto: UpdateMethodDto) {
-    return this.methodService.update(+id, updateMethodDto);
+  @Patch(':id') // PATCH /methods/:id
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', example: '' },
+      },
+    },
+  })
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body(ValidationPipe) methodUpdate: UpdateMethodDto
+  ) {
+    return this.methodService.update(id, methodUpdate);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.methodService.remove(+id);
+  @Delete(':id') // DELETE /methods/:id
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  removeMethod(@Param('id', ParseIntPipe) id: number) {
+    return this.methodService.removeMethod(id);
   }
 }
