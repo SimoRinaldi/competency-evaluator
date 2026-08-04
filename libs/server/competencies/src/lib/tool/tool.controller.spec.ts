@@ -8,7 +8,18 @@ describe('ToolController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ToolController],
-      providers: [ToolService],
+      providers: [
+        {
+          provide: ToolService,
+          useValue: {
+            getTools: jest.fn(),
+            getOneTool: jest.fn(),
+            create: jest.fn(),
+            update: jest.fn(),
+            removeTool: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
     controller = module.get<ToolController>(ToolController);
