@@ -1,8 +1,8 @@
 import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';               
-import { RubricSet } from './rubric-set.entity';       
+import { RubricSetEntity } from './rubric-set.entity';       
 
 @Entity('rubric_level')
-export class RubricLevel {
+export class RubricLevelEntity {
     @PrimaryGeneratedColumn()                                                                            
     id: number;                                                                                         
                                                                                                            
@@ -13,12 +13,12 @@ export class RubricLevel {
     rank: number;                       
 
     // Molti RubricLevel appartengono a UN SOLO RubricSet                                                
-    @ManyToOne(() => RubricSet, (rubricSet) => rubricSet.levels, {                                       
+    @ManyToOne(() => RubricSetEntity, (rubricSet) => rubricSet.levels, {                                       
         onDelete: 'CASCADE',          
     })  
 
     @JoinColumn({name: 'rubric_set_id'})   
-    rubricSet: RubricSet;                                                                               
+    rubricSet: RubricSetEntity;                                                                               
                                                                                                                                 
     @Column()                                                                                            
     rubric_set_id: number;

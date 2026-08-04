@@ -1,14 +1,14 @@
 import {Column, Entity, PrimaryGeneratedColumn, OneToMany} from 'typeorm';    
-import { Indicator } from '../../indicators/entities/indicator.entity'                                                    
+import { IndicatorEntity } from '../../indicators/entities/indicator.entity'                                                    
                                                                                                            
 @Entity('observation_object')                                                                          
-export class ObservationObject {                                                                       
+export class ObservationObjectEntity {                                                                       
     @PrimaryGeneratedColumn()                                                                            
     id: number;                                                                                         
                                                                                                                                                   
     @Column({type: 'text', nullable: true})                                                            
     description: string;          
     
-    @OneToMany(() => Indicator, (indicator) => indicator.observationObject)
-    indicators: Indicator[];
+    @OneToMany(() => IndicatorEntity, (indicator) => indicator.observationObject)
+    indicators: IndicatorEntity[];
 }                                           

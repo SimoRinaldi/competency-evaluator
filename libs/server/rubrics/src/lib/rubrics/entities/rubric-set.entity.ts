@@ -1,9 +1,9 @@
 import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
-import { RubricLevel } from './rubric-level.entity'; 
-import { Indicator } from '../../indicators/entities/indicator.entity'
+import { RubricLevelEntity } from './rubric-level.entity'; 
+import { IndicatorEntity } from '../../indicators/entities/indicator.entity'
 
 @Entity('rubric_set')
-export class RubricSet {
+export class RubricSetEntity {
     @PrimaryGeneratedColumn()                                                                            
     id: number;                                                                                          
                                                                                                                                                                                  
@@ -11,12 +11,12 @@ export class RubricSet {
     yes_no: boolean; 
 
     // Un RubricSet ha MOLTI RubricLevel                                                   
-    @OneToMany(() => RubricLevel, (level) => level.rubricSet, {                                          
+    @OneToMany(() => RubricLevelEntity, (level) => level.rubricSet, {                                          
         cascade: true,                      
     })                                                                                                   
-    levels: RubricLevel[]; 
+    levels: RubricLevelEntity[]; 
 
     // Un RubricSet è associato a molti Indicator
-    @OneToMany(() => Indicator, (indicator) => indicator.rubricSet)
-    indicators: Indicator[];
+    @OneToMany(() => IndicatorEntity, (indicator) => indicator.rubricSet)
+    indicators: IndicatorEntity[];
 }
