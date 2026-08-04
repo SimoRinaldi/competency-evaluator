@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';               
 import { RubricSetEntity } from './rubric-set.entity';       
 
-@Entity('rubric_level')
+@Entity('rubric_levels')
 export class RubricLevelEntity {
     @PrimaryGeneratedColumn()                                                                            
     id: number;                                                                                         

@@ -2,7 +2,7 @@ import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 't
 import { RubricSetEntity } from '../../rubrics/entities/rubric-set.entity';                                             
 import { ObservationObjectEntity } from '../../observation-objects/entities/observation-object.entity';                     
                                                                                                                           
-@Entity('indicator')                                                                                                  
+@Entity('indicators')                                                                                                  
 export class IndicatorEntity {                                                                                                                                                                                                          
     @PrimaryGeneratedColumn()                                                                                           
     id: number;                                                                                                        

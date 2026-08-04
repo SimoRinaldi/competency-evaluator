@@ -2,7 +2,7 @@ import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { RubricLevelEntity } from './rubric-level.entity'; 
 import { IndicatorEntity } from '../../indicators/entities/indicator.entity'
 
-@Entity('rubric_set')
+@Entity('rubric_sets')
 export class RubricSetEntity {
     @PrimaryGeneratedColumn()                                                                            
     id: number;                                                                                          

@@ -1,7 +1,7 @@
 import {Column, Entity, PrimaryGeneratedColumn, OneToMany} from 'typeorm';    
 import { IndicatorEntity } from '../../indicators/entities/indicator.entity'                                                    
                                                                                                            
-@Entity('observation_object')                                                                          
+@Entity('observation_objects')                                                                          
 export class ObservationObjectEntity {                                                                       
     @PrimaryGeneratedColumn()                                                                            
     id: number;                                                                                         
