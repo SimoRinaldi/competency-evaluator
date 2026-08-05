@@ -26,9 +26,6 @@
     },
     {
       "path": "./libs/server/security"
-    },
-    {
-      "path": "./libs/server/rubrics"
     }
   ]
 }
