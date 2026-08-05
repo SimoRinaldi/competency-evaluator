@@ -1,4 +1,35 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { RubricSetEntity } from './entities/rubric-set.entity';
+import { CreateRubricSetDto } from './dto/create-rubric.dto';
 
 @Injectable()
-export class ServerRubricsService {}
+export class ServerRubricsService {
+    constructor(
+        @InjectRepository(RubricSetEntity)
+        private readonly rubricSetRepository: Repository<RubricSetEntity>
+    ) {}
+
+    async create(createRubricSetDto: CreateRubricSetDto) {                                                                                                                                                                                                                       
+        const newSet = this.rubricSetRepository.create(createRubricSetDto);                                                                                                                                                                                                    
+        return await this.rubricSetRepository.save(newSet);                                                                                                                      
+    } 
+
+    async findAll() {                                                                                                                                                                                                                                                             
+        return await this.rubricSetRepository.find({                                                                                                                             
+          relations: ['levels'],                                                                                                                                                 
+        });                                                                                                                                                                      
+    }                                                                                                                                                                          
+                                                                                                                                                                                 
+    async findOne(id: number) {                                                                                                                                                
+        const set = await this.rubricSetRepository.findOne({                                                                                                                     
+            where: { id },                                                                                                                                                         
+            relations: ['levels'],                                                                                                                                                 
+        });                                                                                                                                                                      
+        if (!set) {                                                                                                                                                              
+            throw new NotFoundException(`RubricSet con ID ${id} non trovato`);                                                                                                     
+        }                                                                                                                                                                        
+        return set;                                                                                                                                                              
+    }                                                                                                                                                                          
+}

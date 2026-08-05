@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { RubricLevelEntity } from './rubric-level.entity'; 
-import { IndicatorEntity } from '../../indicators/entities/indicator.entity'
+import { IndicatorEntity } from './indicator.entity'
 
 @Entity('rubric_sets')
 export class RubricSetEntity {

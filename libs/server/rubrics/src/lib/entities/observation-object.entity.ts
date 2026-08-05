@@ -1,5 +1,5 @@
 import {Column, Entity, PrimaryGeneratedColumn, OneToMany} from 'typeorm';    
-import { IndicatorEntity } from '../../indicators/entities/indicator.entity'                                                    
+import { IndicatorEntity } from './indicator.entity'                                                    
                                                                                                            
 @Entity('observation_objects')                                                                          
 export class ObservationObjectEntity {                                                                       
