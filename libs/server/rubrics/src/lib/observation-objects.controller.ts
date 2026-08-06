@@ -1,6 +1,7 @@
-import { Controller, Get, Post, Body, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, ParseIntPipe, Patch, Delete } from '@nestjs/common';
 import { ObservationObjectsService } from './observation-objects.service';
 import { CreateObservationObjectDto } from './dto/create-observation-object.dto';
+import { UpdateObservationObjectDto } from './dto/update-observation-object.dto';
 
 @Controller('observation-objects')
 export class ObservationObjectsController {
@@ -21,5 +22,15 @@ export class ObservationObjectsController {
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.observationObjectsService.findOne(id);
+  }
+
+  @Patch(':id')
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateIndicatorDto: UpdateObservationObjectDto) {
+    return this.observationObjectsService.update(id, updateIndicatorDto);
+  }
+
+  @Delete('id')
+    remove(@Param('id', ParseIntPipe) id: number) {
+    return this.observationObjectsService.remove(id);
   }
 }

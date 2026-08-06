@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';                                                                                                                    
 import { IndicatorEntity } from './entities/indicator.entity';                                                                                
 import { CreateIndicatorDto } from './dto/create-indicator.dto';
+import { UpdateIndicatorDto } from './dto/update-indicator.dto';
 
 @Injectable()
 export class IndicatorsService {
@@ -34,5 +35,15 @@ export class IndicatorsService {
         }
 
         return indicator;
+    }
+
+    async update(id: number, updateIndicatorDto: UpdateIndicatorDto) {
+        await this.indicatorRepository.update(id, updateIndicatorDto);
+        return this.findOne(id);
+    }
+
+    async remove(id: number) {
+        await this.indicatorRepository.delete(id);
+        return { deleted: true };
     }
 }

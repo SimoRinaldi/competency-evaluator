@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';                                                                                                                    
 import { ObservationObjectEntity } from './entities/observation-object.entity';                                                                                
 import { CreateObservationObjectDto } from './dto/create-observation-object.dto';
+import { UpdateObservationObjectDto } from './dto/update-observation-object.dto';
 
 @Injectable()
 export class ObservationObjectsService {
@@ -34,5 +35,15 @@ export class ObservationObjectsService {
         }
 
         return obj;
+    }
+
+    async update(id: number, updateIndicatorDto: UpdateObservationObjectDto) {
+        await this.observationObjectRepository.update(id, updateIndicatorDto);
+        return this.findOne(id);
+    }
+
+    async remove(id: number) {
+        await this.observationObjectRepository.delete(id);
+        return { deleted: true };
     }
 }
