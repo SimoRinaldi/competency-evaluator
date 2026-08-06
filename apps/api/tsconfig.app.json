@@ -23,6 +23,9 @@
   ],
   "references": [
     {
+      "path": "../../libs/server/rubrics/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/server/auth/tsconfig.lib.json"
     },
     {

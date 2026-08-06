@@ -19,4 +19,4 @@ import { IndicatorEntity } from './entities/indicator.entity';
   providers: [RubricsService, ObservationObjectsService, IndicatorsService],
   exports: [RubricsService, ObservationObjectsService, IndicatorsService],
 })
-export class RubricsModule {}
+export class ServerRubricsModule {}
