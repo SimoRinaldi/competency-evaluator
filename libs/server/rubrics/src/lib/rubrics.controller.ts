@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Param, ParseIntPipe } from '@nestjs/common';
-import { ServerRubricsService } from './rubrics.service';
+import { RubricsService } from './rubrics.service';
 import { CreateRubricSetDto } from './dto/create-rubric.dto'
 
 @Controller('rubrics')
-export class ServerRubricsController {
+export class RubricsController {
 
-  constructor(private readonly serverRubricsService: ServerRubricsService) {}
+  constructor(private readonly serverRubricsService: RubricsService) {}
 
   @Post()
   create(@Body() createRubricSetDto: CreateRubricSetDto) {

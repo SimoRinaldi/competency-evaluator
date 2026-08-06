@@ -5,7 +5,7 @@ import { RubricSetEntity } from './entities/rubric-set.entity';
 import { CreateRubricSetDto } from './dto/create-rubric.dto';
 
 @Injectable()
-export class ServerRubricsService {
+export class RubricsService {
     constructor(
         @InjectRepository(RubricSetEntity)
         private readonly rubricSetRepository: Repository<RubricSetEntity>
