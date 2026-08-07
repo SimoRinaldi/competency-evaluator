@@ -9,7 +9,7 @@ import { JwtAuthGuard, RolesGuard, Roles } from '@server/security';
 @ApiTags('Rubrics APIs')
 @Controller('rubrics')
 export class RubricsController {
-  constructor(private readonly rubricsService: RubricsService) {}
+  constructor( private readonly rubricsService: RubricsService ) {}
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -39,7 +39,7 @@ export class RubricsController {
   
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
+  @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Modifica una rubrica' })
   @ApiParam({ name: 'id', type: 'number' })

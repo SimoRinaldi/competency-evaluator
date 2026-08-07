@@ -9,7 +9,7 @@ import { JwtAuthGuard, RolesGuard, Roles } from '@server/security';
 @ApiTags('Indicators APIs')
 @Controller('indicators')
 export class IndicatorsController {
-  constructor(private readonly indicatorsService: IndicatorsService) {}
+  constructor( private readonly indicatorsService: IndicatorsService ) {}
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
