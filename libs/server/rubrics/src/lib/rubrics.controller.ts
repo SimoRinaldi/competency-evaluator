@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Param, ParseIntPipe, Patch, Delete, UseGuards, ValidationPipe } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiBody, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiOperation, ApiParam } from '@nestjs/swagger';
 import { RubricsService } from './rubrics.service';
 import { CreateRubricSetDto } from './dto/create-rubric.dto'
 import { UpdateRubricSetDto } from './dto/update-rubric.dto';
