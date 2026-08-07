@@ -4,9 +4,10 @@ import { AppService } from './app.service';
 import { ServerUsersModule } from '@server/users';
 import { DatabaseModule } from '@org/database';
 import { ServerAuthModule } from '@server/auth';
+import { ServerRubricsModule } from '@server/rubrics';
 
 @Module({
-  imports: [ServerUsersModule, DatabaseModule, ServerAuthModule],
+  imports: [ServerUsersModule, DatabaseModule, ServerAuthModule, ServerRubricsModule],
   controllers: [AppController],
   providers: [AppService],
 })

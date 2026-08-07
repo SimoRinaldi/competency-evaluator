@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';                                                                                                                                        
-import { RubricSetEntity } from '../../rubrics/entities/rubric-set.entity';                                             
-import { ObservationObjectEntity } from '../../observation-objects/entities/observation-object.entity';                     
+import { RubricSetEntity } from './rubric-set.entity';                                             
+import { ObservationObjectEntity } from './observation-object.entity';                     
                                                                                                                           
 @Entity('indicators')                                                                                                  
 export class IndicatorEntity {                                                                                                                                                                                                          
