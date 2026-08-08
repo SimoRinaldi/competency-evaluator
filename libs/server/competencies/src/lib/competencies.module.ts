@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { CompetencyModule } from './competency/competency.module';
-import { SubCompetencyModule } from './sub-competency/sub-competency.module';
+import { SubCompetencyModule } from './subcompetency/subcompetency.module';
 import { SkillModule } from './skill/skill.module';
 import { ToolModule } from './tool/tool.module';
 import { MethodModule } from './method/method.module';

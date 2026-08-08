@@ -5,7 +5,7 @@ import {
   OneToMany,
   Relation,
 } from 'typeorm';
-import { SubCompetencyEntity } from '../../sub-competency/entities/sub-competency.entity';
+import { SubCompetencyEntity } from '../../subcompetency/entities/subcompetency.entity';
 
 @Entity('competencies')
 export class CompetencyEntity {
@@ -23,6 +23,6 @@ export class CompetencyEntity {
   @Column({ type: 'int', nullable: false })
   weight!: number;
 
-  @OneToMany(() => SubCompetencyEntity, (sub_competency) => sub_competency.id)
-  sub_competencies?: Relation<SubCompetencyEntity>[];
+  @OneToMany(() => SubCompetencyEntity, (subcompetency) => subcompetency.id)
+  subcompetencies?: Relation<SubCompetencyEntity>[];
 }

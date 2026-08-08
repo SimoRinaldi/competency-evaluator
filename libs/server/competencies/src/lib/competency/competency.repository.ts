@@ -13,7 +13,7 @@ export class CompetencyRepository {
   ) {}
 
   findById(id: number): Promise<CompetencyEntity | null> {
-    return this.repository.findOne({ where: { id }, relations: ['sub_competencies'] });
+    return this.repository.findOne({ where: { id }, relations: ['subcompetencies'] });
   }
 
   findByTitle(title: string): Promise<CompetencyEntity | null> {
@@ -29,7 +29,7 @@ export class CompetencyRepository {
   }
 
   findAll(): Promise<CompetencyEntity[]> {
-    return this.repository.find({ order: { id: 'ASC' }, relations: ['sub_competencies'] });
+    return this.repository.find({ order: { id: 'ASC' }, relations: ['subcompetencies'] });
   }
 
   async updateOne(

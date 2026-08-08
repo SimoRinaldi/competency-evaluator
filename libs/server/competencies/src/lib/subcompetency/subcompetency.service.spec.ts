@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SubCompetencyService } from './sub-competency.service';
+import { SubCompetencyService } from './subcompetency.service';
 
 describe('SubCompetencyService', () => {
   let service: SubCompetencyService;

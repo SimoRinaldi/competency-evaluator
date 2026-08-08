@@ -13,18 +13,18 @@ import {
 import { ApiTags, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard, Roles, RolesGuard } from '@server/security';
 import { UserRole } from '@server/users';
-import { SubCompetencyService } from './sub-competency.service';
-import { CreateSubCompetencyDto } from './dto/create-sub-competency.dto';
-import { UpdateSubCompetencyDto } from './dto/update-sub-competency.dto';
+import { SubCompetencyService } from './subcompetency.service';
+import { CreateSubCompetencyDto } from './dto/create-subcompetency.dto';
+import { UpdateSubCompetencyDto } from './dto/update-subcompetency.dto';
 
 @ApiTags('SubCompetencies APIs')
-@Controller('sub-competencies')
+@Controller('subcompetencies')
 export class SubCompetencyController {
   constructor(
     private readonly subCompetencyService: SubCompetencyService
   ) {}
 
-  @Get() // GET /sub-competencies
+  @Get() // GET /subcompetencies
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
   @ApiBearerAuth()
@@ -32,7 +32,7 @@ export class SubCompetencyController {
     return this.subCompetencyService.getSubCompetencies();
   }
 
-  @Get(':id') // GET /sub-competencies/:id
+  @Get(':id') // GET /subcompetencies/:id
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
   @ApiBearerAuth()
@@ -40,7 +40,7 @@ export class SubCompetencyController {
     return this.subCompetencyService.getOneSubCompetency(id);
   }
 
-  @Post() // POST /sub-competencies
+  @Post() // POST /subcompetencies
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
@@ -62,7 +62,7 @@ export class SubCompetencyController {
     return this.subCompetencyService.create(subCompetency);
   }
 
-  @Patch(':id') // PATCH /sub-competencies/:id
+  @Patch(':id') // PATCH /subcompetencies/:id
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
@@ -86,7 +86,7 @@ export class SubCompetencyController {
     return this.subCompetencyService.update(id, subCompetencyUpdate);
   }
 
-  @Delete(':id') // DELETE /sub-competencies/:id
+  @Delete(':id') // DELETE /subcompetencies/:id
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth()

@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SubCompetencyEntity } from './entities/sub-competency.entity';
+import { SubCompetencyEntity } from './entities/subcompetency.entity';
 import { Repository } from 'typeorm';
-import { CreateSubCompetencyDto } from './dto/create-sub-competency.dto';
-import { UpdateSubCompetencyDto } from './dto/update-sub-competency.dto';
+import { CreateSubCompetencyDto } from './dto/create-subcompetency.dto';
+import { UpdateSubCompetencyDto } from './dto/update-subcompetency.dto';
 
 @Injectable()
 export class SubCompetencyRepository {

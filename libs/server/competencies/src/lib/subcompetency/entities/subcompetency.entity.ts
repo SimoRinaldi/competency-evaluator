@@ -8,7 +8,7 @@ import {
 import type { Relation } from 'typeorm';
 import { CompetencyEntity } from '../../competency/entities/competency.entity';
 
-@Entity('sub_competencies')
+@Entity('subcompetencies')
 export class SubCompetencyEntity {
   @PrimaryGeneratedColumn()
   id!: number;

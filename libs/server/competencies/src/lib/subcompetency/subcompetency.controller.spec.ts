@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SubCompetencyController } from './sub-competency.controller';
-import { SubCompetencyService } from './sub-competency.service';
+import { SubCompetencyController } from './subcompetency.controller';
+import { SubCompetencyService } from './subcompetency.service';
 
 describe('SubCompetencyController', () => {
   let controller: SubCompetencyController;

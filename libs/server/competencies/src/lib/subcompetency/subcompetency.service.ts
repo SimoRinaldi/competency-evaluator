@@ -3,10 +3,10 @@ import {
   NotFoundException,
   ConflictException,
 } from '@nestjs/common';
-import { CreateSubCompetencyDto } from './dto/create-sub-competency.dto';
-import { UpdateSubCompetencyDto } from './dto/update-sub-competency.dto';
-import { SubCompetencyEntity } from './entities/sub-competency.entity';
-import { SubCompetencyRepository } from './sub-competency.repository';
+import { CreateSubCompetencyDto } from './dto/create-subcompetency.dto';
+import { UpdateSubCompetencyDto } from './dto/update-subcompetency.dto';
+import { SubCompetencyEntity } from './entities/subcompetency.entity';
+import { SubCompetencyRepository } from './subcompetency.repository';
 
 @Injectable()
 export class SubCompetencyService {
@@ -27,7 +27,7 @@ export class SubCompetencyService {
     const subCompetencies = await this.subCompetencyRepository.findAll();
 
     if (subCompetencies && subCompetencies.length === 0) {
-      throw new NotFoundException(`No sub-competencies found.`);
+      throw new NotFoundException(`No subcompetencies found.`);
     }
     return subCompetencies;
   }
