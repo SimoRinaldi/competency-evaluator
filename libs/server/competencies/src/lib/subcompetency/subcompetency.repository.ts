@@ -27,16 +27,12 @@ export class SubCompetencyRepository {
   }
 
   async createOne(dto: CreateSubCompetencyDto): Promise<SubCompetencyEntity> {
+    const { tool_ids, method_ids, skill_ids, ...rest } = dto;
     const subCompetency = this.repository.create({
-      title: dto.title,
-      weight: dto.weight,
-      input: dto.input,
-      output: dto.output,
-      action: dto.action,
-      competency_id: dto.competency_id,
-      tools: dto.tool_ids ? dto.tool_ids.map((id) => ({ id } as ToolEntity)) : undefined,
-      methods: dto.method_ids ? dto.method_ids.map((id) => ({ id } as MethodEntity)) : undefined,
-      skills: dto.skill_ids ? dto.skill_ids.map((id) => ({ id } as SkillEntity)) : undefined,
+      ...rest,
+      tools: tool_ids?.map((id) => ({ id })),
+      methods: method_ids?.map((id) => ({ id })),
+      skills: skill_ids?.map((id) => ({ id })),
     });
     return this.repository.save(subCompetency);
   }
