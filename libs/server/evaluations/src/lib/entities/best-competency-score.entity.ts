@@ -15,6 +15,7 @@ export class BestCompetencyScoreEntity {
     @ManyToOne(() => UserEntity)
     @JoinColumn({name: 'user_id'})
     user: UserEntity;
+
     @Column({type: 'integer', nullable: false})
     user_id: number
 
