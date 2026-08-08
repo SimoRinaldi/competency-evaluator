@@ -10,7 +10,7 @@ import {
   ValidationPipe,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard, Roles, RolesGuard } from '@server/security';
 import { UserRole } from '@server/users';
 import { CompetencyService } from './competency.service';
@@ -42,16 +42,6 @@ export class CompetencyController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        title: { type: 'string', example: '' },
-        weight: { type: 'number', example: 5 },
-      },
-      required: ['title', 'weight'],
-    },
-  })
   create(@Body(ValidationPipe) competency: CreateCompetencyDto) {
     return this.competencyService.create(competency);
   }
@@ -60,15 +50,6 @@ export class CompetencyController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        title: { type: 'string', example: '' },
-        weight: { type: 'number', example: 5 },
-      },
-    },
-  })
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body(ValidationPipe) competencyUpdate: UpdateCompetencyDto

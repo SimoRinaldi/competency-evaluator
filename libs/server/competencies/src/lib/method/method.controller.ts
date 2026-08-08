@@ -10,7 +10,7 @@ import {
   ValidationPipe,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard, Roles, RolesGuard } from '@server/security';
 import { UserRole } from '@server/users';
 import { MethodService } from './method.service';
@@ -42,15 +42,6 @@ export class MethodController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        name: { type: 'string', example: '' },
-      },
-      required: ['name'],
-    },
-  })
   create(@Body(ValidationPipe) method: CreateMethodDto) {
     return this.methodService.create(method);
   }
@@ -59,14 +50,6 @@ export class MethodController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        name: { type: 'string', example: '' },
-      },
-    },
-  })
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body(ValidationPipe) methodUpdate: UpdateMethodDto

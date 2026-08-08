@@ -10,7 +10,7 @@ import {
   ValidationPipe,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard, Roles, RolesGuard } from '@server/security';
 import { UserRole } from '@server/users';
 import { SubCompetencyService } from './subcompetency.service';
@@ -44,20 +44,6 @@ export class SubCompetencyController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        title: { type: 'string', example: '' },
-        weight: { type: 'number', example: 5 },
-        input: { type: 'string', example: '' },
-        output: { type: 'string', example: '' },
-        action: { type: 'string', example: '' },
-        competency_id: { type: 'number', example: 1 },
-      },
-      required: ['title', 'weight', 'competency_id'],
-    },
-  })
   create(@Body(ValidationPipe) subCompetency: CreateSubCompetencyDto) {
     return this.subCompetencyService.create(subCompetency);
   }
@@ -66,19 +52,6 @@ export class SubCompetencyController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        title: { type: 'string', example: '' },
-        weight: { type: 'number', example: 5 },
-        input: { type: 'string', example: '' },
-        output: { type: 'string', example: '' },
-        action: { type: 'string', example: '' },
-        competency_id: { type: 'number', example: 1 },
-      },
-    },
-  })
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body(ValidationPipe) subCompetencyUpdate: UpdateSubCompetencyDto
