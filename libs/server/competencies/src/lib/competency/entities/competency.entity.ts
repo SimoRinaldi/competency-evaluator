@@ -16,13 +16,17 @@ export class CompetencyEntity {
     type: 'varchar',
     length: 255,
     nullable: false,
-    unique: true
+    unique: true,
   })
   title!: string;
 
   @Column({ type: 'int', nullable: false })
   weight!: number;
 
-  @OneToMany(() => SubCompetencyEntity, (subcompetency) => subcompetency.id)
+  // Una competency ha molte subcompetencies
+  @OneToMany(
+    () => SubCompetencyEntity,
+    (subCompetency) => subCompetency.competency
+  )
   subcompetencies?: Relation<SubCompetencyEntity>[];
 }
