@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ServerEvaluationsController } from './evaluations.controller';
+import { ServerEvaluationsController } from './best-subcompetency-score.controller';
 import { ServerEvaluationsService } from './evaluations.service';
 
 @Module({
