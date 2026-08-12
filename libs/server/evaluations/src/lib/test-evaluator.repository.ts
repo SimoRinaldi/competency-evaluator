@@ -6,7 +6,7 @@ import { CreateTestEvaluatorDto } from './dto/create-test-evaluator.dto';
 import { UpdateTestEvaluatorDto } from './dto/update-test-evaluator.dto';
 
 @Injectable()
-export class TestEvaluatorsRepository {
+export class ServerTestEvaluatorsRepository {
     constructor(
         @InjectRepository(TestEvaluatorEntity)
         private readonly repository: Repository<TestEvaluatorEntity>) {}
@@ -32,12 +32,12 @@ export class TestEvaluatorsRepository {
         return this.repository.findOneBy({ user_id });
     }
 
-    async updateOne(id: number, dto: UpdateTestEvaluatorDto): Promise<TestEvaluatorEntity | null> {
+    async updateOne(id: number, dto: UpdateTestEvaluatorDto): Promise<TestEvaluatorEntity> {
         const test_evaluator = await this.findById(id);
         if(!test_evaluator)
             return null;
         if (dto.user_id !== undefined) test_evaluator.user_id = dto.user_id;
-        if (dto.test_ids !== undefined) test_evaluator.test_ids = dto.test_ids;
+        if (dto.test_ids !== undefined) test_evaluator.tests = dto.test_ids;
 
         return this.repository.save(test_evaluator);
     }

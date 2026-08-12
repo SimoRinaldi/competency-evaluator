@@ -32,7 +32,7 @@ export class ServerTestEvaluatorController {
   }
 
   @Delete('id')
-  remove(@Param('id', ParseIntPipe) id: number) {
+  delete(@Param('id', ParseIntPipe) id: number) {
     return this.serverTestEvaluatorsService.delete(id);
   }
 }

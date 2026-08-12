@@ -1,13 +1,12 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { TestEvaluatorEntity } from './entities/test-evaluator.entity';
 import { CreateTestEvaluatorDto } from './dto/create-test-evaluator.dto';
-import { TestEvaluatorsRepository } from './test-evaluator.repository';
+import { ServerTestEvaluatorsRepository } from './test-evaluator.repository';
 import { UpdateTestEvaluatorDto } from './dto/update-test-evaluator.dto';
 
 @Injectable()
 export class ServerTestEvaluatorsService {
-
-    constructor( private readonly testEvaluatorsRepository: TestEvaluatorsRepository ){}
+    constructor( private readonly testEvaluatorsRepository: ServerTestEvaluatorsRepository ){}
 
     async create(dto: CreateTestEvaluatorDto): Promise<TestEvaluatorEntity> {
         const existing = await this.testEvaluatorsRepository.findByUserId(dto.user_id);
@@ -23,7 +22,7 @@ export class ServerTestEvaluatorsService {
         return this.testEvaluatorsRepository.findAll();
     }
 
-    async findOne(id: number): Promise<TestEvaluatorEntity>{
+    async findOne(id: number): Promise<TestEvaluatorEntity> {
         const test_evaluator = await this.testEvaluatorsRepository.findById(id);
 
         if (!test_evaluator) 
@@ -32,10 +31,11 @@ export class ServerTestEvaluatorsService {
         return test_evaluator;
     }
 
-    async update(id: number, dto: UpdateTestEvaluatorDto) Promise<TestEvaluatorEntity> {
+    async update(id: number, dto: UpdateTestEvaluatorDto) {
         return this.testEvaluatorsRepository.updateOne(id, dto);
     }
 
-    async remove(id: number) Promise<void> {
+    async delete(id: number) {
         return this.testEvaluatorsRepository.deleteOne(id);
     }
+}
