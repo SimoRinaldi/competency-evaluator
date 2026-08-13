@@ -22,14 +22,16 @@ export class ServerTestEvaluatorController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
   @ApiBearerAuth()
   findAll() {
     return this.serverTestEvaluatorsService.findAll();
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
   @ApiBearerAuth()
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.serverTestEvaluatorsService.findOne(id);
