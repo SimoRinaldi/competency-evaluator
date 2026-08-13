@@ -21,23 +21,32 @@ export class ServerTestEvaluatorsRepository {
     }
 
     async findAll(): Promise<TestEvaluatorEntity[]> {
-        return this.repository.find({order: {id: 'ASC'}});   
+        return this.repository.find({
+            order: { id: 'ASC' },
+            relations: ['user', 'tests'] 
+        });   
     }
 
     async findById(id: number): Promise<TestEvaluatorEntity | null> {
-        return this.repository.findOneBy({ id });
+        return this.repository.findOne({
+            where: { id },
+            relations: ['user', 'tests']
+        });
     }
 
     async findByUserId(user_id: number): Promise<TestEvaluatorEntity | null> {
         return this.repository.findOneBy({ user_id });
     }
 
-    async updateOne(id: number, dto: UpdateTestEvaluatorDto): Promise<TestEvaluatorEntity> {
-        const test_evaluator = await this.findById(id);
-        if(!test_evaluator)
-            return null;
-        if (dto.user_id !== undefined) test_evaluator.user_id = dto.user_id;
-        if (dto.test_ids !== undefined) test_evaluator.tests = dto.test_ids;
+    async updateOne(test_evaluator: TestEvaluatorEntity, dto: UpdateTestEvaluatorDto): Promise<TestEvaluatorEntity> {
+        if (dto.user_id !== undefined) {
+            test_evaluator.user_id = dto.user_id;
+        }
+
+        // va aggiunto l'import di TestEntity
+        if (dto.test_ids !== undefined) {
+            test_evaluator.tests = dto.test_ids.map(id => ({ id } as TestEntity)); 
+        }
 
         return this.repository.save(test_evaluator);
     }
