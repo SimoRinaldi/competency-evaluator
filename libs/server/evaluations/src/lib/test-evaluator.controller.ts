@@ -47,7 +47,7 @@ export class ServerTestEvaluatorController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
-  delete(@Param('id', ParseIntPipe) id: number) {
+  remove(@Param('id', ParseIntPipe) id: number) {
     return this.serverTestEvaluatorsService.remove(id);
   }
 }

@@ -16,7 +16,6 @@ export class RubricLevelAssignmentEntity {
     @ManyToOne(() => TestEvaluatorEntity)
     @JoinColumn({ name: 'evaluator_id' })
     evaluator: TestEvaluatorEntity; 
-
     @Column({ type: 'integer', nullable: false })
     evaluator_id: number;
 }

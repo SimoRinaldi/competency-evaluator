@@ -5,7 +5,7 @@ export class CreateRubricLevelAssignmentDto {
     @IsNotEmpty()
     @Min(1)
     @Max(5)
-    rubrik_rank: number;
+    rubric_rank: number;
 
     @IsInt()
     @IsPositive()

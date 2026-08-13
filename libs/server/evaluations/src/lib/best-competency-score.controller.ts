@@ -31,7 +31,7 @@ export class ServerBestCompetencyScoreController {
     return this.serverBestCompetencyScoresService.update(id, updateBestCompetencyScoreDto);
   }
 
-  @Delete('id')
+  @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.serverBestCompetencyScoresService.delete(id);
   }
