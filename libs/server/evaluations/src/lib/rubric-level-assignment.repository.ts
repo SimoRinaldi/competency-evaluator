@@ -49,7 +49,7 @@ export class ServerRubricLevelAssignmentsRepository {
     }
 
     async updateOne(rla: RubricLevelAssignmentEntity, dto: UpdateRubricLevelAssignmentDto): Promise<RubricLevelAssignmentEntity> {
-        if (dto.rubric_rank != undefined) rla.rubric_rank = dto.rubric_rank
+        if (dto.rubric_rank !== undefined) rla.rubric_rank = dto.rubric_rank
         if (dto.indicator_id !== undefined) rla.indicator_id = dto.indicator_id;
         if (dto.test_execution_id !== undefined) rla.test_execution_id = dto.test_execution_id;
         if (dto.evaluator_id !== undefined) rla.evaluator_id = dto.evaluator_id;
