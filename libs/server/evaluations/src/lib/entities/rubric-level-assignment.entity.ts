@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { TestEvaluatorEntity } from './test-evaluator.entity';
+import { IndicatorEntity } from '@server/rubrics';
 
 @Entity('rubric_level_assignments')
 export class RubricLevelAssignmentEntity {
@@ -9,7 +10,11 @@ export class RubricLevelAssignmentEntity {
     @Column({ type:'integer', nullable: false })
     rubric_rank: number;
 
-    // attributo indicator_id da aggiungere
+    @ManyToOne(() => IndicatorEntity)
+    @JoinColumn({ name: 'indicator_id' })
+    indicator: IndicatorEntity; 
+    @Column({ type: 'integer', nullable: false })
+    indicator_id: number;
 
     // attributo test_execution_id da aggiungere
 
