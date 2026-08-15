@@ -29,6 +29,9 @@
     },
     {
       "path": "./libs/server/rubrics"
+    },
+    {
+      "path": "./libs/server/evaluations"
     }
   ]
 }
