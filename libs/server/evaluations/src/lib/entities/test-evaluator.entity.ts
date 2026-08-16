@@ -13,7 +13,7 @@ export class TestEvaluatorEntity {
   user_id: number;
 
   // relazione ManyToMany con test
-  @ManyToMany(() => TestEntity)
+  /* @ManyToMany(() => TestEntity)
   @JoinTable({
     name: 'test_evaluator_test',
     joinColumn: {
@@ -26,4 +26,5 @@ export class TestEvaluatorEntity {
     }
   })
   tests: TestEntity[];
+  */
 }

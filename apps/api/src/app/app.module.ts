@@ -5,9 +5,10 @@ import { ServerUsersModule } from '@server/users';
 import { DatabaseModule } from '@org/database';
 import { ServerAuthModule } from '@server/auth';
 import { ServerRubricsModule } from '@server/rubrics';
+import { ServerEvaluationsModule } from '@server/evaluations';
 
 @Module({
-  imports: [ServerUsersModule, DatabaseModule, ServerAuthModule, ServerRubricsModule],
+  imports: [ServerUsersModule, DatabaseModule, ServerAuthModule, ServerRubricsModule, ServerEvaluationsModule],
   controllers: [AppController],
   providers: [AppService],
 })

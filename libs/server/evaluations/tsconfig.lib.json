@@ -18,5 +18,15 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": ["src/**/*.ts"],
-  "references": []
+  "references": [
+    {
+      "path": "../rubrics/tsconfig.lib.json"
+    },
+    {
+      "path": "../users/tsconfig.lib.json"
+    },
+    {
+      "path": "../security/tsconfig.lib.json"
+    }
+  ]
 }
