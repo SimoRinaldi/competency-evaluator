@@ -36,18 +36,6 @@ export class ServerRubricLevelAssignmentsRepository {
         });
     }
 
-    async findDuplicateAssignment(
-        indicator_id: number,
-        test_execution_id: number,
-        evaluator_id: number 
-    ): Promise<RubricLevelAssignmentEntity | null> {
-        return this.repository.findOneBy({
-            indicator_id,
-            test_execution_id,
-            evaluator_id
-        });
-    }
-
     async updateOne(rla: RubricLevelAssignmentEntity, dto: UpdateRubricLevelAssignmentDto): Promise<RubricLevelAssignmentEntity> {
         if (dto.rubric_rank !== undefined) rla.rubric_rank = dto.rubric_rank
         if (dto.indicator_id !== undefined) rla.indicator_id = dto.indicator_id;
@@ -60,5 +48,29 @@ export class ServerRubricLevelAssignmentsRepository {
     async deleteOne(id: number): Promise<boolean> {
         const result = await this.repository.delete(id);
         return (result.affected ?? 0) > 0;
+    }
+
+    async findDuplicateAssignment(
+        indicator_id: number,
+        test_execution_id: number,
+        evaluator_id: number 
+    ): Promise<RubricLevelAssignmentEntity | null> {
+        return this.repository.findOneBy({
+            indicator_id,
+            test_execution_id,
+            evaluator_id
+        });
+    }
+
+    async findByTestExecutionWithRelations(test_execution_id: number): Promise<RubricLevelAssignmentEntity[]> {
+        return this.repository.find({
+            where: { test_execution_id: test_execution_id },
+            relations: [
+                'indicator',
+                'indicator.observation_object',
+                'indicator.observation_object.subcompetency',
+                'indicator.observation_object.subcompetency.competency'
+            ]
+        });
     }
 }

@@ -56,4 +56,8 @@ export class ServerRubricLevelAssignmentsService {
             throw new NotFoundException(`Errore durante l'eliminazione. Il Rubric Level Assignment con ID ${id} potrebbe essere già stato rimosso.`);
         }
     }
+
+    async findByTestExecutionWithRelations(test_execution_id: number): Promise<RubricLevelAssignmentEntity[]> {
+        return this.rubricLevelAssignmentsRepository.findByTestExecutionWithRelations(test_execution_id);
+    }
 }
