@@ -16,7 +16,7 @@ export class IndicatorEntity {
     // Relazione con RubricSet
     @ManyToOne(() => RubricSetEntity, (rubricSet) => rubricSet.indicators)                                                    
     @JoinColumn({ name: 'rubric_set_id' })                                                                              
-    rubricSet: RubricSetEntity;                                                                                                                                                                                                                                                              
+    rubric_set: RubricSetEntity;                                                                                                                                                                                                                                                              
     @Column()                                                                                                           
     rubric_set_id: number;                                                                                             
                                                                                                                                                                                                                                            
@@ -25,7 +25,7 @@ export class IndicatorEntity {
         onDelete: 'CASCADE',              
     })                                                                                                                  
     @JoinColumn({ name: 'observation_object_id' })                                                                      
-    observationObject: ObservationObjectEntity;                                                                                                                                                                                                                                               
+    observation_object: ObservationObjectEntity;                                                                                                                                                                                                                                               
     @Column()                                                                                                           
     observation_object_id: number;                                                                                     
 }  
