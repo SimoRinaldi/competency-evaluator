@@ -1,0 +1,106 @@
+import {
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { TestExecutionEntity } from './entities/test-execution.entity';
+import { CreateTestExecutionDto } from './dto/create-test-execution.dto';
+import { UpdateTestExecutionDto } from './dto/update-test-execution.dto';
+import { ServerTestExecutionsRepository } from './test-execution.repository';
+import { ServerTestsRepository } from './test.repository';
+import { ServerEvaluatedUsersRepository } from './evaluated-user.repository';
+
+@Injectable()
+export class ServerTestExecutionsService {
+  constructor(
+    private readonly testExecutionsRepository: ServerTestExecutionsRepository,
+    private readonly testsRepository: ServerTestsRepository,
+    private readonly evaluatedUsersRepository: ServerEvaluatedUsersRepository
+  ) {}
+
+  async create(dto: CreateTestExecutionDto): Promise<TestExecutionEntity> {
+    const test = await this.testsRepository.findById(dto.test_id);
+    if (!test) {
+      throw new NotFoundException(`Test con ID ${dto.test_id} non trovato.`);
+    }
+
+    const evaluatedUser = await this.evaluatedUsersRepository.findById(
+      dto.user_id
+    );
+    if (!evaluatedUser) {
+      throw new NotFoundException(
+        `Evaluated user con ID ${dto.user_id} non trovato.`
+      );
+    }
+
+    return this.testExecutionsRepository.createOne(dto);
+  }
+
+  async findAll(): Promise<TestExecutionEntity[]> {
+    return this.testExecutionsRepository.findAll();
+  }
+
+  async findOne(id: number): Promise<TestExecutionEntity> {
+    const testExecution = await this.testExecutionsRepository.findById(id);
+
+    if (!testExecution) {
+      throw new NotFoundException(`Test execution con ID ${id} non trovata.`);
+    }
+
+    return testExecution;
+  }
+
+  async findByEvaluatedUser(userId: number): Promise<TestExecutionEntity[]> {
+    const evaluatedUser = await this.evaluatedUsersRepository.findById(userId);
+    if (!evaluatedUser) {
+      throw new NotFoundException(
+        `Evaluated user con ID ${userId} non trovato.`
+      );
+    }
+
+    return this.testExecutionsRepository.findByEvaluatedUserId(userId);
+  }
+
+  async update(
+    id: number,
+    dto: UpdateTestExecutionDto
+  ): Promise<TestExecutionEntity> {
+    const testExecution = await this.testExecutionsRepository.findById(id);
+    if (!testExecution) {
+      throw new NotFoundException(`Test execution con ID ${id} non trovata.`);
+    }
+
+    if (dto.test_id !== undefined && dto.test_id !== testExecution.test_id) {
+      const test = await this.testsRepository.findById(dto.test_id);
+      if (!test) {
+        throw new NotFoundException(`Test con ID ${dto.test_id} non trovato.`);
+      }
+    }
+
+    if (dto.user_id !== undefined && dto.user_id !== testExecution.user_id) {
+      const evaluatedUser = await this.evaluatedUsersRepository.findById(
+        dto.user_id
+      );
+      if (!evaluatedUser) {
+        throw new NotFoundException(
+          `Evaluated user con ID ${dto.user_id} non trovato.`
+        );
+      }
+    }
+
+    return this.testExecutionsRepository.updateOne(testExecution, dto);
+  }
+
+  async remove(id: number): Promise<void> {
+    const testExecution = await this.testExecutionsRepository.findById(id);
+    if (!testExecution) {
+      throw new NotFoundException(`Test execution con ID ${id} non trovata.`);
+    }
+
+    const isDeleted = await this.testExecutionsRepository.deleteOne(id);
+    if (!isDeleted) {
+      throw new NotFoundException(
+        `Errore durante l'eliminazione. La test execution con ID ${id} potrebbe essere già stata rimossa.`
+      );
+    }
+  }
+}

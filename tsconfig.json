@@ -26,6 +26,9 @@
     },
     {
       "path": "./libs/server/security"
+    },
+    {
+      "path": "./libs/server/test-management"
     }
   ]
 }
