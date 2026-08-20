@@ -11,7 +11,7 @@ export class ServerBestCompetencyScoresService {
     ){}
 
     async create(dto: CreateBestCompetencyScoreDto): Promise<BestCompetencyScoreEntity> {
-        const existing = await this.bestCompetencyScoresRepository.findByUserAndCompetency(
+        const existing = await this.findByUserAndCompetency(
             dto.user_id,
             dto.competency_id
         );
@@ -56,5 +56,9 @@ export class ServerBestCompetencyScoresService {
         if (!isDeleted) {
             throw new NotFoundException(`Errore durante l'eliminazione. Il Best Competency Score con ID ${id} potrebbe essere già stato rimosso.`);
         }
+    }
+
+    async findByUserAndCompetency(user_id: number, competency_id: number): Promise<BestCompetencyScoreEntity | null> {
+        return this.bestCompetencyScoresRepository.findByUserAndCompetency(user_id, competency_id);
     }
 }
