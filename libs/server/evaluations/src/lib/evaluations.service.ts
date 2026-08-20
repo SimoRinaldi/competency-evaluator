@@ -19,11 +19,32 @@ export class ServerEvaluationsService {
             return;
         }
 
+        // Chiave: indicator_id | Valore: { sum_rank: somma voti, count: numero valutatori, data: l'oggetto completo per leggere i pesi }
+        const groupedIndicators = new Map<number, { sum_rank: number; count: number; data: any }>();
+
+        for (const rla of rubricLevelAssignments) {
+            const ind_id = rla.indicator.id;
+            
+            if (!groupedIndicators.has(ind_id)) {
+                groupedIndicators.set(ind_id, {
+                    sum_rank: 0,
+                    count: 0,
+                    data: rla
+                });
+            }
+
+            const current_indicator = groupedIndicators.get(ind_id)!;
+            current_indicator.sum_rank += Number(rla.rubric_rank);
+            current_indicator.count += 1;
+        }
+
         // Chiave: subcompetency_id | Valore: { obtained: somma, max: somma, competency_id: id_competenza_madre }
         const subCompetencyScores = new Map<number, { obtained: number; max: number; competency_id: number }>();
 
-        for (const rla of rubricLevelAssignments) {
-            const RL = rla.rubric_rank;
+        for (const grouped of groupedIndicators.values()) {
+            const average_RL = grouped.sum_rank / grouped.count;
+
+            const rla = grouped.data;
             const P_ind = rla.indicator.weight;
             const subcomp = rla.indicator.observation_object.subcompetency;
             const P_sub = subcomp.weight;
@@ -31,7 +52,7 @@ export class ServerEvaluationsService {
 
             const weight_sum = Number(P_comp) + Number(P_sub) + Number(P_ind);
 
-            const partial_obtained = weight_sum * Number(RL);
+            const partial_obtained = weight_sum * average_RL;
             const partial_max = weight_sum * 5;
 
             if (!subCompetencyScores.has(subcomp.id))
