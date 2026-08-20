@@ -42,6 +42,7 @@ export class ServerEvaluationsService {
             current_subcompetency.max += partial_max;
         }
 
+        // Chiave: competency_id | Valore: { obtained: somma, max: somma }
         const competencyScores = new Map<number, { obtained: number; max: number }>();
 
         for (const [subcomp_id, stats] of subCompetencyScores.entries()) {
@@ -64,7 +65,7 @@ export class ServerEvaluationsService {
         }
 
         // sistema deve salvare il punteggio totale anche su quella specifica esecuzione del test
-        // per aggiornare anche gli attributi di test_execution
+        // per aggiornare anche gli attributi di test_execution_test
     }
 
     private async upsertBestSubCompetencyScores(
