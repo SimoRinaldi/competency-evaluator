@@ -1,4 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
+import { SubCompetencyEntity } from '@server/competencies';
 import { TestDesignerEntity } from './test-designer.entity';
 import { TestExecutionEntity } from './test-execution.entity';
 
@@ -16,7 +26,6 @@ export class TestEntity {
   // - materiale necessario
   // - numero di esaminatori e se devono essere esperti della materia
   // (la pagina per l'inserimento del testo dovrà quindi riportare esplicitamente tali indicazioni a titolo informativo)
-  // TODO: valutare se mettere degli attributi apposta nell'entità o lasciarlo cosi
 
   @ManyToOne(() => TestDesignerEntity, (designer) => designer.tests)
   @JoinColumn({ name: 'test_designer_id' })
@@ -28,15 +37,18 @@ export class TestEntity {
   @OneToMany(() => TestExecutionEntity, (execution) => execution.test)
   test_executions!: TestExecutionEntity[];
 
-  // Relazione ManyToMany con SubcompetencyEntity (JoinTable: test_subcompetency)
-  // Sarà attivata al momento dell'integrazione del modulo competenze (COEVA-03-competenze)
-  /*
-  @ManyToMany(() => SubcompetencyEntity)
+  // Relazione ManyToMany con SubCompetencyEntity (JoinTable: test_subcompetency)
+  @ManyToMany(() => SubCompetencyEntity)
   @JoinTable({
     name: 'test_subcompetency',
-    joinColumn: { name: 'test_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'subcompetency_id', referencedColumnName: 'id' }
+    joinColumn: {
+      name: 'test_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'subcompetency_id',
+      referencedColumnName: 'id',
+    },
   })
-  subcompetencies!: SubcompetencyEntity[];
-  */
+  subcompetencies?: SubCompetencyEntity[];
 }

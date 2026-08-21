@@ -1,5 +1,12 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty, IsPositive, IsString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsArray,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsPositive,
+  IsString,
+} from 'class-validator';
 
 export class CreateTestDto {
   @ApiProperty({
@@ -21,4 +28,16 @@ export class CreateTestDto {
   @IsPositive()
   @IsNotEmpty()
   test_designer_id!: number;
+
+  @ApiPropertyOptional({
+    description:
+      'Array di ID delle sotto-competenze valutate in questo test',
+    example: [1, 2, 3],
+    type: [Number],
+  })
+  @IsArray()
+  @IsInt({ each: true })
+  @IsPositive({ each: true })
+  @IsOptional()
+  subcompetency_ids?: number[];
 }
