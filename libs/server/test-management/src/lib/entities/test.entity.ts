@@ -9,7 +9,7 @@ import {
   JoinTable,
 } from 'typeorm';
 import { SubCompetencyEntity } from '@server/competencies';
-import { TestDesignerEntity } from './test-designer.entity';
+import { TestDesignerEntity } from '@server/users';
 import { TestExecutionEntity } from './test-execution.entity';
 
 @Entity('tests')
@@ -27,7 +27,7 @@ export class TestEntity {
   // - numero di esaminatori e se devono essere esperti della materia
   // (la pagina per l'inserimento del testo dovrà quindi riportare esplicitamente tali indicazioni a titolo informativo)
 
-  @ManyToOne(() => TestDesignerEntity, (designer) => designer.tests)
+  @ManyToOne(() => TestDesignerEntity)
   @JoinColumn({ name: 'test_designer_id' })
   test_designer!: TestDesignerEntity;
 
@@ -51,4 +51,23 @@ export class TestEntity {
     },
   })
   subcompetencies?: SubCompetencyEntity[];
+
+  // TODO: Relazione ManyToMany con TestEvaluatorEntity (JoinTable: test_evaluator_test) da collegare con COEVA-02-04
+  /*
+  @ManyToMany(() => TestEvaluatorEntity)
+  @JoinTable({
+    name: 'test_evaluator_test',
+    joinColumn: {
+      name: 'test_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'test_evaluator_id',
+      referencedColumnName: 'id',
+    },
+  })
+  evaluators?: TestEvaluatorEntity[];
+  */
 }
+
+

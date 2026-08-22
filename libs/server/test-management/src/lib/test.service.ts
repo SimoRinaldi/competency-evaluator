@@ -2,17 +2,17 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { TestDesignersRepository } from '@server/users';
 import { TestEntity } from './entities/test.entity';
 import { CreateTestDto } from './dto/create-test.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
 import { ServerTestsRepository } from './test.repository';
-import { ServerTestDesignersRepository } from './test-designer.repository';
 
 @Injectable()
 export class ServerTestsService {
   constructor(
     private readonly testsRepository: ServerTestsRepository,
-    private readonly testDesignersRepository: ServerTestDesignersRepository
+    private readonly testDesignersRepository: TestDesignersRepository
   ) {}
 
   async create(dto: CreateTestDto): Promise<TestEntity> {
@@ -90,3 +90,5 @@ export class ServerTestsService {
     }
   }
 }
+
+

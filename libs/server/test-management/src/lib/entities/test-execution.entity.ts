@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
+import { EvaluatedUserEntity } from '@server/users';
 import { TestEntity } from './test.entity';
-import { EvaluatedUserEntity } from './evaluated-user.entity';
 import { TestOutputEntity } from './test-output.entity';
 
 @Entity('test_executions')
