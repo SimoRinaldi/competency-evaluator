@@ -6,10 +6,10 @@ export class RubricLevelEntity {
     @PrimaryGeneratedColumn()                                                                            
     id!: number;                                                                                         
                                                                                                            
-    @Column({type: 'varchar', length: 255, nullable: false})                                                            
+    @Column({type: 'text', nullable: false})                                                            
     description!: string;                                                                                
                                                                                                                                          
-    @Column({type: 'int', nullable: false})                                                                             
+    @Column({type: 'integer', nullable: false})                                                                             
     rank!: number;                       
                                                
     @ManyToOne(() => RubricSetEntity, (rubricSet) => rubricSet.levels, {                                       

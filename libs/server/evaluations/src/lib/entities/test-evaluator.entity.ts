@@ -14,21 +14,5 @@ export class TestEvaluatorEntity {
   user_id!: number;
 
   @OneToMany(() => RubricLevelAssignmentEntity, (rla) => rla.evaluator)
-  rubric_level_assignments!: RubricLevelAssignmentEntity[];
-
-  // relazione ManyToMany con test
-  /* @ManyToMany(() => TestEntity)
-  @JoinTable({
-    name: 'test_evaluator_test',
-    joinColumn: {
-      name: 'test_evaluator_id',
-      referencedColumnName: 'id'
-    },
-    inverseJoinColumn: {
-      name: 'test_id',
-      referencedColumnName: 'id'
-    }
-  })
-  tests: TestEntity[];
-  */
+  rubric_level_assignments?: RubricLevelAssignmentEntity[];
 }

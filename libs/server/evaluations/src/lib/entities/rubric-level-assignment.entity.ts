@@ -16,7 +16,11 @@ export class RubricLevelAssignmentEntity {
     @Column({ type: 'integer', nullable: false })
     indicator_id!: number;
 
-    // attributo test_execution_id da aggiungere
+    @ManyToOne(() => TestExecutionEntity, (test_execution) => test_execution.rubric_level_assignments)
+    @JoinColumn({ name: 'test_execution_id' })
+    test_execution!: TestExecutionEntity; 
+    @Column({ type: 'integer', nullable: false })
+    test_execution_id!: number;
 
     @ManyToOne(() => TestEvaluatorEntity, (test_evaluator) => test_evaluator.rubric_level_assignments)
     @JoinColumn({ name: 'evaluator_id' })

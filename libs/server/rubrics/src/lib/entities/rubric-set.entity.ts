@@ -13,8 +13,8 @@ export class RubricSetEntity {
     @OneToMany(() => RubricLevelEntity, (level) => level.rubric_set, {                                          
         cascade: true,                      
     })                                                                                                   
-    levels!: RubricLevelEntity[]; 
+    levels?: RubricLevelEntity[]; 
 
     @OneToMany(() => IndicatorEntity, (indicator) => indicator.rubric_set)
-    indicators!: IndicatorEntity[];
+    indicators?: IndicatorEntity[];
 }

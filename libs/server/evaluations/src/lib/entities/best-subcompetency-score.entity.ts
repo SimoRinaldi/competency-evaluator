@@ -17,7 +17,11 @@ export class BestSubCompetencyScoreEntity {
     user!: UserEntity;
 
     @Column({type: 'integer', nullable: false})
-    user_id!: number
+    user_id!: number;
 
-    // attributo subcompetency_id da aggiungere
+    @ManyToOne(() => SubCompetencyEntity, (subcompetency) => subcompetency.best_subcompetency_scores)
+    @JoinColumn({name: 'subcompetency_id'})
+    subcompetency!: SubCompetencyEntity;
+    @Column({type: 'integer', nullable: false})
+    subcompetency_id!: number;
 }

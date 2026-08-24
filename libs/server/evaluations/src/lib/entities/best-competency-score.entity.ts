@@ -16,7 +16,11 @@ export class BestCompetencyScoreEntity {
     @JoinColumn({name: 'user_id'})
     user!: UserEntity;
     @Column({type: 'integer', nullable: false})
-    user_id!: number
+    user_id!: number;
 
-    // attributo competency_id da aggiungere
+    @ManyToOne(() => CompetencyEntity, (competency) => competency.best_competency_scores)
+    @JoinColumn({name: 'competency_id'})
+    competency!: CompetencyEntity;
+    @Column({type: 'integer', nullable: false})
+    competency_id!: number;
 }
