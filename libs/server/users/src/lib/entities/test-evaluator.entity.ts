@@ -1,18 +1,23 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
+import type { Relation } from 'typeorm';
 import { UserEntity } from '../user.entity';
-import { RubricLevelAssignmentEntity } from '@server/evaluations';
 
 @Entity('test_evaluators')
 export class TestEvaluatorEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @OneToOne(() => UserEntity)
+  @OneToOne(() => UserEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
-  user!: UserEntity;
+  user?: Relation<UserEntity>;
+
   @Column({ type: 'integer', nullable: false, unique: true })
   user_id!: number;
-
-  @OneToMany(() => RubricLevelAssignmentEntity, (rla) => rla.evaluator)
-  rubric_level_assignments?: RubricLevelAssignmentEntity[];
 }
+

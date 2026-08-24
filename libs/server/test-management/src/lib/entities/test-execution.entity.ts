@@ -9,7 +9,6 @@ import {
 import { EvaluatedUserEntity } from '@server/users';
 import { TestEntity } from './test.entity';
 import { TestOutputEntity } from './test-output.entity';
-import { RubricLevelAssignmentEntity } from '@server/evaluations';
 
 @Entity('test_executions')
 export class TestExecutionEntity {
@@ -23,7 +22,7 @@ export class TestExecutionEntity {
   @Column({ type: 'integer', nullable: false })
   test_id!: number;
 
-  @ManyToOne(() => EvaluatedUserEntity, (user) => user.test_executions)
+  @ManyToOne(() => EvaluatedUserEntity)
   @JoinColumn({ name: 'user_id' })
   evaluated_user!: EvaluatedUserEntity;
 
@@ -36,9 +35,7 @@ export class TestExecutionEntity {
   @Column({ type: 'numeric', nullable: true })
   max_score?: string | null;
 
-  @OneToMany(() => RubricLevelAssignmentEntity, (rla) => rla.test_execution)
-  rubric_level_assignments?: RubricLevelAssignmentEntity[];
-
   @OneToMany(() => TestOutputEntity, (output) => output.test_execution)
   test_outputs?: TestOutputEntity[];
 }
+

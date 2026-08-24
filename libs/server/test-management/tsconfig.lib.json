@@ -23,10 +23,10 @@
       "path": "../security/tsconfig.lib.json"
     },
     {
-      "path": "../users/tsconfig.lib.json"
+      "path": "../competencies/tsconfig.lib.json"
     },
     {
-      "path": "../competencies/tsconfig.lib.json"
+      "path": "../users/tsconfig.lib.json"
     }
   ],
   "exclude": [

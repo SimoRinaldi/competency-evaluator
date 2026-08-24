@@ -106,25 +106,4 @@ export class SubCompetencyEntity {
     },
   })
   skills?: Relation<SkillEntity>[];
-
-  // Relazione ManyToMany con SubCompetencyEntity (JoinTable: test_subcompetency)
-  @ManyToMany(() => SubCompetencyEntity)
-  @JoinTable({
-    name: 'test_subcompetency',
-    joinColumn: {
-      name: 'subcompetency_id',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'test_id',
-      referencedColumnName: 'id',
-    }
-  })
-  subcompetencies?: SubCompetencyEntity[];
-
-  @OneToMany(
-    () => BestSubCompetencyScoreEntity,
-    (bestSubCompetencyScores) => bestSubCompetencyScores.competency
-  )
-  best_subcompetency_scores?: Relation<BestSubCompetencyScoreEntity>[];
 }

@@ -23,6 +23,9 @@
     },
     {
       "path": "../users/tsconfig.lib.json"
+    },
+    {
+      "path": "../competencies/tsconfig.lib.json"
     }
   ],
   "exclude": [

@@ -4,12 +4,9 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   JoinColumn,
-  OneToMany,
-  Relation,
 } from 'typeorm';
 import { RubricSetEntity } from './rubric-set.entity';
 import { ObservationObjectEntity } from './observation-object.entity';
-import { RubricLevelAssignmentEntity } from '@server/evaluations';
 
 @Entity('indicators')
 export class IndicatorEntity {
@@ -39,7 +36,5 @@ export class IndicatorEntity {
   observation_object!: ObservationObjectEntity;
   @Column({ type: 'integer', nullable: false })
   observation_object_id!: number;
-
-  @OneToMany(() => RubricLevelAssignmentEntity, (rla) => rla.indicator)
-  rubric_level_assignments?: Relation<RubricLevelAssignmentEntity>[];
 }
+

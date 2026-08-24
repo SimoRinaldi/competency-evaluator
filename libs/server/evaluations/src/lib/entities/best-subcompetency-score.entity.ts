@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { UserEntity } from '@server/users';
+import { SubCompetencyEntity } from '@server/competencies';
 
 @Entity('best_subcompetency_scores')
 export class BestSubCompetencyScoreEntity {
@@ -19,7 +20,7 @@ export class BestSubCompetencyScoreEntity {
     @Column({type: 'integer', nullable: false})
     user_id!: number;
 
-    @ManyToOne(() => SubCompetencyEntity, (subcompetency) => subcompetency.best_subcompetency_scores)
+    @ManyToOne(() => SubCompetencyEntity)
     @JoinColumn({name: 'subcompetency_id'})
     subcompetency!: SubCompetencyEntity;
     @Column({type: 'integer', nullable: false})

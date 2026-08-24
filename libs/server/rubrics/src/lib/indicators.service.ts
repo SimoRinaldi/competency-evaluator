@@ -19,18 +19,18 @@ export class IndicatorsService {
 
     async findAll() {                                                                                                                                                                                                
         return await this.indicatorRepository.find({                                                                                                 
-          relations: ['observationObject', 'rubricSet'],                                                                                                                         
+          relations: ['observation_object', 'rubric_set'],                                                                                                                         
         });                                                                                                                                                  
     }
 
     async findOne(id: number) {
         const indicator = await this.indicatorRepository.findOne({
             where: {id},
-            relations: ['observationObject', 'rubricSet'],
+            relations: ['observation_object', 'rubric_set'],
         });
 
         if (!indicator) {
-            throw new NotFoundException('Indicator con ID ${id} non trovato');
+            throw new NotFoundException(`Indicator con ID ${id} non trovato`);
         }
 
         return indicator;

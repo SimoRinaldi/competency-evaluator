@@ -6,7 +6,6 @@ import {
   Relation,
 } from 'typeorm';
 import { SubCompetencyEntity } from '../../subcompetency/entities/subcompetency.entity';
-import { BestCompetencyScoreEntity } from '@server/evaluations';
 
 @Entity('competencies')
 export class CompetencyEntity {
@@ -24,12 +23,6 @@ export class CompetencyEntity {
   @Column({ type: 'int', nullable: false })
   weight!: number;
 
-  @OneToMany(
-    () => BestCompetencyScoreEntity,
-    (bestCompetencyScores) => bestCompetencyScores.competency
-  )
-  best_competency_scores?: Relation<BestCompetencyScoreEntity>[];
-
   // Una competency ha molte subcompetencies
   @OneToMany(
     () => SubCompetencyEntity,
@@ -37,3 +30,4 @@ export class CompetencyEntity {
   )
   subcompetencies?: Relation<SubCompetencyEntity>[];
 }
+

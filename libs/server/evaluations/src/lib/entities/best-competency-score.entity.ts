@@ -25,12 +25,10 @@ export class BestCompetencyScoreEntity {
   @Column({ type: 'integer', nullable: false })
   user_id!: number;
 
-  @ManyToOne(
-    () => CompetencyEntity,
-    (competency) => competency.best_competency_scores
-  )
+  @ManyToOne(() => CompetencyEntity)
   @JoinColumn({ name: 'competency_id' })
   competency!: CompetencyEntity;
   @Column({ type: 'integer', nullable: false })
   competency_id!: number;
 }
+
