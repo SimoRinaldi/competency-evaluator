@@ -9,8 +9,8 @@
   },
   "private": true,
   "devDependencies": {
-    "@angular-devkit/core": "^21.2.19",
-    "@angular-devkit/schematics": "^21.2.19",
+    "@angular-devkit/core": "^22.1.2",
+    "@angular-devkit/schematics": "^22.1.2",
     "@eslint/js": "^9.8.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/swagger": "^11.2.6",
