@@ -5,16 +5,16 @@ import { IndicatorEntity } from './indicator.entity'
 @Entity('rubric_sets')
 export class RubricSetEntity {
     @PrimaryGeneratedColumn()                                                                            
-    id: number;                                                                                          
+    id!: number;                                                                                          
                                                                                                                                                                                  
     @Column({type: 'boolean', default: false})                                                         
-    yes_no: boolean; 
+    yes_no!: boolean; 
                                                  
-    @OneToMany(() => RubricLevelEntity, (level) => level.rubricSet, {                                          
+    @OneToMany(() => RubricLevelEntity, (level) => level.rubric_set, {                                          
         cascade: true,                      
     })                                                                                                   
-    levels: RubricLevelEntity[]; 
+    levels!: RubricLevelEntity[]; 
 
-    @OneToMany(() => IndicatorEntity, (indicator) => indicator.rubricSet)
-    indicators: IndicatorEntity[];
+    @OneToMany(() => IndicatorEntity, (indicator) => indicator.rubric_set)
+    indicators!: IndicatorEntity[];
 }

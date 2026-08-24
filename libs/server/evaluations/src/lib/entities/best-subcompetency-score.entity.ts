@@ -4,20 +4,20 @@ import { UserEntity } from '@server/users';
 @Entity('best_subcompetency_scores')
 export class BestSubCompetencyScoreEntity {
     @PrimaryGeneratedColumn()
-    id: number;
+    id!: number;
 
     @Column({type:'integer', nullable: false})
-    best_score_absolute: number;
+    best_score_absolute!: number;
 
     @Column({type: 'numeric', nullable: false})
-    best_score_percentage: string; 
+    best_score_percentage!: string; 
 
     @ManyToOne(() => UserEntity)
     @JoinColumn({name: 'user_id'})
-    user: UserEntity;
+    user!: UserEntity;
 
     @Column({type: 'integer', nullable: false})
-    user_id: number
+    user_id!: number
 
     // attributo subcompetency_id da aggiungere
 }

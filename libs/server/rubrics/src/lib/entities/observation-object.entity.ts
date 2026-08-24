@@ -4,18 +4,19 @@ import { IndicatorEntity } from './indicator.entity'
 @Entity('observation_objects')                                                                          
 export class ObservationObjectEntity {                                                                       
     @PrimaryGeneratedColumn()                                                                            
-    id: number;                                                                                         
+    id!: number;                                                                                         
                                                                                                                                                   
-    @Column({type: 'text', nullable: true})                                                            
-    description: string;          
+    @Column({type: 'varchar', length: 255, nullable: false})                                                            
+    description!: string;          
     
-    @OneToMany(() => IndicatorEntity, (indicator) => indicator.observation_object)
-    indicators: IndicatorEntity[];
+    @OneToMany(() => IndicatorEntity, (indicator) => indicator.observation_object, {
+        cascade: true
+    })
+    indicators!: IndicatorEntity[];
 
-    // Relazione con SubCompetency
     @ManyToOne(() => SubCompetencyEntity)
     @JoinColumn({ name: 'subcompetency_id' })
-    subcompetency: SubCompetencyEntity;
-    @Column()                                                                                                           
-    subcompetency_id: number; 
+    subcompetency!: SubCompetencyEntity;
+    @Column({type: 'integer', nullable: false})                                                                                                           
+    subcompetency_id!: number; 
 }      

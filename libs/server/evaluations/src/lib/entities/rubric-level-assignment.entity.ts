@@ -5,22 +5,22 @@ import { IndicatorEntity } from '@server/rubrics';
 @Entity('rubric_level_assignments')
 export class RubricLevelAssignmentEntity {
     @PrimaryGeneratedColumn()
-    id: number;
+    id!: number;
 
     @Column({ type:'integer', nullable: false })
-    rubric_rank: number;
+    rubric_rank!: number;
 
-    @ManyToOne(() => IndicatorEntity)
+    @ManyToOne(() => IndicatorEntity, (indicator) => indicator.rubric_level_assignments)
     @JoinColumn({ name: 'indicator_id' })
-    indicator: IndicatorEntity; 
+    indicator!: IndicatorEntity; 
     @Column({ type: 'integer', nullable: false })
-    indicator_id: number;
+    indicator_id!: number;
 
     // attributo test_execution_id da aggiungere
 
-    @ManyToOne(() => TestEvaluatorEntity)
+    @ManyToOne(() => TestEvaluatorEntity, (test_evaluator) => test_evaluator.rubric_level_assignments)
     @JoinColumn({ name: 'evaluator_id' })
-    evaluator: TestEvaluatorEntity; 
+    evaluator!: TestEvaluatorEntity; 
     @Column({ type: 'integer', nullable: false })
-    evaluator_id: number;
+    evaluator_id!: number;
 }
