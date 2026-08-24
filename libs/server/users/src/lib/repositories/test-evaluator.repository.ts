@@ -1,9 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { TestEvaluatorEntity } from './entities/test-evaluator.entity';
-import { CreateTestEvaluatorDto } from './dto/create-test-evaluator.dto';
-import { UpdateTestEvaluatorDto } from './dto/update-test-evaluator.dto';
+import { TestEvaluatorEntity } from '../entities/test-evaluator.entity';
 
 @Injectable()
 export class ServerTestEvaluatorsRepository {
@@ -11,7 +9,7 @@ export class ServerTestEvaluatorsRepository {
         @InjectRepository(TestEvaluatorEntity)
         private readonly repository: Repository<TestEvaluatorEntity>) {}
 
-    async createOne(dto: CreateTestEvaluatorDto): Promise<TestEvaluatorEntity> {
+    async createOne(dto: CreateUserDto): Promise<TestEvaluatorEntity> {
         const test_evaluator = this.repository.create({
             user_id: dto.user_id,
             tests: dto.test_ids ? dto.test_ids.map(id => ({ id })) : undefined
@@ -38,7 +36,7 @@ export class ServerTestEvaluatorsRepository {
         return this.repository.findOneBy({ user_id });
     }
 
-    async updateOne(test_evaluator: TestEvaluatorEntity, dto: UpdateTestEvaluatorDto): Promise<TestEvaluatorEntity> {
+    async updateOne(test_evaluator: TestEvaluatorEntity, dto: UpdateUserDto): Promise<TestEvaluatorEntity> {
         if (dto.user_id !== undefined) test_evaluator.user_id = dto.user_id;
 
         // va aggiunto l'import di TestEntity

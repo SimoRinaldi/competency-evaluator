@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, OneToMany } from 'typeorm';
-import { UserEntity } from '@server/users';
-import { RubricLevelAssignmentEntity } from './rubric-level-assignment.entity';
+import { UserEntity } from '../user.entity';
+import { RubricLevelAssignmentEntity } from '@server/evaluations';
 
 @Entity('test_evaluators')
 export class TestEvaluatorEntity {

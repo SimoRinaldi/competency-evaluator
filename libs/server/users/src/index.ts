@@ -4,6 +4,7 @@ export * from './lib/users.repository';
 export * from './lib/user.entity';
 export * from './lib/entities/evaluated-user.entity';
 export * from './lib/entities/test-designer.entity';
+export * from './lib/entities/test-evaluator.entity';
 export * from './lib/repositories/evaluated-user.repository';
 export * from './lib/repositories/test-designer.repository';
 export * from './lib/dto/user-role.enum';

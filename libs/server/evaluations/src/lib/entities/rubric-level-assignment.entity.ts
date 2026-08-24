@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
-import { TestEvaluatorEntity } from './test-evaluator.entity';
+import { TestEvaluatorEntity } from '@server/users';
 import { IndicatorEntity } from '@server/rubrics';
 
 @Entity('rubric_level_assignments')

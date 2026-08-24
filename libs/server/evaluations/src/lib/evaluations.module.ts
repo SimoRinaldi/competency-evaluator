@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { TestEvaluatorEntity } from './entities/test-evaluator.entity';
 import { RubricLevelAssignmentEntity } from './entities/rubric-level-assignment.entity';
 import { BestCompetencyScoreEntity } from './entities/best-competency-score.entity';
 import { BestSubCompetencyScoreEntity } from './entities/best-subcompetency-score.entity';
@@ -24,7 +23,6 @@ import { ServerBestSubCompetencyScoresRepository } from './best-subcompetency-sc
 @Module({
   imports: [
     TypeOrmModule.forFeature([
-      TestEvaluatorEntity,
       RubricLevelAssignmentEntity,
       BestCompetencyScoreEntity,
       BestSubCompetencyScoreEntity
