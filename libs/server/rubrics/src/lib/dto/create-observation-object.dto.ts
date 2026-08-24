@@ -5,5 +5,5 @@ export class CreateObservationObjectDto {
     @ApiProperty({ example: 'Documento di sintesi PDF', required: false })
     @IsOptional()                                                                                                       
     @IsString()                                                                                                         
-    description: string;                                                                                                                                                                                                                                                                                                                                                                                                     
+    description!: string;                                                                                                                                                                                                                                                                                                                                                                                                     
 }

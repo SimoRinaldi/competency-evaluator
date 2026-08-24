@@ -5,21 +5,21 @@ export class CreateRubricLevelAssignmentDto {
     @IsNotEmpty()
     @Min(1)
     @Max(5)
-    rubric_rank: number;
+    rubric_rank!: number;
 
     @IsInt()
     @IsPositive()
     @IsNotEmpty()
-    indicator_id: number;
+    indicator_id!: number;
 
     @IsInt()
     @IsPositive()
     @IsNotEmpty()
-    test_execution_id: number;
+    test_execution_id!: number;
 
     @IsInt()
     @IsPositive()
     @IsNotEmpty()
-    evaluator_id: number;
+    evaluator_id!: number;
 };
 
