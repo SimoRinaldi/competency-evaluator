@@ -7,7 +7,6 @@ import { UpdateIndicatorDto } from './dto/update-indicator.dto';
 
 @Injectable()
 export class IndicatorsService {
-    
     constructor(
         @InjectRepository(IndicatorEntity)
         private readonly indicatorRepository: Repository<IndicatorEntity>,
@@ -45,5 +44,12 @@ export class IndicatorsService {
     async remove(id: number) {
         await this.indicatorRepository.delete(id);
         return { deleted: true };
+    }
+
+    async findByIdWithRubricSet(indicator_id: number): Promise<IndicatorEntity | null> {
+        return this.indicatorRepository.findOne({
+            where: { id: indicator_id },
+            relations: ['rubric_set']
+        });
     }
 }
