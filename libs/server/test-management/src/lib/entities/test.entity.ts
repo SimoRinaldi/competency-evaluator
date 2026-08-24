@@ -8,7 +8,6 @@ import {
   ManyToMany,
   JoinTable,
 } from 'typeorm';
-import { SubCompetencyEntity } from '@server/competencies';
 import { TestDesignerEntity } from '@server/users';
 import { TestExecutionEntity } from './test-execution.entity';
 
@@ -37,23 +36,6 @@ export class TestEntity {
   @OneToMany(() => TestExecutionEntity, (execution) => execution.test)
   test_executions!: TestExecutionEntity[];
 
-  // Relazione ManyToMany con SubCompetencyEntity (JoinTable: test_subcompetency)
-  @ManyToMany(() => SubCompetencyEntity)
-  @JoinTable({
-    name: 'test_subcompetency',
-    joinColumn: {
-      name: 'test_id',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'subcompetency_id',
-      referencedColumnName: 'id',
-    },
-  })
-  subcompetencies?: SubCompetencyEntity[];
-
-  // TODO: Relazione ManyToMany con TestEvaluatorEntity (JoinTable: test_evaluator_test) da collegare con COEVA-02-04
-  /*
   @ManyToMany(() => TestEvaluatorEntity)
   @JoinTable({
     name: 'test_evaluator_test',
@@ -67,7 +49,4 @@ export class TestEntity {
     },
   })
   evaluators?: TestEvaluatorEntity[];
-  */
 }
-
-

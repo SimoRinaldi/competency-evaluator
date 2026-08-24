@@ -28,6 +28,9 @@ export class TestExecutionEntity {
   @Column({ type: 'numeric', nullable: true })
   max_score?: string | null;
 
+  @OneToMany(() => RubricLevelAssignmentEntity, (rla) => rla.test_execution)
+  rubric_level_assignments?: RubricLevelAssignmentEntity[];
+
   @OneToMany(() => TestOutputEntity, (output) => output.test_execution)
-  test_outputs!: TestOutputEntity[];
+  test_outputs?: TestOutputEntity[];
 }

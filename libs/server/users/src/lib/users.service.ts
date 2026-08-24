@@ -116,28 +116,8 @@ export class ServerUsersService {
     return this.dataSource.transaction(async (manager) => {
       if (dto.name !== undefined) user.name = dto.name;
       if (dto.email !== undefined) user.email = dto.email;
-      if (dto.role !== undefined) user.role = dto.role;
 
       const updatedUser = await manager.save(user);
-
-      if (dto.role !== undefined && newRole !== oldRole) {
-
-        // creo i profili nuovi
-        // si potrebbe anche pensare di eliminare quelli vecchi ma secondo me ha poco
-        // senso, già l'update del ruolo non so se servirà
-        if (newRole === UserRole.USER) {
-          await manager.save(
-            manager.create(EvaluatedUserEntity, { user_id: id })
-          );
-        } else if (newRole === UserRole.TEST_DESIGNER) {
-          await manager.save(
-            manager.create(TestDesignerEntity, { user_id: id })
-          );
-        } else if (newRole === UserRole.EVALUATOR) {
-          // TODO: aggiungere la create di test_evaluator
-        }
-      }
-
       return updatedUser;
     });
   }

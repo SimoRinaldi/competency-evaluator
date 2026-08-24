@@ -64,16 +64,67 @@ export class SubCompetencyEntity {
 
   // Molti a molti con tool
   @ManyToMany(() => ToolEntity)
-  @JoinTable({ name: 'tool_subcompetency' })
+  @JoinTable({
+    name: 'tool_subcompetency',
+    joinColumn: {
+      name: 'subcompetency_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'tool_id',
+      referencedColumnName: 'id',
+    },
+  })
   tools?: Relation<ToolEntity>[];
 
   // Molti a molti con method
   @ManyToMany(() => MethodEntity)
-  @JoinTable({ name: 'method_subcompetency' })
+  @JoinTable({
+    name: 'method_subcompetency',
+    joinColumn: {
+      name: 'subcompetency_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'method_id',
+      referencedColumnName: 'id',
+    },
+  })
   methods?: Relation<MethodEntity>[];
 
   // Molti a molti con skill
   @ManyToMany(() => SkillEntity)
-  @JoinTable({ name: 'skill_subcompetency' })
+  @JoinTable({
+    name: 'skill_subcompetency',
+    joinColumn: {
+      name: 'subcompetency_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'skill_id',
+      referencedColumnName: 'id',
+    },
+  })
   skills?: Relation<SkillEntity>[];
+
+  // Relazione ManyToMany con SubCompetencyEntity (JoinTable: test_subcompetency)
+  @ManyToMany(() => SubCompetencyEntity)
+  @JoinTable({
+    name: 'test_subcompetency',
+    joinColumn: {
+      name: 'subcompetency_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'test_id',
+      referencedColumnName: 'id',
+    }
+  })
+  subcompetencies?: SubCompetencyEntity[];
+
+  @OneToMany(
+    () => BestSubCompetencyScoreEntity,
+    (bestSubCompetencyScores) => bestSubCompetencyScores.competency
+  )
+  best_subcompetency_scores?: Relation<BestSubCompetencyScoreEntity>[];
 }

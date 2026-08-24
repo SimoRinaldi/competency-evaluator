@@ -10,18 +10,18 @@ export class TestOutputEntity {
   name!: string;
 
   @Column({ type: 'text', nullable: true })
-  description?: string | null;
+  description?: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  url?: string | null;
-
-  @ManyToOne(() => TestExecutionEntity, (execution) => execution.test_outputs)
-  @JoinColumn({ name: 'test_execution_id' })
-  test_execution!: TestExecutionEntity;
+  url?: string;
 
   @Column({ type: 'integer', nullable: false })
   test_execution_id!: number;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  version?: string | null;
+  version?: string;
+
+  @ManyToOne(() => TestExecutionEntity, (execution) => execution.test_outputs)
+  @JoinColumn({ name: 'test_execution_id' })
+  test_execution!: TestExecutionEntity;
 }
