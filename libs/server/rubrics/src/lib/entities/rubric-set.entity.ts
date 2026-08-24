@@ -1,4 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import type { Relation } from 'typeorm';
 import { RubricLevelEntity } from './rubric-level.entity';
 import { IndicatorEntity } from './indicator.entity';
 
@@ -13,8 +14,8 @@ export class RubricSetEntity {
   @OneToMany(() => RubricLevelEntity, (level) => level.rubric_set, {
     cascade: true,
   })
-  levels?: RubricLevelEntity[];
+  levels?: Relation<RubricLevelEntity>[];
 
   @OneToMany(() => IndicatorEntity, (indicator) => indicator.rubric_set)
-  indicators?: IndicatorEntity[];
+  indicators?: Relation<IndicatorEntity>[];
 }

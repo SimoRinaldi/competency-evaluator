@@ -5,11 +5,12 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
+import type { Relation } from 'typeorm';
 import { UserEntity } from '@server/users';
-import { CompetencyEntity } from '@server/competencies';
+import { SubCompetencyEntity } from '@server/competencies';
 
-@Entity('best_competency_scores')
-export class BestCompetencyScoreEntity {
+@Entity('best_subcompetency_scores')
+export class BestSubCompetencyScoreEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
@@ -21,14 +22,15 @@ export class BestCompetencyScoreEntity {
 
   @ManyToOne(() => UserEntity)
   @JoinColumn({ name: 'user_id' })
-  user!: UserEntity;
+  user?: Relation<UserEntity>;
+
   @Column({ type: 'integer', nullable: false })
   user_id!: number;
 
-  @ManyToOne(() => CompetencyEntity)
-  @JoinColumn({ name: 'competency_id' })
-  competency!: CompetencyEntity;
-  @Column({ type: 'integer', nullable: false })
-  competency_id!: number;
-}
+  @ManyToOne(() => SubCompetencyEntity)
+  @JoinColumn({ name: 'subcompetency_id' })
+  subcompetency?: Relation<SubCompetencyEntity>;
 
+  @Column({ type: 'integer', nullable: false })
+  subcompetency_id!: number;
+}

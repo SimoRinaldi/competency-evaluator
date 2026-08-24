@@ -5,6 +5,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
+import type { Relation } from 'typeorm';
 import { TestEvaluatorEntity } from '@server/users';
 import { IndicatorEntity } from '@server/rubrics';
 import { TestExecutionEntity } from '@server/test-management';
@@ -19,20 +20,22 @@ export class RubricLevelAssignmentEntity {
 
   @ManyToOne(() => IndicatorEntity)
   @JoinColumn({ name: 'indicator_id' })
-  indicator!: IndicatorEntity;
+  indicator?: Relation<IndicatorEntity>;
+
   @Column({ type: 'integer', nullable: false })
   indicator_id!: number;
 
   @ManyToOne(() => TestExecutionEntity)
   @JoinColumn({ name: 'test_execution_id' })
-  test_execution!: TestExecutionEntity;
+  test_execution?: Relation<TestExecutionEntity>;
+
   @Column({ type: 'integer', nullable: false })
   test_execution_id!: number;
 
   @ManyToOne(() => TestEvaluatorEntity)
   @JoinColumn({ name: 'evaluator_id' })
-  evaluator!: TestEvaluatorEntity;
+  evaluator?: Relation<TestEvaluatorEntity>;
+
   @Column({ type: 'integer', nullable: false })
   evaluator_id!: number;
 }
-

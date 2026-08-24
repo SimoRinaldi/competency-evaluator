@@ -5,6 +5,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
+import type { Relation } from 'typeorm';
 import { TestExecutionEntity } from './test-execution.entity';
 
 @Entity('test_outputs')
@@ -29,5 +30,5 @@ export class TestOutputEntity {
 
   @ManyToOne(() => TestExecutionEntity, (execution) => execution.test_outputs)
   @JoinColumn({ name: 'test_execution_id' })
-  test_execution!: TestExecutionEntity;
+  test_execution?: Relation<TestExecutionEntity>;
 }
