@@ -1,7 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+} from 'typeorm';
 import { EvaluatedUserEntity } from '@server/users';
 import { TestEntity } from './test.entity';
 import { TestOutputEntity } from './test-output.entity';
+import { RubricLevelAssignmentEntity } from '@server/evaluations';
 
 @Entity('test_executions')
 export class TestExecutionEntity {

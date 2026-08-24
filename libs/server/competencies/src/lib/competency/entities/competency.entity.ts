@@ -6,6 +6,7 @@ import {
   Relation,
 } from 'typeorm';
 import { SubCompetencyEntity } from '../../subcompetency/entities/subcompetency.entity';
+import { BestCompetencyScoreEntity } from '@server/evaluations';
 
 @Entity('competencies')
 export class CompetencyEntity {

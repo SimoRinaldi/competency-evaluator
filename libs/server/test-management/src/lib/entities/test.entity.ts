@@ -8,7 +8,7 @@ import {
   ManyToMany,
   JoinTable,
 } from 'typeorm';
-import { TestDesignerEntity } from '@server/users';
+import { TestDesignerEntity, TestEvaluatorEntity } from '@server/users';
 import { TestExecutionEntity } from './test-execution.entity';
 
 @Entity('tests')

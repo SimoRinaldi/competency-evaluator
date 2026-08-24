@@ -6,11 +6,11 @@ import { RubricLevelAssignmentEntity } from '@server/evaluations';
 export class TestEvaluatorEntity {
   @PrimaryGeneratedColumn()
   id!: number;
-  
+
   @OneToOne(() => UserEntity)
   @JoinColumn({ name: 'user_id' })
   user!: UserEntity;
-  @Column({ type: 'integer', nullable: false, unique: true }) 
+  @Column({ type: 'integer', nullable: false, unique: true })
   user_id!: number;
 
   @OneToMany(() => RubricLevelAssignmentEntity, (rla) => rla.evaluator)

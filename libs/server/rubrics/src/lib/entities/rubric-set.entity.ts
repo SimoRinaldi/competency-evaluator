@@ -1,20 +1,20 @@
 import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
-import { RubricLevelEntity } from './rubric-level.entity'; 
-import { IndicatorEntity } from './indicator.entity'
+import { RubricLevelEntity } from './rubric-level.entity';
+import { IndicatorEntity } from './indicator.entity';
 
 @Entity('rubric_sets')
 export class RubricSetEntity {
-    @PrimaryGeneratedColumn()                                                                            
-    id!: number;                                                                                          
-                                                                                                                                                                                 
-    @Column({type: 'boolean', default: false})                                                         
-    yes_no!: boolean; 
-                                                 
-    @OneToMany(() => RubricLevelEntity, (level) => level.rubric_set, {                                          
-        cascade: true,                      
-    })                                                                                                   
-    levels?: RubricLevelEntity[]; 
+  @PrimaryGeneratedColumn()
+  id!: number;
 
-    @OneToMany(() => IndicatorEntity, (indicator) => indicator.rubric_set)
-    indicators?: IndicatorEntity[];
+  @Column({ type: 'boolean', default: false })
+  yes_no!: boolean;
+
+  @OneToMany(() => RubricLevelEntity, (level) => level.rubric_set, {
+    cascade: true,
+  })
+  levels?: RubricLevelEntity[];
+
+  @OneToMany(() => IndicatorEntity, (indicator) => indicator.rubric_set)
+  indicators?: IndicatorEntity[];
 }
