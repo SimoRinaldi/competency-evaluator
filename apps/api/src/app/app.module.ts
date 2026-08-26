@@ -4,7 +4,6 @@ import { AppService } from './app.service';
 import { ServerUsersModule } from '@server/users';
 import { DatabaseModule } from '@org/database';
 import { ServerAuthModule } from '@server/auth';
-import { ServerRubricsModule } from '@server/rubrics';
 import { ServerEvaluationsModule } from '@server/evaluations';
 import { ServerTestManagementModule } from '@server/test-management';
 import { ServerCompetenciesModule } from '@server/competencies';
@@ -16,8 +15,7 @@ import { ServerCompetenciesModule } from '@server/competencies';
     ServerAuthModule,
     ServerTestManagementModule,
     ServerCompetenciesModule,
-    ServerRubricsModule, 
-    ServerEvaluationsModule
+    ServerEvaluationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

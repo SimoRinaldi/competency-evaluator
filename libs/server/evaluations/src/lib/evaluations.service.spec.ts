@@ -3,6 +3,7 @@ import { ServerEvaluationsService } from './evaluations.service';
 import { RubricLevelAssignmentService } from './rubric-level-assignment/rubric-level-assignment.service';
 import { BestSubCompetencyScoreService } from './best-subcompetency-score/best-subcompetency-score.service';
 import { BestCompetencyScoreService } from './best-competency-score/best-competency-score.service';
+import { ServerTestExecutionsService } from '@server/test-management';
 
 describe('ServerEvaluationsService', () => {
   let service: ServerEvaluationsService;
@@ -18,6 +19,9 @@ describe('ServerEvaluationsService', () => {
   const mockBestCompetencyScoreService = {
     findByUserAndCompetency: jest.fn(),
     create: jest.fn(),
+    update: jest.fn(),
+  };
+  const mockTestExecutionsService = {
     update: jest.fn(),
   };
 
@@ -36,6 +40,10 @@ describe('ServerEvaluationsService', () => {
         {
           provide: BestCompetencyScoreService,
           useValue: mockBestCompetencyScoreService,
+        },
+        {
+          provide: ServerTestExecutionsService,
+          useValue: mockTestExecutionsService,
         },
       ],
     }).compile();

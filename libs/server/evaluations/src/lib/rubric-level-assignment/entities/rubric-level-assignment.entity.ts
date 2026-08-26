@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import type { Relation } from 'typeorm';
 import { TestEvaluatorEntity } from '@server/users';
-import { IndicatorEntity } from '@server/rubrics';
+import { IndicatorEntity } from '@server/competencies';
 import { TestExecutionEntity } from '@server/test-management';
 
 @Entity('rubric_level_assignments')

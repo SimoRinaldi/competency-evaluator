@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { IndicatorsService } from '@server/rubrics';
+import { IndicatorsService } from '@server/competencies';
 import { RubricLevelAssignmentService } from './rubric-level-assignment.service';
 import { RubricLevelAssignmentRepository } from './rubric-level-assignment.repository';
 

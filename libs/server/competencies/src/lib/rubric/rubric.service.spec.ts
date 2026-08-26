@@ -1,15 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ToolService } from './tool.service';
-import { ToolRepository } from './tool.repository';
+import { RubricService } from './rubric.service';
+import { RubricRepository } from './rubric.repository';
 
-describe('ToolService', () => {
-  let service: ToolService;
+describe('RubricService', () => {
+  let service: RubricService;
 
   const mockRepository = {
-    findById: jest.fn(),
-    findByName: jest.fn(),
     createOne: jest.fn(),
     findAll: jest.fn(),
+    findById: jest.fn(),
     updateOne: jest.fn(),
     deleteOne: jest.fn(),
   };
@@ -17,15 +16,15 @@ describe('ToolService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        ToolService,
+        RubricService,
         {
-          provide: ToolRepository,
+          provide: RubricRepository,
           useValue: mockRepository,
         },
       ],
     }).compile();
 
-    service = module.get<ToolService>(ToolService);
+    service = module.get<RubricService>(RubricService);
   });
 
   it('should be defined', () => {

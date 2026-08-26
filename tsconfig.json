@@ -28,9 +28,6 @@
       "path": "./libs/server/security"
     },
     {
-      "path": "./libs/server/rubrics"
-    },
-    {
       "path": "./libs/server/evaluations"
     },
     {

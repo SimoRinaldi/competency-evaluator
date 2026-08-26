@@ -22,9 +22,6 @@
       "path": "../test-management/tsconfig.lib.json"
     },
     {
-      "path": "../rubrics/tsconfig.lib.json"
-    },
-    {
       "path": "../competencies/tsconfig.lib.json"
     },
     {

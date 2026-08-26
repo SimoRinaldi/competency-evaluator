@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { IndicatorsService } from '@server/rubrics';
+import { IndicatorsService } from '@server/competencies';
 import { RubricLevelAssignmentRepository } from './rubric-level-assignment.repository';
 import { CreateRubricLevelAssignmentDto } from './dto/create-rubric-level-assignment.dto';
 import { UpdateRubricLevelAssignmentDto } from './dto/update-rubric-level-assignment.dto';

@@ -1,30 +1,30 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SkillController } from './skill.controller';
-import { SkillService } from './skill.service';
+import { RubricController } from './rubric.controller';
+import { RubricService } from './rubric.service';
 
-describe('SkillController', () => {
-  let controller: SkillController;
+describe('RubricController', () => {
+  let controller: RubricController;
 
   const mockService = {
-    getSkills: jest.fn(),
-    getOneSkill: jest.fn(),
     create: jest.fn(),
+    findAll: jest.fn(),
+    findOne: jest.fn(),
     update: jest.fn(),
-    removeSkill: jest.fn(),
+    remove: jest.fn(),
   };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [SkillController],
+      controllers: [RubricController],
       providers: [
         {
-          provide: SkillService,
+          provide: RubricService,
           useValue: mockService,
         },
       ],
     }).compile();
 
-    controller = module.get<SkillController>(SkillController);
+    controller = module.get<RubricController>(RubricController);
   });
 
   it('should be defined', () => {

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ServerRubricsModule } from '@server/rubrics';
+import { IndicatorModule } from '@server/competencies';
 import { RubricLevelAssignmentEntity } from './entities/rubric-level-assignment.entity';
 import { RubricLevelAssignmentController } from './rubric-level-assignment.controller';
 import { RubricLevelAssignmentService } from './rubric-level-assignment.service';
@@ -9,7 +9,7 @@ import { RubricLevelAssignmentRepository } from './rubric-level-assignment.repos
 @Module({
   imports: [
     TypeOrmModule.forFeature([RubricLevelAssignmentEntity]),
-    ServerRubricsModule,
+    IndicatorModule,
   ],
   controllers: [RubricLevelAssignmentController],
   providers: [RubricLevelAssignmentService, RubricLevelAssignmentRepository],

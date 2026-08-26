@@ -5,10 +5,23 @@ import { MethodService } from './method.service';
 describe('MethodController', () => {
   let controller: MethodController;
 
+  const mockService = {
+    getMethods: jest.fn(),
+    getOneMethod: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    removeMethod: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [MethodController],
-      providers: [MethodService],
+      providers: [
+        {
+          provide: MethodService,
+          useValue: mockService,
+        },
+      ],
     }).compile();
 
     controller = module.get<MethodController>(MethodController);
