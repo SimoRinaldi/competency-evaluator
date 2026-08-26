@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import type { Relation } from 'typeorm';
 import { UserEntity } from '@server/users';
-import { CompetencyEntity } from '@server/competencies';
+import { CompetencyEntity } from '@server/competencies-management';
 
 @Entity('competency_historical_scores')
 export class CompetencyHistoricalScoreEntity {

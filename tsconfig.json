@@ -28,19 +28,19 @@
       "path": "./libs/server/security"
     },
     {
-      "path": "./libs/server/evaluations"
+      "path": "./libs/server/tests-management"
     },
     {
-      "path": "./libs/server/test-management"
+      "path": "./libs/server/tests-execution"
     },
     {
-      "path": "./libs/server/test-execution"
+      "path": "./libs/server/competencies-management"
     },
     {
       "path": "./libs/server/historical-scores"
     },
     {
-      "path": "./libs/server/competencies"
+      "path": "./libs/server/tests-evaluation"
     }
   ]
 }

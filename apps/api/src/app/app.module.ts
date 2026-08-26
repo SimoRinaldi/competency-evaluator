@@ -4,22 +4,22 @@ import { AppService } from './app.service';
 import { ServerUsersModule } from '@server/users';
 import { DatabaseModule } from '@org/database';
 import { ServerAuthModule } from '@server/auth';
-import { ServerEvaluationsModule } from '@server/evaluations';
+import { ServerTestsEvaluationModule } from '@server/tests-evaluation';
 import { ServerHistoricalScoresModule } from '@server/historical-scores';
-import { ServerTestManagementModule } from '@server/test-management';
-import { ServerTestExecutionModule } from '@server/test-execution';
-import { ServerCompetenciesModule } from '@server/competencies';
+import { ServerTestsManagementModule } from '@server/tests-management';
+import { ServerTestsExecutionModule } from '@server/tests-execution';
+import { ServerCompetenciesManagementModule } from '@server/competencies-management';
 
 @Module({
   imports: [
     ServerUsersModule,
     DatabaseModule,
     ServerAuthModule,
-    ServerTestManagementModule,
-    ServerTestExecutionModule,
-    ServerCompetenciesModule,
+    ServerTestsManagementModule,
+    ServerTestsExecutionModule,
+    ServerCompetenciesManagementModule,
     ServerHistoricalScoresModule,
-    ServerEvaluationsModule,
+    ServerTestsEvaluationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
