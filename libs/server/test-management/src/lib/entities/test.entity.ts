@@ -53,7 +53,7 @@ export class TestEntity {
 
   @ManyToMany(() => TestEvaluatorEntity)
   @JoinTable({
-    name: 'test_evaluator_test',
+    name: 'test_evaluations',
     joinColumn: {
       name: 'test_id',
       referencedColumnName: 'id',
