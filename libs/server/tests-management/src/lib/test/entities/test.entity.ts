@@ -10,7 +10,8 @@ import {
 } from 'typeorm';
 import type { Relation } from 'typeorm';
 import type { TestExecutionEntity } from '@server/tests-execution';
-import { TestDesignerEntity, TestEvaluatorEntity } from '@server/users';
+import type { TestEvaluatorEntity } from '@server/tests-evaluation';
+import { TestDesignerEntity } from '../../test-designer/entities/test-designer.entity';
 import { SubCompetencyEntity } from '@server/competencies-management';
 
 @Entity('tests')
@@ -45,7 +46,7 @@ export class TestEntity {
   })
   subcompetencies?: Relation<SubCompetencyEntity>[];
 
-  @ManyToMany(() => TestEvaluatorEntity)
+  @ManyToMany('TestEvaluatorEntity')
   @JoinTable({
     name: 'test_evaluations',
     joinColumn: {

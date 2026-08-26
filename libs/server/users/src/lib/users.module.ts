@@ -1,43 +1,14 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './user.entity';
-import { EvaluatedUserEntity } from './entities/evaluated-user.entity';
-import { TestDesignerEntity } from './entities/test-designer.entity';
-import { TestEvaluatorEntity } from './entities/test-evaluator.entity';
-import { ServerUsersController } from './users.controller';
-import { ServerUsersService } from './users.service';
 import { UsersRepository } from './users.repository';
-import { EvaluatedUsersRepository } from './repositories/evaluated-user.repository';
-import { TestDesignersRepository } from './repositories/test-designer.repository';
-import { TestEvaluatorsRepository } from './repositories/test-evaluator.repository';
+import { ServerUsersService } from './users.service';
+import { UsersController } from './users.controller';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([
-      UserEntity,
-      EvaluatedUserEntity,
-      TestDesignerEntity,
-      TestEvaluatorEntity,
-    ]),
-  ],
-  controllers: [ServerUsersController],
-  providers: [
-    ServerUsersService,
-    UsersRepository,
-    EvaluatedUsersRepository,
-    TestDesignersRepository,
-    TestEvaluatorsRepository,
-  ],
-  exports: [
-    ServerUsersService,
-    UsersRepository,
-    EvaluatedUsersRepository,
-    TestDesignersRepository,
-    TestEvaluatorsRepository,
-  ],
+  imports: [TypeOrmModule.forFeature([UserEntity])],
+  controllers: [UsersController],
+  providers: [UsersRepository, ServerUsersService],
+  exports: [UsersRepository, ServerUsersService],
 })
 export class ServerUsersModule {}
-
-
-
-

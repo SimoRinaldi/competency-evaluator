@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { TestDesignersRepository } from '@server/users';
+import { TestDesignerRepository } from '../test-designer/test-designer.repository';
 import { TestEntity } from './entities/test.entity';
 import { CreateTestDto } from './dto/create-test.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
@@ -9,11 +9,11 @@ import { TestRepository } from './test.repository';
 export class TestService {
   constructor(
     private readonly testsRepository: TestRepository,
-    private readonly testDesignersRepository: TestDesignersRepository
+    private readonly testDesignerRepository: TestDesignerRepository
   ) {}
 
   async create(dto: CreateTestDto): Promise<TestEntity> {
-    const designer = await this.testDesignersRepository.findById(
+    const designer = await this.testDesignerRepository.findById(
       dto.test_designer_id
     );
     if (!designer) {

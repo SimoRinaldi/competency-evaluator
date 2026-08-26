@@ -5,9 +5,14 @@ import { TestEntity } from './entities/test.entity';
 import { TestController } from './test.controller';
 import { TestService } from './test.service';
 import { TestRepository } from './test.repository';
+import { TestDesignerSubModule } from '../test-designer/test-designer.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([TestEntity]), ServerUsersModule],
+  imports: [
+    TypeOrmModule.forFeature([TestEntity]),
+    ServerUsersModule,
+    TestDesignerSubModule,
+  ],
   controllers: [TestController],
   providers: [TestService, TestRepository],
   exports: [TestService, TestRepository],

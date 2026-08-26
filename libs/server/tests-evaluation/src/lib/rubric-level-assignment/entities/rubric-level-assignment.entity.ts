@@ -6,7 +6,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import type { Relation } from 'typeorm';
-import { TestEvaluatorEntity } from '@server/users';
+import { TestEvaluatorEntity } from '../../test-evaluator/entities/test-evaluator.entity';
 import { IndicatorEntity } from '@server/competencies-management';
 import { TestExecutionEntity } from '@server/tests-execution';
 

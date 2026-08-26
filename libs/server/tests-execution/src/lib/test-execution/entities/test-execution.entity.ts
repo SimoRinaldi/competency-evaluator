@@ -7,7 +7,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import type { Relation } from 'typeorm';
-import { EvaluatedUserEntity } from '@server/users';
+import { EvaluatedUserEntity } from '../../evaluated-user/entities/evaluated-user.entity';
 import { TestEntity } from '@server/tests-management';
 import { TestOutputEntity } from '../../test-output/entities/test-output.entity';
 

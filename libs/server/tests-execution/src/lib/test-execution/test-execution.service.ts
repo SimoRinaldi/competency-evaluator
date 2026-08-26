@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { EvaluatedUsersRepository } from '@server/users';
+import { EvaluatedUserRepository } from '../evaluated-user/evaluated-user.repository';
 import { TestRepository } from '@server/tests-management';
 import { TestExecutionEntity } from './entities/test-execution.entity';
 import { CreateTestExecutionDto } from './dto/create-test-execution.dto';
@@ -11,7 +11,7 @@ export class TestExecutionService {
   constructor(
     private readonly testExecutionsRepository: TestExecutionRepository,
     private readonly testsRepository: TestRepository,
-    private readonly evaluatedUsersRepository: EvaluatedUsersRepository
+    private readonly evaluatedUsersRepository: EvaluatedUserRepository
   ) {}
 
   async create(dto: CreateTestExecutionDto): Promise<TestExecutionEntity> {

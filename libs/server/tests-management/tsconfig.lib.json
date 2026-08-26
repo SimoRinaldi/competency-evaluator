@@ -20,16 +20,19 @@
   "include": ["src/**/*.ts"],
   "references": [
     {
-      "path": "../security/tsconfig.lib.json"
-    },
-    {
       "path": "../competencies-management/tsconfig.lib.json"
     },
     {
-      "path": "../users/tsconfig.lib.json"
+      "path": "../tests-evaluation/tsconfig.lib.json"
     },
     {
       "path": "../tests-execution/tsconfig.lib.json"
+    },
+    {
+      "path": "../security/tsconfig.lib.json"
+    },
+    {
+      "path": "../users/tsconfig.lib.json"
     }
   ],
   "exclude": [

@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TestExecutionService } from './test-execution.service';
 import { TestExecutionRepository } from './test-execution.repository';
 import { TestRepository } from '@server/tests-management';
-import { EvaluatedUsersRepository } from '@server/users';
+import { EvaluatedUserRepository } from '../evaluated-user/evaluated-user.repository';
 
 describe('TestExecutionService', () => {
   let service: TestExecutionService;
