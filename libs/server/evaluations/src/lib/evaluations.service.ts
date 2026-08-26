@@ -1,15 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { RubricLevelAssignmentService } from './rubric-level-assignment/rubric-level-assignment.service';
-import { BestSubCompetencyScoreService } from './best-subcompetency-score/best-subcompetency-score.service';
-import { BestCompetencyScoreService } from './best-competency-score/best-competency-score.service';
+import {
+  CompetencyHistoricalScoreService,
+  SubCompetencyHistoricalScoreService,
+} from '@server/historical-scores';
 import { ServerTestExecutionsService } from '@server/test-execution';
 
 @Injectable()
 export class ServerEvaluationsService {
   constructor(
     private readonly rubricLevelAssignmentsService: RubricLevelAssignmentService,
-    private readonly bestSubCompetencyScoresService: BestSubCompetencyScoreService,
-    private readonly bestCompetencyScoresService: BestCompetencyScoreService,
+    private readonly subCompetencyHistoricalScoreService: SubCompetencyHistoricalScoreService,
+    private readonly competencyHistoricalScoreService: CompetencyHistoricalScoreService,
     private readonly testExecutionsService: ServerTestExecutionsService
   ) {}
 
@@ -28,12 +30,6 @@ export class ServerEvaluationsService {
     }
 
     // Mappa per aggregare i voti di TUTTI i valutatori per ogni singolo indicatore.
-    // Chiave: ID dell'indicatore
-    // Valore: { 
-    //  sum_rank: somma dei voti dati da tutti i valutatori,
-    //  count: quanti valutatori hanno dato un voto,
-    //  data: oggeto rubricLevelAssignment 
-    // }
     const groupedIndicators = new Map<
       number,
       {
@@ -45,10 +41,8 @@ export class ServerEvaluationsService {
 
     // scorre TUTTI i voti (rubricLevelAssignments) inseriti per questa esecuzione del test
     for (const rla of rubricLevelAssignments) {
-      // recupera l'ID dell'indicatore a cui si riferisce questo voto
       const ind_id = rla.indicator?.id ?? rla.indicator_id;
 
-      // se è il primo voto che si incontra per questo indicatore, inizializza i contatori a zero.
       const current = groupedIndicators.get(ind_id) ?? {
         sum_rank: 0,
         count: 0,
@@ -61,9 +55,6 @@ export class ServerEvaluationsService {
     }
 
     // Mappa per accumulare i punteggi totali (ottenuto e massimo) per ogni sotto-competenza.
-    // Un test valuta più indicatori, e più indicatori possono appartenere alla stessa sotto-competenza.
-    // Chiave: ID della sotto-competenza.
-    // Valore: { obtained: punteggio ottenuto, max: punteggio massimo, competency_id: ID della competenza padre }
     const subCompetencyScores = new Map<
       number,
       { obtained: number; max: number; competency_id?: number }
@@ -98,9 +89,6 @@ export class ServerEvaluationsService {
     }
 
     // Mappa per accumulare i punteggi totali (ottenuto e massimo) per la singola competenza padre.
-    // Più sotto-competenze andranno a riempire la stessa competenza.
-    // Chiave: ID della competenza.
-    // Valore: { obtained: punteggio ottenuto, max: punteggio massimo }
     const competencyScores = new Map<
       number,
       { obtained: number; max: number }
@@ -108,22 +96,25 @@ export class ServerEvaluationsService {
 
     for (const [subcomp_id, subcompStats] of subCompetencyScores.entries()) {
       const subcomp_percentage =
-        subcompStats.max > 0 ? (subcompStats.obtained / subcompStats.max) * 100 : 0;
+        subcompStats.max > 0
+          ? (subcompStats.obtained / subcompStats.max) * 100
+          : 0;
 
-      // CONTROLLARE SE SUPERATO SOGLIA
-      await this.bestSubCompetencyScoresService.create({
-        best_score_absolute: Math.round(subcompStats.obtained),
-        best_score_percentage: subcomp_percentage.toFixed(2),
+      await this.subCompetencyHistoricalScoreService.create({
+        score_absolute: Math.round(subcompStats.obtained),
+        score_percentage: subcomp_percentage.toFixed(2),
         user_id: user_id,
         subcompetency_id: subcomp_id,
       });
 
       if (subcompStats.competency_id !== undefined) {
-        const currentComp = competencyScores.get(subcompStats.competency_id) ?? {
+        const currentComp = competencyScores.get(
+          subcompStats.competency_id
+        ) ?? {
           obtained: 0,
           max: 0,
         };
-        
+
         currentComp.obtained += subcompStats.obtained;
         currentComp.max += subcompStats.max;
         competencyScores.set(subcompStats.competency_id, currentComp);
@@ -134,10 +125,9 @@ export class ServerEvaluationsService {
       const comp_percentage =
         compStats.max > 0 ? (compStats.obtained / compStats.max) * 100 : 0;
 
-      // CONTROLLARE SE SUPERATO SOGLIA
-      await this.bestCompetencyScoresService.create({
-        best_score_absolute: Math.round(compStats.obtained),
-        best_score_percentage: comp_percentage.toFixed(2),
+      await this.competencyHistoricalScoreService.create({
+        score_absolute: Math.round(compStats.obtained),
+        score_percentage: comp_percentage.toFixed(2),
         user_id: user_id,
         competency_id: comp_id,
       });
@@ -147,7 +137,6 @@ export class ServerEvaluationsService {
     let test_score = 0;
     let max_score = 0;
 
-    // somma i punteggi di tutte le sotto-competenze valutate da quel test
     for (const stats of subCompetencyScores.values()) {
       test_score += stats.obtained;
       max_score += stats.max;
@@ -155,7 +144,7 @@ export class ServerEvaluationsService {
 
     await this.testExecutionsService.update(test_execution_id, {
       test_score: test_score.toFixed(2),
-      max_score: max_score.toFixed(2)
+      max_score: max_score.toFixed(2),
     });
   }
 }

@@ -7,18 +7,18 @@ import {
 } from 'typeorm';
 import type { Relation } from 'typeorm';
 import { UserEntity } from '@server/users';
-import { SubCompetencyEntity } from '@server/competencies';
+import { CompetencyEntity } from '@server/competencies';
 
-@Entity('best_subcompetency_scores')
-export class BestSubCompetencyScoreEntity {
+@Entity('competency_historical_scores')
+export class CompetencyHistoricalScoreEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
   @Column({ type: 'integer', nullable: false })
-  best_score_absolute!: number;
+  score_absolute!: number;
 
   @Column({ type: 'numeric', nullable: false })
-  best_score_percentage!: string;
+  score_percentage!: string;
 
   @ManyToOne(() => UserEntity)
   @JoinColumn({ name: 'user_id' })
@@ -27,10 +27,10 @@ export class BestSubCompetencyScoreEntity {
   @Column({ type: 'integer', nullable: false })
   user_id!: number;
 
-  @ManyToOne(() => SubCompetencyEntity)
-  @JoinColumn({ name: 'subcompetency_id' })
-  subcompetency?: Relation<SubCompetencyEntity>;
+  @ManyToOne(() => CompetencyEntity)
+  @JoinColumn({ name: 'competency_id' })
+  competency?: Relation<CompetencyEntity>;
 
   @Column({ type: 'integer', nullable: false })
-  subcompetency_id!: number;
+  competency_id!: number;
 }

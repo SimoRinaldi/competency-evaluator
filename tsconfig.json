@@ -37,6 +37,9 @@
       "path": "./libs/server/test-execution"
     },
     {
+      "path": "./libs/server/historical-scores"
+    },
+    {
       "path": "./libs/server/competencies"
     }
   ]

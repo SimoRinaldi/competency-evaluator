@@ -19,7 +19,7 @@
   "include": ["src/**/*.ts"],
   "references": [
     {
-      "path": "../test-execution/tsconfig.lib.json"
+      "path": "../security/tsconfig.lib.json"
     },
     {
       "path": "../competencies/tsconfig.lib.json"
@@ -28,7 +28,10 @@
       "path": "../users/tsconfig.lib.json"
     },
     {
-      "path": "../security/tsconfig.lib.json"
+      "path": "../test-execution/tsconfig.lib.json"
+    },
+    {
+      "path": "../historical-scores/tsconfig.lib.json"
     }
   ]
 }

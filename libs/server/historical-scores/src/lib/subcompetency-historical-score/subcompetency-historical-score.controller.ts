@@ -13,15 +13,15 @@ import {
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard, Roles, RolesGuard } from '@server/security';
 import { UserRole } from '@server/users';
-import { BestCompetencyScoreService } from './best-competency-score.service';
-import { CreateBestCompetencyScoreDto } from './dto/create-best-competency-score.dto';
-import { UpdateBestCompetencyScoreDto } from './dto/update-best-competency-score.dto';
+import { SubCompetencyHistoricalScoreService } from './subcompetency-historical-score.service';
+import { CreateSubCompetencyHistoricalScoreDto } from './dto/create-subcompetency-historical-score.dto';
+import { UpdateSubCompetencyHistoricalScoreDto } from './dto/update-subcompetency-historical-score.dto';
 
-@ApiTags('Best Competency Scores APIs')
-@Controller('best_competency_scores')
-export class BestCompetencyScoreController {
+@ApiTags('SubCompetency Historical Scores APIs')
+@Controller('subcompetency_historical_scores')
+export class SubCompetencyHistoricalScoreController {
   constructor(
-    private readonly bestCompetencyScoreService: BestCompetencyScoreService
+    private readonly service: SubCompetencyHistoricalScoreService
   ) {}
 
   @Post()
@@ -30,9 +30,9 @@ export class BestCompetencyScoreController {
   @ApiBearerAuth()
   create(
     @Body(ValidationPipe)
-    createBestCompetencyScore: CreateBestCompetencyScoreDto
+    dto: CreateSubCompetencyHistoricalScoreDto
   ) {
-    return this.bestCompetencyScoreService.create(createBestCompetencyScore);
+    return this.service.create(dto);
   }
 
   @Get()
@@ -40,7 +40,7 @@ export class BestCompetencyScoreController {
   @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
   @ApiBearerAuth()
   findAll() {
-    return this.bestCompetencyScoreService.findAll();
+    return this.service.findAll();
   }
 
   @Get(':id')
@@ -48,7 +48,7 @@ export class BestCompetencyScoreController {
   @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
   @ApiBearerAuth()
   findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.bestCompetencyScoreService.findOne(id);
+    return this.service.findOne(id);
   }
 
   @Patch(':id')
@@ -58,12 +58,9 @@ export class BestCompetencyScoreController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body(ValidationPipe)
-    updateBestCompetencyScoreDto: UpdateBestCompetencyScoreDto
+    dto: UpdateSubCompetencyHistoricalScoreDto
   ) {
-    return this.bestCompetencyScoreService.update(
-      id,
-      updateBestCompetencyScoreDto
-    );
+    return this.service.update(id, dto);
   }
 
   @Delete(':id')
@@ -71,6 +68,6 @@ export class BestCompetencyScoreController {
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   remove(@Param('id', ParseIntPipe) id: number) {
-    return this.bestCompetencyScoreService.remove(id);
+    return this.service.remove(id);
   }
 }

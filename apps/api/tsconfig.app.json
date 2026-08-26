@@ -32,6 +32,9 @@
       "path": "../../libs/server/test-management/tsconfig.lib.json"
     },
     {
+      "path": "../../libs/server/historical-scores/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/server/evaluations/tsconfig.lib.json"
     },
     {
