@@ -19,7 +19,7 @@
   "include": ["src/**/*.ts"],
   "references": [
     {
-      "path": "../test-management/tsconfig.lib.json"
+      "path": "../test-execution/tsconfig.lib.json"
     },
     {
       "path": "../competencies/tsconfig.lib.json"

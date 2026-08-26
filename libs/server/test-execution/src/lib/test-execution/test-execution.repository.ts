@@ -6,7 +6,7 @@ import { CreateTestExecutionDto } from './dto/create-test-execution.dto';
 import { UpdateTestExecutionDto } from './dto/update-test-execution.dto';
 
 @Injectable()
-export class ServerTestExecutionsRepository {
+export class TestExecutionRepository {
   constructor(
     @InjectRepository(TestExecutionEntity)
     private readonly repository: Repository<TestExecutionEntity>
@@ -55,13 +55,22 @@ export class ServerTestExecutionsRepository {
     });
   }
 
+  async findByTestId(test_id: number): Promise<TestExecutionEntity[]> {
+    return this.repository.find({
+      where: { test_id },
+      order: { id: 'ASC' },
+      relations: ['test', 'evaluated_user', 'test_outputs'],
+    });
+  }
+
   async updateOne(
     testExecution: TestExecutionEntity,
     dto: UpdateTestExecutionDto
   ): Promise<TestExecutionEntity> {
     if (dto.test_id !== undefined) testExecution.test_id = dto.test_id;
     if (dto.user_id !== undefined) testExecution.user_id = dto.user_id;
-    if (dto.test_score !== undefined) testExecution.test_score = dto.test_score;
+    if (dto.test_score !== undefined)
+      testExecution.test_score = dto.test_score;
     if (dto.max_score !== undefined) testExecution.max_score = dto.max_score;
 
     return this.repository.save(testExecution);
@@ -72,3 +81,5 @@ export class ServerTestExecutionsRepository {
     return (result.affected ?? 0) > 0;
   }
 }
+
+export { TestExecutionRepository as ServerTestExecutionsRepository };

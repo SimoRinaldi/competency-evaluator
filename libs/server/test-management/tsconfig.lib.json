@@ -27,6 +27,9 @@
     },
     {
       "path": "../users/tsconfig.lib.json"
+    },
+    {
+      "path": "../test-execution/tsconfig.lib.json"
     }
   ],
   "exclude": [

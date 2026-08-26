@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { RubricLevelAssignmentService } from './rubric-level-assignment/rubric-level-assignment.service';
 import { BestSubCompetencyScoreService } from './best-subcompetency-score/best-subcompetency-score.service';
 import { BestCompetencyScoreService } from './best-competency-score/best-competency-score.service';
-import { ServerTestExecutionsService } from '@server/test-management';
+import { ServerTestExecutionsService } from '@server/test-execution';
 
 @Injectable()
 export class ServerEvaluationsService {

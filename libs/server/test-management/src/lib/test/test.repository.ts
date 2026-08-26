@@ -7,7 +7,7 @@ import { CreateTestDto } from './dto/create-test.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
 
 @Injectable()
-export class ServerTestsRepository {
+export class TestRepository {
   constructor(
     @InjectRepository(TestEntity)
     private readonly repository: Repository<TestEntity>
@@ -18,9 +18,7 @@ export class ServerTestsRepository {
       assessment_situation: dto.assessment_situation,
       test_designer_id: dto.test_designer_id,
       subcompetencies: dto.subcompetency_ids
-        ? dto.subcompetency_ids.map(
-            (id) => ({ id } as SubCompetencyEntity)
-          )
+        ? dto.subcompetency_ids.map((id) => ({ id } as SubCompetencyEntity))
         : undefined,
     });
 
@@ -67,3 +65,5 @@ export class ServerTestsRepository {
     return (result.affected ?? 0) > 0;
   }
 }
+
+export { TestRepository as ServerTestsRepository };

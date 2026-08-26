@@ -1,19 +1,16 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { EvaluatedUsersRepository } from '@server/users';
+import { TestRepository } from '@server/test-management';
 import { TestExecutionEntity } from './entities/test-execution.entity';
 import { CreateTestExecutionDto } from './dto/create-test-execution.dto';
 import { UpdateTestExecutionDto } from './dto/update-test-execution.dto';
-import { ServerTestExecutionsRepository } from './test-execution.repository';
-import { ServerTestsRepository } from './test.repository';
+import { TestExecutionRepository } from './test-execution.repository';
 
 @Injectable()
-export class ServerTestExecutionsService {
+export class TestExecutionService {
   constructor(
-    private readonly testExecutionsRepository: ServerTestExecutionsRepository,
-    private readonly testsRepository: ServerTestsRepository,
+    private readonly testExecutionsRepository: TestExecutionRepository,
+    private readonly testsRepository: TestRepository,
     private readonly evaluatedUsersRepository: EvaluatedUsersRepository
   ) {}
 
@@ -60,6 +57,15 @@ export class ServerTestExecutionsService {
     return this.testExecutionsRepository.findByEvaluatedUserId(userId);
   }
 
+  async findByTest(testId: number): Promise<TestExecutionEntity[]> {
+    const test = await this.testsRepository.findById(testId);
+    if (!test) {
+      throw new NotFoundException(`Test con ID ${testId} non trovato.`);
+    }
+
+    return this.testExecutionsRepository.findByTestId(testId);
+  }
+
   async update(
     id: number,
     dto: UpdateTestExecutionDto
@@ -104,3 +110,5 @@ export class ServerTestExecutionsService {
     }
   }
 }
+
+export { TestExecutionService as ServerTestExecutionsService };

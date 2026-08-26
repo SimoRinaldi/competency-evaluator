@@ -6,6 +6,7 @@ import { DatabaseModule } from '@org/database';
 import { ServerAuthModule } from '@server/auth';
 import { ServerEvaluationsModule } from '@server/evaluations';
 import { ServerTestManagementModule } from '@server/test-management';
+import { ServerTestExecutionModule } from '@server/test-execution';
 import { ServerCompetenciesModule } from '@server/competencies';
 
 @Module({
@@ -14,6 +15,7 @@ import { ServerCompetenciesModule } from '@server/competencies';
     DatabaseModule,
     ServerAuthModule,
     ServerTestManagementModule,
+    ServerTestExecutionModule,
     ServerCompetenciesModule,
     ServerEvaluationsModule,
   ],

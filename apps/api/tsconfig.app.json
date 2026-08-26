@@ -26,6 +26,9 @@
       "path": "../../libs/server/competencies/tsconfig.lib.json"
     },
     {
+      "path": "../../libs/server/test-execution/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/server/test-management/tsconfig.lib.json"
     },
     {

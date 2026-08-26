@@ -8,8 +8,8 @@ import {
 } from 'typeorm';
 import type { Relation } from 'typeorm';
 import { EvaluatedUserEntity } from '@server/users';
-import { TestEntity } from './test.entity';
-import { TestOutputEntity } from './test-output.entity';
+import { TestEntity } from '@server/test-management';
+import { TestOutputEntity } from '../../test-output/entities/test-output.entity';
 
 @Entity('test_executions')
 export class TestExecutionEntity {
@@ -39,4 +39,3 @@ export class TestExecutionEntity {
   @OneToMany(() => TestOutputEntity, (output) => output.test_execution)
   test_outputs?: Relation<TestOutputEntity>[];
 }
-

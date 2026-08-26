@@ -1,17 +1,14 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { TestDesignersRepository } from '@server/users';
 import { TestEntity } from './entities/test.entity';
 import { CreateTestDto } from './dto/create-test.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
-import { ServerTestsRepository } from './test.repository';
+import { TestRepository } from './test.repository';
 
 @Injectable()
-export class ServerTestsService {
+export class TestService {
   constructor(
-    private readonly testsRepository: ServerTestsRepository,
+    private readonly testsRepository: TestRepository,
     private readonly testDesignersRepository: TestDesignersRepository
   ) {}
 
@@ -91,4 +88,4 @@ export class ServerTestsService {
   }
 }
 
-
+export { TestService as ServerTestsService };

@@ -13,21 +13,21 @@ import {
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard, Roles, RolesGuard } from '@server/security';
 import { UserRole } from '@server/users';
-import { ServerTestsService } from './test.service';
+import { TestService } from './test.service';
 import { CreateTestDto } from './dto/create-test.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
 
 @ApiTags('Tests API')
 @Controller('tests')
-export class ServerTestController {
-  constructor(private readonly serverTestsService: ServerTestsService) {}
+export class TestController {
+  constructor(private readonly testsService: TestService) {}
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
   @ApiBearerAuth()
   create(@Body(ValidationPipe) createTestDto: CreateTestDto) {
-    return this.serverTestsService.create(createTestDto);
+    return this.testsService.create(createTestDto);
   }
 
   @Get()
@@ -40,7 +40,7 @@ export class ServerTestController {
   )
   @ApiBearerAuth()
   findAll() {
-    return this.serverTestsService.findAll();
+    return this.testsService.findAll();
   }
 
   @Get(':id')
@@ -53,7 +53,7 @@ export class ServerTestController {
   )
   @ApiBearerAuth()
   findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.serverTestsService.findOne(id);
+    return this.testsService.findOne(id);
   }
 
   @Get('by-designer/:designerId')
@@ -66,7 +66,7 @@ export class ServerTestController {
   )
   @ApiBearerAuth()
   findByDesigner(@Param('designerId', ParseIntPipe) designerId: number) {
-    return this.serverTestsService.findByTestDesigner(designerId);
+    return this.testsService.findByTestDesigner(designerId);
   }
 
   @Patch(':id')
@@ -77,7 +77,7 @@ export class ServerTestController {
     @Param('id', ParseIntPipe) id: number,
     @Body(ValidationPipe) updateTestDto: UpdateTestDto
   ) {
-    return this.serverTestsService.update(id, updateTestDto);
+    return this.testsService.update(id, updateTestDto);
   }
 
   @Delete(':id')
@@ -85,6 +85,8 @@ export class ServerTestController {
   @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
   @ApiBearerAuth()
   remove(@Param('id', ParseIntPipe) id: number) {
-    return this.serverTestsService.remove(id);
+    return this.testsService.remove(id);
   }
 }
+
+export { TestController as ServerTestController };
