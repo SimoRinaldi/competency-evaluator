@@ -35,7 +35,7 @@ export class EvaluatedUserController {
 
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER, UserRole.TEST_EVALUATOR)
+  @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER, UserRole.EVALUATOR)
   @ApiBearerAuth()
   findAll() {
     return this.service.findAll();
@@ -43,7 +43,7 @@ export class EvaluatedUserController {
 
   @Get(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER, UserRole.TEST_EVALUATOR)
+  @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER, UserRole.EVALUATOR)
   @ApiBearerAuth()
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.service.findOne(id);

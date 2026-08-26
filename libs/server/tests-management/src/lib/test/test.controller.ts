@@ -17,17 +17,20 @@ import { TestService } from './test.service';
 import { CreateTestDto } from './dto/create-test.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
 
-@ApiTags('Tests API')
+@ApiTags('Tests APIs')
 @Controller('tests')
 export class TestController {
-  constructor(private readonly testsService: TestService) {}
+  constructor(private readonly testService: TestService) {}
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
   @ApiBearerAuth()
-  create(@Body(ValidationPipe) createTestDto: CreateTestDto) {
-    return this.testsService.create(createTestDto);
+  create(
+    @Body(ValidationPipe)
+    dto: CreateTestDto
+  ) {
+    return this.testService.create(dto);
   }
 
   @Get()
@@ -40,7 +43,7 @@ export class TestController {
   )
   @ApiBearerAuth()
   findAll() {
-    return this.testsService.findAll();
+    return this.testService.findAll();
   }
 
   @Get(':id')
@@ -53,7 +56,7 @@ export class TestController {
   )
   @ApiBearerAuth()
   findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.testsService.findOne(id);
+    return this.testService.findOne(id);
   }
 
   @Get('by-designer/:designerId')
@@ -66,7 +69,7 @@ export class TestController {
   )
   @ApiBearerAuth()
   findByDesigner(@Param('designerId', ParseIntPipe) designerId: number) {
-    return this.testsService.findByTestDesigner(designerId);
+    return this.testService.findByTestDesigner(designerId);
   }
 
   @Patch(':id')
@@ -75,9 +78,10 @@ export class TestController {
   @ApiBearerAuth()
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body(ValidationPipe) updateTestDto: UpdateTestDto
+    @Body(ValidationPipe)
+    dto: UpdateTestDto
   ) {
-    return this.testsService.update(id, updateTestDto);
+    return this.testService.update(id, dto);
   }
 
   @Delete(':id')
@@ -85,8 +89,6 @@ export class TestController {
   @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
   @ApiBearerAuth()
   remove(@Param('id', ParseIntPipe) id: number) {
-    return this.testsService.remove(id);
+    return this.testService.remove(id);
   }
 }
-
-export { TestController as ServerTestController };

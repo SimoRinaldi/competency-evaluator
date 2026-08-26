@@ -6,17 +6,17 @@ import { TestExecutionEntity } from './entities/test-execution.entity';
 import { TestExecutionController } from './test-execution.controller';
 import { TestExecutionService } from './test-execution.service';
 import { TestExecutionRepository } from './test-execution.repository';
-import { EvaluatedUserSubModule } from '../evaluated-user/evaluated-user.module';
+import { EvaluatedUserModule } from '../evaluated-user/evaluated-user.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([TestExecutionEntity]),
     ServerUsersModule,
     ServerTestsManagementModule,
-    EvaluatedUserSubModule,
+    EvaluatedUserModule,
   ],
   controllers: [TestExecutionController],
   providers: [TestExecutionService, TestExecutionRepository],
   exports: [TestExecutionService, TestExecutionRepository],
 })
-export class TestExecutionSubModule {}
+export class TestExecutionModule {}

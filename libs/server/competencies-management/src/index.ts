@@ -1,4 +1,4 @@
-export * from './lib/competencies.module';
+export * from './lib/competencies-management.module';
 
 // Entità per relazioni
 export * from './lib/competency/entities/competency.entity';

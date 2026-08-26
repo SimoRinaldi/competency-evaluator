@@ -23,12 +23,6 @@
       "path": "../competencies-management/tsconfig.lib.json"
     },
     {
-      "path": "../tests-evaluation/tsconfig.lib.json"
-    },
-    {
-      "path": "../tests-execution/tsconfig.lib.json"
-    },
-    {
       "path": "../security/tsconfig.lib.json"
     },
     {

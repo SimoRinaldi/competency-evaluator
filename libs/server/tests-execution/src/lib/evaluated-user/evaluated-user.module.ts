@@ -15,4 +15,4 @@ import { ServerUsersModule } from '@server/users';
   providers: [EvaluatedUserService, EvaluatedUserRepository],
   exports: [EvaluatedUserService, EvaluatedUserRepository],
 })
-export class EvaluatedUserSubModule {}
+export class EvaluatedUserModule {}

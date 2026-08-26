@@ -1,4 +1,4 @@
-export * from './lib/test-execution.module';
+export * from './lib/tests-execution.module';
 
 // Entità per relazioni TypeORM
 export * from './lib/test-execution/entities/test-execution.entity';

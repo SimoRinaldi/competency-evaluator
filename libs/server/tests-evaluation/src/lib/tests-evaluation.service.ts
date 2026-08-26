@@ -4,15 +4,15 @@ import {
   CompetencyHistoricalScoreService,
   SubCompetencyHistoricalScoreService,
 } from '@server/historical-scores';
-import { ServerTestsExecutionService } from '@server/tests-execution';
+import { TestExecutionService } from '@server/tests-execution';
 
 @Injectable()
-export class ServerTestsEvaluationService {
+export class TestsEvaluationService {
   constructor(
     private readonly rubricLevelAssignmentsService: RubricLevelAssignmentService,
     private readonly subCompetencyHistoricalScoreService: SubCompetencyHistoricalScoreService,
     private readonly competencyHistoricalScoreService: CompetencyHistoricalScoreService,
-    private readonly testExecutionsService: ServerTestExecutionsService
+    private readonly testExecutionService: TestExecutionService
   ) {}
 
   async calculateTestScores(
@@ -142,12 +142,14 @@ export class ServerTestsEvaluationService {
       max_score += stats.max;
     }
 
-    await this.testExecutionsService.update(test_execution_id, {
+    await this.testExecutionService.update(test_execution_id, {
       test_score: test_score.toFixed(2),
       max_score: max_score.toFixed(2),
     });
   }
 }
 
-export { ServerTestsEvaluationService as ServerEvaluationsService };
-
+export {
+  TestsEvaluationService as ServerTestsEvaluationService,
+  TestsEvaluationService as ServerEvaluationsService,
+};

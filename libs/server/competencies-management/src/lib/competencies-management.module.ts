@@ -33,5 +33,3 @@ import { IndicatorModule } from './indicator/indicator.module';
   ],
 })
 export class ServerCompetenciesManagementModule {}
-
-export { ServerCompetenciesManagementModule as ServerCompetenciesModule };

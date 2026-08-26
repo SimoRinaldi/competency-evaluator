@@ -1,25 +1,23 @@
 import { Module } from '@nestjs/common';
 import { RubricLevelAssignmentModule } from './rubric-level-assignment/rubric-level-assignment.module';
-import { TestEvaluatorSubModule } from './test-evaluator/test-evaluator.module';
-import { ServerTestsEvaluationService } from './evaluations.service';
+import { TestEvaluatorModule } from './test-evaluator/test-evaluator.module';
+import { TestsEvaluationService } from './tests-evaluation.service';
 import { ServerHistoricalScoresModule } from '@server/historical-scores';
 import { ServerTestsExecutionModule } from '@server/tests-execution';
 
 @Module({
   imports: [
     RubricLevelAssignmentModule,
-    TestEvaluatorSubModule,
+    TestEvaluatorModule,
     ServerHistoricalScoresModule,
     ServerTestsExecutionModule,
   ],
   controllers: [],
-  providers: [ServerTestsEvaluationService],
+  providers: [TestsEvaluationService],
   exports: [
     RubricLevelAssignmentModule,
-    TestEvaluatorSubModule,
-    ServerTestsEvaluationService,
+    TestEvaluatorModule,
+    TestsEvaluationService,
   ],
 })
 export class ServerTestsEvaluationModule {}
-
-export { ServerTestsEvaluationModule as ServerEvaluationsModule };

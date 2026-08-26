@@ -22,7 +22,7 @@ describe('TestExecutionService', () => {
     findById: jest.fn(),
   };
 
-  const mockEvaluatedUsersRepository = {
+  const mockEvaluatedUserRepository = {
     findById: jest.fn(),
   };
 
@@ -39,8 +39,8 @@ describe('TestExecutionService', () => {
           useValue: mockTestRepository,
         },
         {
-          provide: EvaluatedUsersRepository,
-          useValue: mockEvaluatedUsersRepository,
+          provide: EvaluatedUserRepository,
+          useValue: mockEvaluatedUserRepository,
         },
       ],
     }).compile();

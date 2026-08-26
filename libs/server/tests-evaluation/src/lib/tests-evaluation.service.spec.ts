@@ -1,14 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ServerTestsEvaluationService } from './evaluations.service';
+import { TestsEvaluationService } from './tests-evaluation.service';
 import { RubricLevelAssignmentService } from './rubric-level-assignment/rubric-level-assignment.service';
 import {
   CompetencyHistoricalScoreService,
   SubCompetencyHistoricalScoreService,
 } from '@server/historical-scores';
-import { ServerTestsExecutionService } from '@server/tests-execution';
+import { TestExecutionService } from '@server/tests-execution';
 
-describe('ServerTestsEvaluationService', () => {
-  let service: ServerTestsEvaluationService;
+describe('TestsEvaluationService', () => {
+  let service: TestsEvaluationService;
 
   const mockRubricLevelAssignmentService = {
     findByTestExecutionWithRelations: jest.fn(),
@@ -23,14 +23,14 @@ describe('ServerTestsEvaluationService', () => {
     create: jest.fn(),
     update: jest.fn(),
   };
-  const mockTestExecutionsService = {
+  const mockTestExecutionService = {
     update: jest.fn(),
   };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        ServerTestsEvaluationService,
+        TestsEvaluationService,
         {
           provide: RubricLevelAssignmentService,
           useValue: mockRubricLevelAssignmentService,
@@ -44,14 +44,14 @@ describe('ServerTestsEvaluationService', () => {
           useValue: mockCompetencyHistoricalScoreService,
         },
         {
-          provide: ServerTestsExecutionService,
-          useValue: mockTestExecutionsService,
+          provide: TestExecutionService,
+          useValue: mockTestExecutionService,
         },
       ],
     }).compile();
 
-    service = module.get<ServerTestsEvaluationService>(
-      ServerTestsEvaluationService
+    service = module.get<TestsEvaluationService>(
+      TestsEvaluationService
     );
   });
 

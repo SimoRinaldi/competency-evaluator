@@ -17,19 +17,22 @@ import { TestExecutionService } from './test-execution.service';
 import { CreateTestExecutionDto } from './dto/create-test-execution.dto';
 import { UpdateTestExecutionDto } from './dto/update-test-execution.dto';
 
-@ApiTags('TestExecutions API')
+@ApiTags('Test Executions APIs')
 @Controller('test_executions')
 export class TestExecutionController {
   constructor(
-    private readonly testExecutionsService: TestExecutionService
+    private readonly testExecutionService: TestExecutionService
   ) {}
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.USER)
   @ApiBearerAuth()
-  create(@Body(ValidationPipe) createTestExecutionDto: CreateTestExecutionDto) {
-    return this.testExecutionsService.create(createTestExecutionDto);
+  create(
+    @Body(ValidationPipe)
+    dto: CreateTestExecutionDto
+  ) {
+    return this.testExecutionService.create(dto);
   }
 
   @Get()
@@ -42,7 +45,7 @@ export class TestExecutionController {
   )
   @ApiBearerAuth()
   findAll() {
-    return this.testExecutionsService.findAll();
+    return this.testExecutionService.findAll();
   }
 
   @Get(':id')
@@ -55,7 +58,7 @@ export class TestExecutionController {
   )
   @ApiBearerAuth()
   findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.testExecutionsService.findOne(id);
+    return this.testExecutionService.findOne(id);
   }
 
   @Get('by-user/:userId')
@@ -68,7 +71,7 @@ export class TestExecutionController {
   )
   @ApiBearerAuth()
   findByEvaluatedUser(@Param('userId', ParseIntPipe) userId: number) {
-    return this.testExecutionsService.findByEvaluatedUser(userId);
+    return this.testExecutionService.findByEvaluatedUser(userId);
   }
 
   @Get('by-test/:testId')
@@ -81,7 +84,7 @@ export class TestExecutionController {
   )
   @ApiBearerAuth()
   findByTest(@Param('testId', ParseIntPipe) testId: number) {
-    return this.testExecutionsService.findByTest(testId);
+    return this.testExecutionService.findByTest(testId);
   }
 
   @Patch(':id')
@@ -90,9 +93,10 @@ export class TestExecutionController {
   @ApiBearerAuth()
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body(ValidationPipe) updateTestExecutionDto: UpdateTestExecutionDto
+    @Body(ValidationPipe)
+    dto: UpdateTestExecutionDto
   ) {
-    return this.testExecutionsService.update(id, updateTestExecutionDto);
+    return this.testExecutionService.update(id, dto);
   }
 
   @Delete(':id')
@@ -100,8 +104,6 @@ export class TestExecutionController {
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   remove(@Param('id', ParseIntPipe) id: number) {
-    return this.testExecutionsService.remove(id);
+    return this.testExecutionService.remove(id);
   }
 }
-
-export { TestExecutionController as ServerTestExecutionController };

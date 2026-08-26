@@ -9,8 +9,6 @@ import {
   JoinTable,
 } from 'typeorm';
 import type { Relation } from 'typeorm';
-import type { TestExecutionEntity } from '@server/tests-execution';
-import type { TestEvaluatorEntity } from '@server/tests-evaluation';
 import { TestDesignerEntity } from '../../test-designer/entities/test-designer.entity';
 import { SubCompetencyEntity } from '@server/competencies-management';
 
@@ -29,8 +27,8 @@ export class TestEntity {
   @Column({ type: 'integer', nullable: false })
   test_designer_id!: number;
 
-  @OneToMany('TestExecutionEntity', (execution: any) => execution.test)
-  test_executions?: Relation<TestExecutionEntity>[];
+  @OneToMany('TestExecutionEntity', 'test')
+  test_executions?: unknown[];
 
   @ManyToMany(() => SubCompetencyEntity)
   @JoinTable({
@@ -58,5 +56,5 @@ export class TestEntity {
       referencedColumnName: 'id',
     },
   })
-  evaluators?: Relation<TestEvaluatorEntity>[];
+  evaluators?: unknown[];
 }
