@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { MoreThanOrEqual, Repository } from 'typeorm';
 import { CompetencyHistoricalScoreEntity } from './entities/competency-historical-score.entity';
 import { CreateCompetencyHistoricalScoreDto } from './dto/create-competency-historical-score.dto';
 import { UpdateCompetencyHistoricalScoreDto } from './dto/update-competency-historical-score.dto';
@@ -47,6 +47,16 @@ export class CompetencyHistoricalScoreRepository {
       user_id,
       competency_id,
     });
+  }
+
+  async findAcquiredCompetencies(
+    user_id: number,
+  ): Promise<CompetencyHistoricalScoreEntity[]> {
+    return this.repository.createQueryBuilder('comp_hist_score')
+      .innerJoinAndSelect('comp_hist_score.competency', 'competency')
+      .where('comp_hist_score.user_id = :id', { id: user_id })
+      .andWhere('comp_hist_score.score_absolute >= competency.threshold')
+      .getMany();
   }
 
   async updateOne(

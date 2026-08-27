@@ -1,6 +1,7 @@
 import {
   IsNotEmpty,
   IsNumber,
+  IsPositive,
   IsString,
   Max,
   Min,
@@ -25,4 +26,13 @@ export class CreateCompetencyDto {
   @Min(1)
   @Max(5)
   weight!: number;
+
+  @ApiProperty({
+    description: 'Soglia di acquisizione della competenza',
+    example: '30'
+  })
+  @IsNumber()
+  @IsPositive()
+  @IsNotEmpty()
+  threshold!: number;
 }

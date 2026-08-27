@@ -24,6 +24,7 @@ export class CompetencyRepository {
     const competency = this.repository.create({
       title: dto.title,
       weight: dto.weight,
+      threshold: dto.threshold
     });
     return this.repository.save(competency);
   }

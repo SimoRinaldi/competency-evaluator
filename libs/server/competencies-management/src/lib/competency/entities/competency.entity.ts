@@ -20,8 +20,11 @@ export class CompetencyEntity {
   })
   title!: string;
 
-  @Column({ type: 'int', nullable: false })
+  @Column({ type: 'integer', nullable: false })
   weight!: number;
+
+  @Column( {type: 'integer', nullable: false } )
+  threshold!: number;
 
   // Una competency ha molte subcompetencies
   @OneToMany(
