@@ -13,7 +13,7 @@ export class RubricLevelEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ type: 'text', nullable: false })
+  @Column({ type: 'varchar', length: 255, nullable: false })
   description!: string;
 
   @Column({ type: 'integer', nullable: false })

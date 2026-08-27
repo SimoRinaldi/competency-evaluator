@@ -30,22 +30,19 @@ export class SubCompetencyEntity {
   weight!: number;
 
   @Column({
-    type: 'varchar',
-    length: 255,
+    type: 'text',
     nullable: true,
   })
   input?: string;
 
   @Column({
-    type: 'varchar',
-    length: 255,
+    type: 'text',
     nullable: true,
   })
   output?: string;
 
   @Column({
-    type: 'varchar',
-    length: 255,
+    type: 'text',
     nullable: true,
   })
   action?: string;
