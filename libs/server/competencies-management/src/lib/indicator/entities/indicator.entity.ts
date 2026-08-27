@@ -9,7 +9,7 @@ import type { Relation } from 'typeorm';
 import { RubricSetEntity } from '../../rubric/entities/rubric-set.entity';
 import { ObservationObjectEntity } from '../../observation-object/entities/observation-object.entity';
 
-@Entity('indicators')
+@Entity('indicator')
 export class IndicatorEntity {
   @PrimaryGeneratedColumn()
   id!: number;

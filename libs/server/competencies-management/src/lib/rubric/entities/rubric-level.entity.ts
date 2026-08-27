@@ -8,7 +8,7 @@ import {
 import type { Relation } from 'typeorm';
 import { RubricSetEntity } from './rubric-set.entity';
 
-@Entity('rubric_levels')
+@Entity('rubric_level')
 export class RubricLevelEntity {
   @PrimaryGeneratedColumn()
   id!: number;

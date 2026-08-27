@@ -10,7 +10,7 @@ import type { Relation } from 'typeorm';
 import { UserEntity } from '@server/users';
 import { TestExecutionEntity } from '../../test-execution/entities/test-execution.entity';
 
-@Entity('evaluated_users')
+@Entity('evaluated_user')
 export class EvaluatedUserEntity {
   @PrimaryGeneratedColumn()
   id!: number;

@@ -10,7 +10,7 @@ import { TestEvaluatorEntity } from '../../test-evaluator/entities/test-evaluato
 import { IndicatorEntity } from '@server/competencies-management';
 import { TestExecutionEntity } from '@server/tests-execution';
 
-@Entity('rubric_level_assignments')
+@Entity('rubric_level_assignment')
 export class RubricLevelAssignmentEntity {
   @PrimaryGeneratedColumn()
   id!: number;

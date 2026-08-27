@@ -11,7 +11,7 @@ import { EvaluatedUserEntity } from '../../evaluated-user/entities/evaluated-use
 import { TestEntity } from '@server/tests-management';
 import { TestOutputEntity } from '../../test-output/entities/test-output.entity';
 
-@Entity('test_executions')
+@Entity('test_execution')
 export class TestExecutionEntity {
   @PrimaryGeneratedColumn()
   id!: number;

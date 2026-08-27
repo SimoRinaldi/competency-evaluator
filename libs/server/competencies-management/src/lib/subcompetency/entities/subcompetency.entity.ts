@@ -13,7 +13,7 @@ import { ToolEntity } from '../../tool/entities/tool.entity';
 import { MethodEntity } from '../../method/entities/method.entity';
 import { SkillEntity } from '../../skill/entities/skill.entity';
 
-@Entity('subcompetencies')
+@Entity('subcompetency')
 export class SubCompetencyEntity {
   @PrimaryGeneratedColumn()
   id!: number;

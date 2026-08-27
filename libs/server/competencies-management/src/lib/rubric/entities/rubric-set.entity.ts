@@ -3,7 +3,7 @@ import type { Relation } from 'typeorm';
 import { RubricLevelEntity } from './rubric-level.entity';
 import { IndicatorEntity } from '../../indicator/entities/indicator.entity';
 
-@Entity('rubric_sets')
+@Entity('rubric_set')
 export class RubricSetEntity {
   @PrimaryGeneratedColumn()
   id!: number;

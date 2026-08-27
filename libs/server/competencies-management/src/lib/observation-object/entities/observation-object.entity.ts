@@ -10,7 +10,7 @@ import type { Relation } from 'typeorm';
 import { IndicatorEntity } from '../../indicator/entities/indicator.entity';
 import { SubCompetencyEntity } from '../../subcompetency/entities/subcompetency.entity';
 
-@Entity('observation_objects')
+@Entity('observation_object')
 export class ObservationObjectEntity {
   @PrimaryGeneratedColumn()
   id!: number;

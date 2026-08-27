@@ -12,7 +12,7 @@ import type { Relation } from 'typeorm';
 import { TestDesignerEntity } from '../../test-designer/entities/test-designer.entity';
 import { SubCompetencyEntity } from '@server/competencies-management';
 
-@Entity('tests')
+@Entity('test')
 export class TestEntity {
   @PrimaryGeneratedColumn()
   id!: number;
@@ -46,7 +46,7 @@ export class TestEntity {
 
   @ManyToMany('TestEvaluatorEntity')
   @JoinTable({
-    name: 'test_evaluations',
+    name: 'test_evaluation',
     joinColumn: {
       name: 'test_id',
       referencedColumnName: 'id',

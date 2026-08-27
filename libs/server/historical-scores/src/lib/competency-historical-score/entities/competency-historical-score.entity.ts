@@ -9,7 +9,7 @@ import type { Relation } from 'typeorm';
 import { UserEntity } from '@server/users';
 import { CompetencyEntity } from '@server/competencies-management';
 
-@Entity('competency_historical_scores')
+@Entity('competency_historical_score')
 export class CompetencyHistoricalScoreEntity {
   @PrimaryGeneratedColumn()
   id!: number;

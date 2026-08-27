@@ -10,7 +10,7 @@ import type { Relation } from 'typeorm';
 import { UserEntity } from '@server/users';
 import { RubricLevelAssignmentEntity } from '../../rubric-level-assignment/entities/rubric-level-assignment.entity';
 
-@Entity('test_evaluators')
+@Entity('test_evaluator')
 export class TestEvaluatorEntity {
   @PrimaryGeneratedColumn()
   id!: number;

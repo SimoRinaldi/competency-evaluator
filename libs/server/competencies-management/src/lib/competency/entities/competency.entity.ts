@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import { SubCompetencyEntity } from '../../subcompetency/entities/subcompetency.entity';
 
-@Entity('competencies')
+@Entity('competency')
 export class CompetencyEntity {
   @PrimaryGeneratedColumn()
   id!: number;
