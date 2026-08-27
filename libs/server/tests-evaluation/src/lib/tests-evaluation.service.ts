@@ -1,25 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { RubricLevelAssignmentService } from './rubric-level-assignment/rubric-level-assignment.service';
-import {
-  CompetencyHistoricalScoreService,
-  SubCompetencyHistoricalScoreService,
-} from '@server/historical-scores';
+import { RubricLevelAssignmentEntity } from './rubric-level-assignment/entities/rubric-level-assignment.entity';
+import { HistoricalScoresService } from '@server/historical-scores';
 import { TestExecutionService } from '@server/tests-execution';
+import { CompetencyService } from '@server/competencies-management';
 
 @Injectable()
 export class TestsEvaluationService {
   constructor(
     private readonly rubricLevelAssignmentsService: RubricLevelAssignmentService,
-    private readonly subCompetencyHistoricalScoreService: SubCompetencyHistoricalScoreService,
-    private readonly competencyHistoricalScoreService: CompetencyHistoricalScoreService,
-    private readonly testExecutionService: TestExecutionService
+    private readonly historicalScoresService: HistoricalScoresService,
+    private readonly testExecutionService: TestExecutionService,
+    private readonly competencyService: CompetencyService,
   ) {}
 
   async calculateTestScores(
     test_execution_id: number,
     user_id: number
   ): Promise<void> {
-    // estrae tutti i rubricLevelAssignments relativi ad una test_execution
+    // Estrazione di tutti i rubricLevelAssignments relativi ad una test_execution
     const rubricLevelAssignments =
       await this.rubricLevelAssignmentsService.findByTestExecutionWithRelations(
         test_execution_id
@@ -29,17 +28,30 @@ export class TestsEvaluationService {
       return;
     }
 
-    // Mappa per aggregare i voti di TUTTI i valutatori per ogni singolo indicatore.
-    const groupedIndicators = new Map<
-      number,
-      {
-        sum_rank: number;
-        count: number;
-        data: (typeof rubricLevelAssignments)[0];
-      }
-    >();
+    // Aggregazione dei voti dei valutatori per ogni singolo indicatore
+    const groupedIndicators = this.aggregateIndicatorRanks(rubricLevelAssignments);
 
-    // scorre TUTTI i voti (rubricLevelAssignments) inseriti per questa esecuzione del test
+    // Calcolo dei punteggi (ottenuto e massimo) per ogni sotto-competenza associata al test
+    const subCompetencyScores = this.calculateSubCompetencyTestScores(groupedIndicators);
+
+    // Inserimento o aggiornamento dei record delle sotto-competenze associate a questo test
+    await this.upsertSubCompetenciesScores(subCompetencyScores, user_id);
+
+    // Identificazione delle competenze associate al test
+    const testCompetencies = await this.identifyTestCompetencies(subCompetencyScores);
+
+    // Ricalcolo del punteggio storico per ogni competenza associata al test
+    await this.recalculateHistoricalCompetencies(testCompetencies, user_id);
+
+    // Aggiornamento del punteggio del test
+    await this.updateTestExecutionScore(test_execution_id, subCompetencyScores);
+  }
+
+  private aggregateIndicatorRanks(
+    rubricLevelAssignments: RubricLevelAssignmentEntity[]
+  ): Map<number, { sum_rank: number; count: number; data: RubricLevelAssignmentEntity }> {
+    const groupedIndicators = new Map<number, { sum_rank: number; count: number; data: RubricLevelAssignmentEntity }>();
+
     for (const rla of rubricLevelAssignments) {
       const ind_id = rla.indicator?.id ?? rla.indicator_id;
 
@@ -54,11 +66,13 @@ export class TestsEvaluationService {
       groupedIndicators.set(ind_id, current);
     }
 
-    // Mappa per accumulare i punteggi totali (ottenuto e massimo) per ogni sotto-competenza.
-    const subCompetencyScores = new Map<
-      number,
-      { obtained: number; max: number; competency_id?: number }
-    >();
+    return groupedIndicators;
+  }
+
+  private calculateSubCompetencyTestScores(
+    groupedIndicators: Map<number, { sum_rank: number; count: number; data: any }>
+  ): Map<number, { obtained: number; max: number; competency_id?: number }> {
+    const subCompetencyScores = new Map<number, { obtained: number; max: number; competency_id?: number }>();
 
     for (const indicator_stats of groupedIndicators.values()) {
       const average_RL = indicator_stats.sum_rank / indicator_stats.count;
@@ -88,52 +102,81 @@ export class TestsEvaluationService {
       subCompetencyScores.set(subcomp.id, currentSubComp);
     }
 
-    // Mappa per accumulare i punteggi totali (ottenuto e massimo) per la singola competenza padre.
-    const competencyScores = new Map<
-      number,
-      { obtained: number; max: number }
-    >();
+    return subCompetencyScores;
+  }
 
+  private async upsertSubCompetenciesScores(
+    subCompetencyScores: Map<number, { obtained: number; max: number; competency_id?: number }>,
+    user_id: number
+  ): Promise<void> {
     for (const [subcomp_id, subcompStats] of subCompetencyScores.entries()) {
       const subcomp_percentage =
         subcompStats.max > 0
           ? (subcompStats.obtained / subcompStats.max) * 100
           : 0;
 
-      await this.subCompetencyHistoricalScoreService.create({
-        score_absolute: Math.round(subcompStats.obtained),
-        score_percentage: subcomp_percentage.toFixed(2),
-        user_id: user_id,
-        subcompetency_id: subcomp_id,
-      });
+      await this.historicalScoresService.upsertSubCompetencyScores(
+        subcomp_id,
+        subcompStats.obtained,
+        subcomp_percentage,
+        user_id
+      );
+    }
+  }
 
+  private async identifyTestCompetencies(
+    subCompetencyScores: Map<number, { obtained: number; max: number; competency_id?: number }>
+  ): Promise<Set<number>> {
+    const testCompetencies = new Set<number>();
+
+    for (const subcompStats of subCompetencyScores.values()) {
       if (subcompStats.competency_id !== undefined) {
-        const currentComp = competencyScores.get(
-          subcompStats.competency_id
-        ) ?? {
-          obtained: 0,
-          max: 0,
-        };
-
-        currentComp.obtained += subcompStats.obtained;
-        currentComp.max += subcompStats.max;
-        competencyScores.set(subcompStats.competency_id, currentComp);
+        testCompetencies.add(subcompStats.competency_id);
       }
     }
 
-    for (const [comp_id, compStats] of competencyScores.entries()) {
-      const comp_percentage =
-        compStats.max > 0 ? (compStats.obtained / compStats.max) * 100 : 0;
+    return testCompetencies;
+  }
 
-      await this.competencyHistoricalScoreService.create({
-        score_absolute: Math.round(compStats.obtained),
-        score_percentage: comp_percentage.toFixed(2),
-        user_id: user_id,
-        competency_id: comp_id,
-      });
+  private async recalculateHistoricalCompetencies(
+    testCompetencies: Set<number>,
+    user_id: number
+  ): Promise<void> {
+    for (const comp_id of testCompetencies) {
+      const competency = await this.competencyService.findOne(comp_id);
+      if (!competency || !competency.subcompetencies) continue;
+
+      let total_obtained = 0;
+      let total_max = 0;
+
+      for (const subcomp of competency.subcompetencies) {
+        const hist = await this.historicalScoresService.getSubCompetencyScore(subcomp.id, user_id);
+        if (hist) {
+          total_obtained += Number(hist.score_absolute);
+          const perc = parseFloat(hist.score_percentage);
+          if (perc > 0) {
+            const max = (Number(hist.score_absolute) / perc) * 100;
+            total_max += max;
+          }
+        }
+      }
+
+      if (total_max > 0) {
+        const final_perc = (total_obtained / total_max) * 100;
+        await this.historicalScoresService.upsertCompetencyScores(
+          comp_id,
+          user_id,
+          total_obtained,
+          final_perc
+        );
+      }
     }
+  }
 
-    // Aggiornamento punteggio globale del test
+  private async updateTestExecutionScore(
+    test_execution_id: number,
+    subCompetencyScores: Map<number, { obtained: number; max: number; competency_id?: number }>
+  ): Promise<void> {
     let test_score = 0;
     let max_score = 0;
 
@@ -148,8 +191,3 @@ export class TestsEvaluationService {
     });
   }
 }
-
-export {
-  TestsEvaluationService as ServerTestsEvaluationService,
-  TestsEvaluationService as ServerEvaluationsService,
-};
