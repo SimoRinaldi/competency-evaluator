@@ -7,13 +7,13 @@ import { TestDesignerRepository } from './test-designer.repository';
 import { CreateTestDesignerDto } from './dto/create-test-designer.dto';
 import { UpdateTestDesignerDto } from './dto/update-test-designer.dto';
 import { TestDesignerEntity } from './entities/test-designer.entity';
-import { ServerUsersService } from '@server/users';
+import { UsersService } from '@server/users';
 
 @Injectable()
 export class TestDesignerService {
   constructor(
     private readonly repository: TestDesignerRepository,
-    private readonly usersService: ServerUsersService
+    private readonly usersService: UsersService
   ) {}
 
   async create(dto: CreateTestDesignerDto): Promise<TestDesignerEntity> {

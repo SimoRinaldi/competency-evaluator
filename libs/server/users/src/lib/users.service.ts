@@ -7,7 +7,7 @@ import { UserRole } from './dto/user-role.enum';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
-export class ServerUsersService {
+export class UsersService {
     constructor(private readonly usersRepository: UsersRepository){}
 
     async findByEmail(email: string): Promise<UserEntity> {

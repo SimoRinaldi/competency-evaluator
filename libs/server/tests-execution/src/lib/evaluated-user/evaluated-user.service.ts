@@ -7,13 +7,13 @@ import { EvaluatedUserRepository } from './evaluated-user.repository';
 import { CreateEvaluatedUserDto } from './dto/create-evaluated-user.dto';
 import { UpdateEvaluatedUserDto } from './dto/update-evaluated-user.dto';
 import { EvaluatedUserEntity } from './entities/evaluated-user.entity';
-import { ServerUsersService } from '@server/users';
+import { UsersService } from '@server/users';
 
 @Injectable()
 export class EvaluatedUserService {
   constructor(
     private readonly repository: EvaluatedUserRepository,
-    private readonly usersService: ServerUsersService
+    private readonly usersService: UsersService
   ) {}
 
   async create(dto: CreateEvaluatedUserDto): Promise<EvaluatedUserEntity> {

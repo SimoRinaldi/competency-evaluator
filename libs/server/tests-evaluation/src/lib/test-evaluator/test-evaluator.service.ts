@@ -7,13 +7,13 @@ import { TestEvaluatorRepository } from './test-evaluator.repository';
 import { CreateTestEvaluatorDto } from './dto/create-test-evaluator.dto';
 import { UpdateTestEvaluatorDto } from './dto/update-test-evaluator.dto';
 import { TestEvaluatorEntity } from './entities/test-evaluator.entity';
-import { ServerUsersService } from '@server/users';
+import { UsersService } from '@server/users';
 
 @Injectable()
 export class TestEvaluatorService {
   constructor(
     private readonly repository: TestEvaluatorRepository,
-    private readonly usersService: ServerUsersService
+    private readonly usersService: UsersService
   ) {}
 
   async create(dto: CreateTestEvaluatorDto): Promise<TestEvaluatorEntity> {
