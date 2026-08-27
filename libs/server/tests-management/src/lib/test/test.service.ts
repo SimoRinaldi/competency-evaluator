@@ -40,7 +40,7 @@ export class TestService {
   }
 
   async findByTestDesigner(designerId: number): Promise<TestEntity[]> {
-    const designer = await this.testDesignersRepository.findById(designerId);
+    const designer = await this.testDesignerRepository.findById(designerId);
     if (!designer) {
       throw new NotFoundException(
         `Test designer con ID ${designerId} non trovato.`
@@ -60,7 +60,7 @@ export class TestService {
       dto.test_designer_id !== undefined &&
       dto.test_designer_id !== test.test_designer_id
     ) {
-      const designer = await this.testDesignersRepository.findById(
+      const designer = await this.testDesignerRepository.findById(
         dto.test_designer_id
       );
       if (!designer) {

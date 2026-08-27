@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TestService } from './test.service';
 import { TestRepository } from './test.repository';
-import { TestDesignersRepository } from '@server/users';
+import { TestDesignerRepository } from '@server/users';
 
 describe('TestService', () => {
   let service: TestService;
@@ -15,7 +15,7 @@ describe('TestService', () => {
     deleteOne: jest.fn(),
   };
 
-  const mockTestDesignersRepository = {
+  const mockTestDesignerRepository = {
     findById: jest.fn(),
   };
 
@@ -28,8 +28,8 @@ describe('TestService', () => {
           useValue: mockTestRepository,
         },
         {
-          provide: TestDesignersRepository,
-          useValue: mockTestDesignersRepository,
+          provide: TestDesignerRepository,
+          useValue: mockTestDesignerRepository,
         },
       ],
     }).compile();
