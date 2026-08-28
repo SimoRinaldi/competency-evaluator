@@ -13,8 +13,9 @@ export class RubricSetEntity {
 
   @OneToMany(() => RubricLevelEntity, (level) => level.rubric_set, {
     cascade: true,
+    orphanedRowAction: 'delete', // cancella i livelli che non appartengono piu al rubric_set (ad esempio quando un rubric set diventa binario)
   })
-  levels?: Relation<RubricLevelEntity>[];
+  levels!: Relation<RubricLevelEntity>[];
 
   @OneToMany(() => IndicatorEntity, (indicator) => indicator.rubric_set)
   indicators?: Relation<IndicatorEntity>[];
