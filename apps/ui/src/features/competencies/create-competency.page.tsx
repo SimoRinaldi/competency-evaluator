@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createCompetency } from './competencies.api';
 import styles from '../css/shared.module.css';
+import { Step1Competency } from './components/step1-competency';
+import { Step2SubCompetencies } from './components/step2-subcompetencies';
 
 export function CreateCompetencyPage() {
   const navigate = useNavigate();
@@ -13,6 +15,8 @@ export function CreateCompetencyPage() {
     weight: '',
     threshold: '',
   });
+
+  const [subCompetencies, setSubCompetencies] = useState<any[]>([]);
 
   return (
     <div className={styles.page}>
@@ -40,75 +44,15 @@ export function CreateCompetencyPage() {
         )}
 
         {step === 2 && (
-          <div>
-            <h3>Step 2: Aggiungi Sottocompetenze</h3>
-            <p>Qui metteremo il prossimo form...</p>
-            {/* Bottone di undo */}
-            <button className={styles.button} onClick={() => setStep(1)}>
-              Indietro
-            </button>
-          </div>
+          <Step2SubCompetencies
+            list={subCompetencies}
+            onAdd={(newSub) => setSubCompetencies([...subCompetencies, newSub])}
+            onNext={() => setStep(3)}
+            onPrev={() => setStep(1)}
+          />
         )}
       </div>
     </div>
-  );
-}
-
-function Step1Competency({ data, onChange, onNext }: any) {
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    onNext();
-  }
-
-  return (
-    <form onSubmit={handleSubmit} className={styles.form}>
-      <div className={styles.field}>
-        <label>
-          Titolo <span className={styles.requiredAsterisk}>*</span>
-        </label>
-        <input
-          type="text"
-          required
-          className={styles.input}
-          value={data.title}
-          onChange={(e) => onChange({ ...data, title: e.target.value })}
-          placeholder="es. Definire l'idea progettuale"
-        />
-      </div>
-
-      <div className={styles.field}>
-        <label>
-          Peso (1-5) <span className={styles.requiredAsterisk}>*</span>
-        </label>
-        <input
-          type="number"
-          min="1"
-          max="5"
-          required
-          className={styles.input}
-          value={data.weight}
-          onChange={(e) => onChange({ ...data, weight: e.target.value })}
-        />
-      </div>
-
-      <div className={styles.field}>
-        <label>
-          Soglia <span className={styles.requiredAsterisk}>*</span>
-        </label>
-        <input
-          type="number"
-          min="1"
-          required
-          className={styles.input}
-          value={data.threshold}
-          onChange={(e) => onChange({ ...data, threshold: e.target.value })}
-        />
-      </div>
-
-      <button type="submit" className={styles.button}>
-        Avanti
-      </button>
-    </form>
   );
 }
 
