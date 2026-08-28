@@ -2,6 +2,7 @@ import {
   IsArray,
   IsNotEmpty,
   IsNumber,
+  IsPositive,
   IsOptional,
   IsString,
   Max,
@@ -86,4 +87,13 @@ export class CreateSubCompetencyDto {
   @IsNumber({}, { each: true })
   @IsOptional()
   skill_ids?: number[];
+
+  @ApiProperty({
+      description: 'Soglia di acquisizione della sotto-competenza',
+      example: '30'
+    })
+  @IsNumber()
+  @IsPositive()
+  @IsNotEmpty()
+  threshold!: number;
 }

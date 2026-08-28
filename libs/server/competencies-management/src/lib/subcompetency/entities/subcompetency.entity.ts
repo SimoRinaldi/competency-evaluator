@@ -26,7 +26,7 @@ export class SubCompetencyEntity {
   })
   title!: string;
 
-  @Column({ type: 'int', nullable: false })
+  @Column({ type: 'integer', nullable: false })
   weight!: number;
 
   @Column({
@@ -47,7 +47,10 @@ export class SubCompetencyEntity {
   })
   action?: string;
 
-  @Column({ type: 'int', nullable: false })
+  @Column( {type: 'integer', nullable: false } )
+  threshold!: number;
+
+  @Column({ type: 'integer', nullable: false })
   competency_id!: number;
 
   // Una sub_competency si riferisce a una competency

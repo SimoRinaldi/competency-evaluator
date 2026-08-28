@@ -51,6 +51,16 @@ export class SubCompetencyHistoricalScoreRepository {
     });
   }
 
+  async findAcquiredSubCompetencies(
+    user_id: number,
+  ): Promise<SubCompetencyHistoricalScoreEntity[]> {
+    return this.repository.createQueryBuilder('subcomp_hist_score')
+      .innerJoinAndSelect('subcomp_hist_score.subcompetency', 'subcompetency')
+      .where('subcomp_hist_score.user_id = :id', { id: user_id })
+      .andWhere('subcomp_hist_score.score_absolute >= subcompetency.threshold')
+      .getMany();
+  }
+
   async updateOne(
     score: SubCompetencyHistoricalScoreEntity,
     dto: UpdateSubCompetencyHistoricalScoreDto

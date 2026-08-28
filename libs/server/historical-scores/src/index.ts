@@ -12,3 +12,5 @@ export * from './lib/competency-historical-score/competency-historical-score.rep
 export * from './lib/subcompetency-historical-score/subcompetency-historical-score.service';
 export * from './lib/subcompetency-historical-score/subcompetency-historical-score.module';
 export * from './lib/subcompetency-historical-score/subcompetency-historical-score.repository';
+
+export * from './lib/historical-scores.service';

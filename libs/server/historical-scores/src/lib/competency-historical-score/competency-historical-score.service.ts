@@ -51,7 +51,17 @@ export class CompetencyHistoricalScoreService {
     userId: number,
     competencyId: number
   ): Promise<CompetencyHistoricalScoreEntity | null> {
-    return this.repository.findByUserAndCompetency(userId, competencyId);
+    return await this.repository.findByUserAndCompetency(userId, competencyId);
+  }
+
+  async findAcquiredCompetencies(
+    user_id: number,
+  ): Promise <CompetencyHistoricalScoreEntity[]> {
+    const acquiredCompetencies = await this.repository.findAcquiredCompetencies(user_id);
+    if (acquiredCompetencies.length === 0)
+      throw new NotFoundException(`Nessuna competenza acquisita trovata per l'utente ${user_id}`);
+
+    return acquiredCompetencies;
   }
 
   async update(

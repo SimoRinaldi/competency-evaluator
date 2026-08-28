@@ -54,6 +54,16 @@ export class SubCompetencyHistoricalScoreService {
     return this.repository.findByUserAndSubCompetency(userId, subcompetencyId);
   }
 
+  async findAcquiredSubCompetencies(
+      user_id: number,
+    ): Promise <SubCompetencyHistoricalScoreEntity[]> {
+      const acquiredSubCompetencies = await this.repository.findAcquiredSubCompetencies(user_id);
+      if (acquiredSubCompetencies.length === 0)
+        throw new NotFoundException(`Nessuna sotto-competenza acquisita trovata per l'utente ${user_id}`);
+  
+      return acquiredSubCompetencies;
+    }
+
   async update(
     id: number,
     dto: UpdateSubCompetencyHistoricalScoreDto
