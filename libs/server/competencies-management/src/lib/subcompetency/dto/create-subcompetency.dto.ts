@@ -70,7 +70,7 @@ export class CreateSubCompetencyDto {
     example: [1, 2],
   })
   @IsArray()
-  @IsInt({}, { each: true })
+  @IsInt({ each: true })
   @IsOptional()
   tool_ids?: number[];
 
@@ -80,7 +80,7 @@ export class CreateSubCompetencyDto {
     example: [1],
   })
   @IsArray()
-  @IsInt({}, { each: true })
+  @IsInt({ each: true })
   @IsOptional()
   method_ids?: number[];
 
@@ -90,7 +90,7 @@ export class CreateSubCompetencyDto {
     example: [3],
   })
   @IsArray()
-  @IsInt({}, { each: true })
+  @IsInt({ each: true })
   @IsOptional()
   skill_ids?: number[];
 

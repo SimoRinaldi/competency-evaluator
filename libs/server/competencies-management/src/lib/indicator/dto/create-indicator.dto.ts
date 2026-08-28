@@ -1,4 +1,4 @@
-import { IsInt, IsString, Min, Max, IsNotEmpty } from 'class-validator';
+import { IsInt, IsString, Min, Max, IsNotEmpty, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateIndicatorDto {
@@ -23,9 +23,8 @@ export class CreateIndicatorDto {
     description: 'ID del set di rubriche associato',
     required: true,
   })
-  @IsNotEmpty()
   @IsInt()
-  rubric_set_id!: number;
+  rubric_set_id?: number;
 
   @ApiProperty({
     example: 42,

@@ -18,3 +18,9 @@ export * from './lib/rubric/rubric.service';
 export * from './lib/rubric/rubric.module';
 export * from './lib/observation-object/observation-object.service';
 export * from './lib/observation-object/observation-object.module';
+export * from './lib/competency/competency.service';
+export * from './lib/competency/competency.module';
+export * from './lib/subcompetency/subcompetency.service';
+export * from './lib/subcompetency/subcompetency.module';
+
+export * from './lib/competencies-management.service'

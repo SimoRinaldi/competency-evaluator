@@ -6,10 +6,11 @@ import {
   IsArray,
   ValidateNested,
   Min,
-  Max,
+  Max
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsRubricLevelsCountValid } from '../validators/rubric-levels-count.validator';
 
 export class CreateRubricLevelDto {
   @ApiProperty({
@@ -53,5 +54,6 @@ export class CreateRubricSetDto {
   @ValidateNested({ each: true })
   @Type(() => CreateRubricLevelDto)
   @IsNotEmpty()
+  @IsRubricLevelsCountValid()
   levels!: CreateRubricLevelDto[];
 }
