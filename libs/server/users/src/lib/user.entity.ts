@@ -3,23 +3,22 @@ import { UserRole } from './dto/user-role.enum.js';
 
 @Entity('users')
 export class UserEntity {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column({type:'varchar', length: 255, nullable: false})
-    name: string;
+  @Column({ type: 'varchar', length: 255, nullable: false })
+  name: string;
 
-    @Column({type:'varchar', length:320, nullable: false, unique: true})
-    email: string;
+  @Column({ type: 'varchar', length: 320, nullable: false, unique: true })
+  email: string;
 
-    @Column()
-    passwordHash: string;
+  @Column()
+  passwordHash: string;
 
-    @Column({
-        type: 'enum',
-        enum: UserRole,
-        default: UserRole.USER
-    })
-    role: UserRole;
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.USER,
+  })
+  role: UserRole;
 }
-

@@ -16,16 +16,8 @@ export class TestExecutionEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @ManyToOne(() => TestEntity, (test) => test.test_executions)
-  @JoinColumn({ name: 'test_id' })
-  test?: Relation<TestEntity>;
-
   @Column({ type: 'integer', nullable: false })
   test_id!: number;
-
-  @ManyToOne(() => EvaluatedUserEntity)
-  @JoinColumn({ name: 'user_id' })
-  evaluated_user?: Relation<EvaluatedUserEntity>;
 
   @Column({ type: 'integer', nullable: false })
   user_id!: number;
@@ -35,6 +27,16 @@ export class TestExecutionEntity {
 
   @Column({ type: 'numeric', nullable: true })
   max_score?: string | null;
+
+  @ManyToOne(() => TestEntity, (test) => test.test_executions, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'test_id' })
+  test?: Relation<TestEntity>;
+
+  @ManyToOne(() => EvaluatedUserEntity, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'user_id' })
+  evaluated_user?: Relation<EvaluatedUserEntity>;
 
   @OneToMany(() => TestOutputEntity, (output) => output.test_execution)
   test_outputs?: Relation<TestOutputEntity>[];

@@ -13,16 +13,20 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateRubricLevelDto {
   @ApiProperty({
+    required: true,
     example: 'Inadeguato',
     description: 'Testo che descrive questo livello',
   })
+  @IsNotEmpty()
   @IsString()
   description!: string;
 
   @ApiProperty({
+    required: true,
     example: 1,
     description: 'Valore numerico del livello',
   })
+  @IsNotEmpty()
   @IsInt()
   @Min(1)
   @Max(5)
@@ -31,14 +35,17 @@ export class CreateRubricLevelDto {
 
 export class CreateRubricSetDto {
   @ApiProperty({
+    required: true,
     example: false,
     description:
       'True per valutazione binaria (Si/No), False per scala standard',
   })
+  @IsNotEmpty()
   @IsBoolean()
   yes_no!: boolean;
 
   @ApiProperty({
+    required: true,
     type: () => [CreateRubricLevelDto],
     description: 'Elenco dei livelli da creare insieme al set',
   })

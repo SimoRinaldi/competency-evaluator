@@ -26,16 +26,16 @@ export class ToolController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
   @ApiBearerAuth()
-  getTools() {
-    return this.toolService.getTools();
+  findAll() {
+    return this.toolService.findAll();
   }
 
   @Get(':id') // GET /tools/:id
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
   @ApiBearerAuth()
-  getOneTool(@Param('id', ParseIntPipe) id: number) {
-    return this.toolService.getOneTool(id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.toolService.findOne(id);
   }
 
   @Post() // POST /tools
@@ -61,7 +61,7 @@ export class ToolController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
-  removeTool(@Param('id', ParseIntPipe) id: number) {
-    return this.toolService.removeTool(id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.toolService.remove(id);
   }
 }

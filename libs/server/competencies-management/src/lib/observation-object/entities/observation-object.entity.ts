@@ -18,19 +18,20 @@ export class ObservationObjectEntity {
   @Column({ type: 'text', nullable: false })
   description!: string;
 
+  @Column({ type: 'integer', nullable: false })
+  subcompetency_id!: number;
+
   @OneToMany(
     () => IndicatorEntity,
     (indicator) => indicator.observation_object,
     {
       cascade: true,
+      orphanedRowAction: 'delete', // cancella gli indicatori rimossi dall'array durante un update
     }
   )
   indicators?: Relation<IndicatorEntity>[];
 
-  @OneToOne(() => SubCompetencyEntity)
+  @OneToOne(() => SubCompetencyEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'subcompetency_id' })
   subcompetency?: Relation<SubCompetencyEntity>;
-
-  @Column({ type: 'integer', nullable: false })
-  subcompetency_id!: number;
 }

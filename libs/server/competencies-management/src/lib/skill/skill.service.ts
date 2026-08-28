@@ -12,7 +12,7 @@ import { SkillRepository } from './skill.repository';
 export class SkillService {
   constructor(private readonly skillRepository: SkillRepository) {}
 
-  async getOneSkill(id: number): Promise<SkillEntity> {
+  async findOne(id: number): Promise<SkillEntity> {
     const skill = await this.skillRepository.findById(id);
 
     if (!skill) throw new NotFoundException(`Skill with id ${id} not found`);
@@ -20,7 +20,7 @@ export class SkillService {
     return skill;
   }
 
-  async getSkills(): Promise<SkillEntity[]> {
+  async findAll(): Promise<SkillEntity[]> {
     const skills = await this.skillRepository.findAll();
 
     if (skills && skills.length === 0) {
@@ -57,7 +57,7 @@ export class SkillService {
     return updated;
   }
 
-  async removeSkill(id: number): Promise<void> {
+  async remove(id: number): Promise<void> {
     const deleted = await this.skillRepository.deleteOne(id);
     if (!deleted) {
       throw new NotFoundException(`Skill with id ${id} not found`);

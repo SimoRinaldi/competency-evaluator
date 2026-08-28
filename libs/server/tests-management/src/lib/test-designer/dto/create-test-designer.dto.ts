@@ -3,6 +3,7 @@ import { IsInt, IsNotEmpty, IsPositive } from 'class-validator';
 
 export class CreateTestDesignerDto {
   @ApiProperty({
+    required: true,
     example: 1,
     description: "ID dell'utente associato come Test Designer",
   })

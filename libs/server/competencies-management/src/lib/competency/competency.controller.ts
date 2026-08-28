@@ -26,16 +26,16 @@ export class CompetencyController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
   @ApiBearerAuth()
-  getCompetencies() {
-    return this.competencyService.getCompetencies();
+  findAll() {
+    return this.competencyService.findAll();
   }
 
   @Get(':id') // GET /competencies/:id
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
   @ApiBearerAuth()
-  getOneCompetency(@Param('id', ParseIntPipe) id: number) {
-    return this.competencyService.getOneCompetency(id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.competencyService.findOne(id);
   }
 
   @Post() // POST /competencies
@@ -61,7 +61,7 @@ export class CompetencyController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
-  removeCompetency(@Param('id', ParseIntPipe) id: number) {
-    return this.competencyService.removeCompetency(id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.competencyService.remove(id);
   }
 }

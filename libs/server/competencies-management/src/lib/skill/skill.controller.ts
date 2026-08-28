@@ -26,16 +26,16 @@ export class SkillController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
   @ApiBearerAuth()
-  getSkills() {
-    return this.skillService.getSkills();
+  findAll() {
+    return this.skillService.findAll();
   }
 
   @Get(':id') // GET /skills/:id
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
   @ApiBearerAuth()
-  getOneSkill(@Param('id', ParseIntPipe) id: number) {
-    return this.skillService.getOneSkill(id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.skillService.findOne(id);
   }
 
   @Post() // POST /skills
@@ -61,7 +61,7 @@ export class SkillController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
-  removeSkill(@Param('id', ParseIntPipe) id: number) {
-    return this.skillService.removeSkill(id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.skillService.remove(id);
   }
 }

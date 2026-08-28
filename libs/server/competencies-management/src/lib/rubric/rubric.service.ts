@@ -52,6 +52,7 @@ export class RubricService {
         return incoming_level;
       });
       this.validateRubricLevels(newYesNo, merged_levels);
+      updateRubricSetDto.levels = merged_levels; // Usiamo i livelli completi per l'update manuale
     } else if (
       updateRubricSetDto.yes_no !== undefined &&
       updateRubricSetDto.yes_no !== existing.yes_no

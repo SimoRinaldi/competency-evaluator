@@ -9,6 +9,7 @@ import {
 
 export class CreateTestExecutionDto {
   @ApiProperty({
+    required: true,
     description: 'ID del test eseguito',
     example: 1,
     type: Number,
@@ -19,6 +20,7 @@ export class CreateTestExecutionDto {
   test_id!: number;
 
   @ApiProperty({
+    required: true,
     description: "ID dell'utente valutato (evaluated_user)",
     example: 1,
     type: Number,

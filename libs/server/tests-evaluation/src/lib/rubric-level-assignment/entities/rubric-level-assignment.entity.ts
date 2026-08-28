@@ -18,24 +18,24 @@ export class RubricLevelAssignmentEntity {
   @Column({ type: 'integer', nullable: false })
   rubric_rank!: number;
 
-  @ManyToOne(() => IndicatorEntity)
-  @JoinColumn({ name: 'indicator_id' })
-  indicator?: Relation<IndicatorEntity>;
-
   @Column({ type: 'integer', nullable: false })
   indicator_id!: number;
-
-  @ManyToOne(() => TestExecutionEntity)
-  @JoinColumn({ name: 'test_execution_id' })
-  test_execution?: Relation<TestExecutionEntity>;
 
   @Column({ type: 'integer', nullable: false })
   test_execution_id!: number;
 
-  @ManyToOne(() => TestEvaluatorEntity)
-  @JoinColumn({ name: 'evaluator_id' })
-  evaluator?: Relation<TestEvaluatorEntity>;
-
   @Column({ type: 'integer', nullable: false })
   evaluator_id!: number;
+
+  @ManyToOne(() => IndicatorEntity, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'indicator_id' })
+  indicator?: Relation<IndicatorEntity>;
+
+  @ManyToOne(() => TestExecutionEntity, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'test_execution_id' })
+  test_execution?: Relation<TestExecutionEntity>;
+
+  @ManyToOne(() => TestEvaluatorEntity, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'evaluator_id' })
+  evaluator?: Relation<TestEvaluatorEntity>;
 }

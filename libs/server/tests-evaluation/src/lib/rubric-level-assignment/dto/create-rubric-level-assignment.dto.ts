@@ -3,7 +3,9 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateRubricLevelAssignmentDto {
   @ApiProperty({
-    description: 'Valore del livello assegnato (da 1 a 5, oppure 1 o 5 per valutazione binaria)',
+    required: true,
+    description:
+      'Valore del livello assegnato (da 1 a 5, oppure 1 o 5 per valutazione binaria)',
     example: 4,
   })
   @IsInt()
@@ -13,6 +15,7 @@ export class CreateRubricLevelAssignmentDto {
   rubric_rank!: number;
 
   @ApiProperty({
+    required: true,
     description: 'ID dell indicatore valutato',
     example: 1,
   })
@@ -22,6 +25,7 @@ export class CreateRubricLevelAssignmentDto {
   indicator_id!: number;
 
   @ApiProperty({
+    required: true,
     description: 'ID dell esecuzione del test',
     example: 1,
   })
@@ -30,10 +34,7 @@ export class CreateRubricLevelAssignmentDto {
   @IsNotEmpty()
   test_execution_id!: number;
 
-  @ApiProperty({
-    description: 'ID del valutatore',
-    example: 1,
-  })
+  @ApiProperty({ required: true, description: 'ID del valutatore', example: 1 })
   @IsInt()
   @IsPositive()
   @IsNotEmpty()

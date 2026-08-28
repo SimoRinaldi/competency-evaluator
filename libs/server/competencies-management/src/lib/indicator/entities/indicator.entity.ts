@@ -20,12 +20,15 @@ export class IndicatorEntity {
   @Column({ type: 'integer', nullable: false })
   weight!: number;
 
+  @Column({ type: 'integer', nullable: false })
+  rubric_set_id!: number;
+
+  @Column({ type: 'integer', nullable: false })
+  observation_object_id!: number;
+
   @ManyToOne(() => RubricSetEntity, (rubric_set) => rubric_set.indicators)
   @JoinColumn({ name: 'rubric_set_id' })
   rubric_set?: Relation<RubricSetEntity>;
-
-  @Column({ type: 'integer', nullable: false })
-  rubric_set_id!: number;
 
   @ManyToOne(
     () => ObservationObjectEntity,
@@ -36,7 +39,4 @@ export class IndicatorEntity {
   )
   @JoinColumn({ name: 'observation_object_id' })
   observation_object?: Relation<ObservationObjectEntity>;
-
-  @Column({ type: 'integer', nullable: false })
-  observation_object_id!: number;
 }

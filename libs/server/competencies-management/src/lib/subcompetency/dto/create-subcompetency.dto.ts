@@ -1,7 +1,7 @@
 import {
   IsArray,
   IsNotEmpty,
-  IsNumber,
+  IsInt,
   IsPositive,
   IsOptional,
   IsString,
@@ -12,6 +12,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateSubCompetencyDto {
   @ApiProperty({
+    required: true,
     description: 'Titolo della sotto-competenza',
     example: 'Intervista con il committente',
   })
@@ -20,10 +21,11 @@ export class CreateSubCompetencyDto {
   title!: string;
 
   @ApiProperty({
+    required: true,
     description: 'Peso o importanza della sotto-competenza',
     example: 3,
   })
-  @IsNumber()
+  @IsInt()
   @IsNotEmpty()
   @Min(1)
   @Max(5)
@@ -53,8 +55,12 @@ export class CreateSubCompetencyDto {
   @IsOptional()
   action?: string;
 
-  @ApiProperty({ description: 'ID della competenza padre', example: 1 })
-  @IsNumber()
+  @ApiProperty({
+    required: true,
+    description: 'ID della competenza padre',
+    example: 1,
+  })
+  @IsInt()
   @IsNotEmpty()
   competency_id!: number;
 
@@ -64,7 +70,7 @@ export class CreateSubCompetencyDto {
     example: [1, 2],
   })
   @IsArray()
-  @IsNumber({}, { each: true })
+  @IsInt({}, { each: true })
   @IsOptional()
   tool_ids?: number[];
 
@@ -74,7 +80,7 @@ export class CreateSubCompetencyDto {
     example: [1],
   })
   @IsArray()
-  @IsNumber({}, { each: true })
+  @IsInt({}, { each: true })
   @IsOptional()
   method_ids?: number[];
 
@@ -84,15 +90,16 @@ export class CreateSubCompetencyDto {
     example: [3],
   })
   @IsArray()
-  @IsNumber({}, { each: true })
+  @IsInt({}, { each: true })
   @IsOptional()
   skill_ids?: number[];
 
   @ApiProperty({
-      description: 'Soglia di acquisizione della sotto-competenza',
-      example: '30'
-    })
-  @IsNumber()
+    required: true,
+    description: 'Soglia di acquisizione della sotto-competenza',
+    example: '30',
+  })
+  @IsInt()
   @IsPositive()
   @IsNotEmpty()
   threshold!: number;

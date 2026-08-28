@@ -14,7 +14,7 @@ export class SubCompetencyService {
     private readonly subCompetencyRepository: SubCompetencyRepository
   ) {}
 
-  async getOneSubCompetency(id: number): Promise<SubCompetencyEntity> {
+  async findOne(id: number): Promise<SubCompetencyEntity> {
     const subCompetency = await this.subCompetencyRepository.findById(id);
 
     if (!subCompetency)
@@ -23,7 +23,7 @@ export class SubCompetencyService {
     return subCompetency;
   }
 
-  async getSubCompetencies(): Promise<SubCompetencyEntity[]> {
+  async findAll(): Promise<SubCompetencyEntity[]> {
     const subCompetencies = await this.subCompetencyRepository.findAll();
 
     if (subCompetencies && subCompetencies.length === 0) {
@@ -65,7 +65,7 @@ export class SubCompetencyService {
     return updated;
   }
 
-  async removeSubCompetency(id: number): Promise<void> {
+  async remove(id: number): Promise<void> {
     const deleted = await this.subCompetencyRepository.deleteOne(id);
     if (!deleted) {
       throw new NotFoundException(`SubCompetency with id ${id} not found`);

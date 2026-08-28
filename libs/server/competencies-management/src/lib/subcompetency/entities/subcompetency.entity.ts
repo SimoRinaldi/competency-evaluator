@@ -47,7 +47,7 @@ export class SubCompetencyEntity {
   })
   action?: string;
 
-  @Column( {type: 'integer', nullable: false } )
+  @Column({ type: 'integer', nullable: false })
   threshold!: number;
 
   @Column({ type: 'integer', nullable: false })

@@ -13,7 +13,7 @@ export class ToolService {
   // Injecting the repository
   constructor(private readonly toolRepository: ToolRepository) {}
 
-  async getOneTool(id: number): Promise<ToolEntity> {
+  async findOne(id: number): Promise<ToolEntity> {
     const tool = await this.toolRepository.findById(id);
 
     if (!tool) throw new NotFoundException(`Tool with id ${id} not found`);
@@ -21,7 +21,7 @@ export class ToolService {
     return tool;
   }
 
-  async getTools(): Promise<ToolEntity[]> {
+  async findAll(): Promise<ToolEntity[]> {
     const tools = await this.toolRepository.findAll();
 
     if (tools && tools.length === 0) {
@@ -58,7 +58,7 @@ export class ToolService {
     return updated;
   }
 
-  async removeTool(id: number): Promise<void> {
+  async remove(id: number): Promise<void> {
     const deleted = await this.toolRepository.deleteOne(id);
     if (!deleted) {
       throw new NotFoundException(`Tool with id ${id} not found`);

@@ -23,7 +23,7 @@ export class CompetencyEntity {
   @Column({ type: 'integer', nullable: false })
   weight!: number;
 
-  @Column( {type: 'integer', nullable: false } )
+  @Column({ type: 'integer', nullable: false })
   threshold!: number;
 
   // Una competency ha molte subcompetencies
@@ -33,4 +33,3 @@ export class CompetencyEntity {
   )
   subcompetencies?: Relation<SubCompetencyEntity>[];
 }
-

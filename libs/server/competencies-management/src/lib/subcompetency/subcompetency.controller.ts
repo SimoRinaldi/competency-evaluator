@@ -28,16 +28,16 @@ export class SubCompetencyController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
   @ApiBearerAuth()
-  getSubCompetencies() {
-    return this.subCompetencyService.getSubCompetencies();
+  findAll() {
+    return this.subCompetencyService.findAll();
   }
 
   @Get(':id') // GET /subcompetencies/:id
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
   @ApiBearerAuth()
-  getOneSubCompetency(@Param('id', ParseIntPipe) id: number) {
-    return this.subCompetencyService.getOneSubCompetency(id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.subCompetencyService.findOne(id);
   }
 
   @Post() // POST /subcompetencies
@@ -63,7 +63,7 @@ export class SubCompetencyController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
-  removeSubCompetency(@Param('id', ParseIntPipe) id: number) {
-    return this.subCompetencyService.removeSubCompetency(id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.subCompetencyService.remove(id);
   }
 }

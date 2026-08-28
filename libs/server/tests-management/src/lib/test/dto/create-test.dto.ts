@@ -10,6 +10,7 @@ import {
 
 export class CreateTestDto {
   @ApiProperty({
+    required: true,
     description:
       'Descrizione del contesto e della situazione di valutazione del test',
     example: 'Assessment di laboratorio sulle architetture software ad eventi.',
@@ -20,6 +21,7 @@ export class CreateTestDto {
   assessment_situation!: string;
 
   @ApiProperty({
+    required: true,
     description: 'ID del Test Designer responsabile della creazione del test',
     example: 1,
     type: Number,
@@ -30,8 +32,7 @@ export class CreateTestDto {
   test_designer_id!: number;
 
   @ApiPropertyOptional({
-    description:
-      'Array di ID delle sotto-competenze valutate in questo test',
+    description: 'Array di ID delle sotto-competenze valutate in questo test',
     example: [1, 2, 3],
     type: [Number],
   })

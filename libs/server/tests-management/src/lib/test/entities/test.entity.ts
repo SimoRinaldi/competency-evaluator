@@ -20,12 +20,12 @@ export class TestEntity {
   @Column({ type: 'text', nullable: false })
   assessment_situation!: string;
 
-  @ManyToOne(() => TestDesignerEntity)
-  @JoinColumn({ name: 'test_designer_id' })
-  test_designer?: Relation<TestDesignerEntity>;
-
   @Column({ type: 'integer', nullable: false })
   test_designer_id!: number;
+
+  @ManyToOne(() => TestDesignerEntity, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'test_designer_id' })
+  test_designer?: Relation<TestDesignerEntity>;
 
   @OneToMany('TestExecutionEntity', 'test')
   test_executions?: unknown[];

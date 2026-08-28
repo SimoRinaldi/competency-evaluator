@@ -1,6 +1,6 @@
 import {
   IsNotEmpty,
-  IsNumber,
+  IsInt,
   IsPositive,
   IsString,
   Max,
@@ -12,6 +12,7 @@ export class CreateCompetencyDto {
   @ApiProperty({
     description: 'Titolo della competenza',
     example: "Definire l'idea progettuale",
+    required: true,
   })
   @IsString()
   @IsNotEmpty()
@@ -20,8 +21,9 @@ export class CreateCompetencyDto {
   @ApiProperty({
     description: 'Peso o importanza della competenza (da 1 a 5)',
     example: 5,
+    required: true,
   })
-  @IsNumber()
+  @IsInt()
   @IsNotEmpty()
   @Min(1)
   @Max(5)
@@ -29,9 +31,10 @@ export class CreateCompetencyDto {
 
   @ApiProperty({
     description: 'Soglia di acquisizione della competenza',
-    example: '30'
+    example: '30',
+    required: true,
   })
-  @IsNumber()
+  @IsInt()
   @IsPositive()
   @IsNotEmpty()
   threshold!: number;

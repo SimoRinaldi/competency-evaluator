@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RubricSetEntity } from './entities/rubric-set.entity';
+import { RubricLevelEntity } from './entities/rubric-level.entity';
 import { CreateRubricSetDto } from './dto/create-rubric.dto';
 import { UpdateRubricSetDto } from './dto/update-rubric.dto';
 
@@ -13,7 +14,10 @@ export class RubricRepository {
   ) {}
 
   async createOne(dto: CreateRubricSetDto): Promise<RubricSetEntity> {
-    const newSet = this.repository.create(dto);
+    const newSet = this.repository.create({
+      yes_no: dto.yes_no,
+      levels: dto.levels as RubricLevelEntity[],
+    });
     return this.repository.save(newSet);
   }
 
@@ -35,13 +39,16 @@ export class RubricRepository {
     id: number,
     dto: UpdateRubricSetDto
   ): Promise<RubricSetEntity | null> {
-    const set = await this.repository.preload({
-      id,
-      ...dto,
-    });
-
+    const set = await this.findById(id);
     if (!set) {
       return null;
+    }
+
+    if (dto.yes_no !== undefined) {
+      set.yes_no = dto.yes_no;
+    }
+    if (dto.levels !== undefined) {
+      set.levels = dto.levels as RubricLevelEntity[];
     }
 
     return this.repository.save(set);

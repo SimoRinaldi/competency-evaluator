@@ -14,7 +14,7 @@ export class CompetencyService {
     private readonly competencyRepository: CompetencyRepository
   ) {}
 
-  async getOneCompetency(id: number): Promise<CompetencyEntity> {
+  async findOne(id: number): Promise<CompetencyEntity> {
     const competency = await this.competencyRepository.findById(id);
 
     if (!competency)
@@ -23,7 +23,7 @@ export class CompetencyService {
     return competency;
   }
 
-  async getCompetencies(): Promise<CompetencyEntity[]> {
+  async findAll(): Promise<CompetencyEntity[]> {
     const competencies = await this.competencyRepository.findAll();
 
     if (competencies && competencies.length === 0) {
@@ -65,7 +65,7 @@ export class CompetencyService {
     return updated;
   }
 
-  async removeCompetency(id: number): Promise<void> {
+  async remove(id: number): Promise<void> {
     const deleted = await this.competencyRepository.deleteOne(id);
     if (!deleted) {
       throw new NotFoundException(`Competency with id ${id} not found`);

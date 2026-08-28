@@ -20,17 +20,17 @@ export class CompetencyHistoricalScoreEntity {
   @Column({ type: 'numeric', nullable: false })
   score_percentage!: string;
 
-  @ManyToOne(() => UserEntity)
-  @JoinColumn({ name: 'user_id' })
-  user?: Relation<UserEntity>;
-
   @Column({ type: 'integer', nullable: false })
   user_id!: number;
 
-  @ManyToOne(() => CompetencyEntity)
-  @JoinColumn({ name: 'competency_id' })
-  competency?: Relation<CompetencyEntity>;
-
   @Column({ type: 'integer', nullable: false })
   competency_id!: number;
+
+  @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'user_id' })
+  user?: Relation<UserEntity>;
+
+  @ManyToOne(() => CompetencyEntity, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'competency_id' })
+  competency?: Relation<CompetencyEntity>;
 }

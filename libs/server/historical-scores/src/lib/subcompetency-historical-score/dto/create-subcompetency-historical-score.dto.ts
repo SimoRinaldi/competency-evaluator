@@ -3,6 +3,7 @@ import { IsInt, IsNotEmpty, IsNumberString, IsPositive } from 'class-validator';
 
 export class CreateSubCompetencyHistoricalScoreDto {
   @ApiProperty({
+    required: true,
     example: 45,
     description: 'Punteggio assoluto calcolato',
   })
@@ -11,6 +12,7 @@ export class CreateSubCompetencyHistoricalScoreDto {
   score_absolute!: number;
 
   @ApiProperty({
+    required: true,
     example: '85.50',
     description: 'Punteggio percentuale',
   })
@@ -19,6 +21,7 @@ export class CreateSubCompetencyHistoricalScoreDto {
   score_percentage!: string;
 
   @ApiProperty({
+    required: true,
     example: 1,
     description: "ID dell'utente valutato",
   })
@@ -28,6 +31,7 @@ export class CreateSubCompetencyHistoricalScoreDto {
   user_id!: number;
 
   @ApiProperty({
+    required: true,
     example: 1,
     description: 'ID della sotto-competenza associata',
   })

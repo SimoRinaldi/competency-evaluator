@@ -26,16 +26,16 @@ export class MethodController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
   @ApiBearerAuth()
-  getMethods() {
-    return this.methodService.getMethods();
+  findAll() {
+    return this.methodService.findAll();
   }
 
   @Get(':id') // GET /methods/:id
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
   @ApiBearerAuth()
-  getOneMethod(@Param('id', ParseIntPipe) id: number) {
-    return this.methodService.getOneMethod(id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.methodService.findOne(id);
   }
 
   @Post() // POST /methods
@@ -61,7 +61,7 @@ export class MethodController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
-  removeMethod(@Param('id', ParseIntPipe) id: number) {
-    return this.methodService.removeMethod(id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.methodService.remove(id);
   }
 }

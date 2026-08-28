@@ -12,7 +12,7 @@ import { MethodRepository } from './method.repository';
 export class MethodService {
   constructor(private readonly methodRepository: MethodRepository) {}
 
-  async getOneMethod(id: number): Promise<MethodEntity> {
+  async findOne(id: number): Promise<MethodEntity> {
     const method = await this.methodRepository.findById(id);
 
     if (!method) throw new NotFoundException(`Method with id ${id} not found`);
@@ -20,7 +20,7 @@ export class MethodService {
     return method;
   }
 
-  async getMethods(): Promise<MethodEntity[]> {
+  async findAll(): Promise<MethodEntity[]> {
     const methods = await this.methodRepository.findAll();
 
     if (methods && methods.length === 0) {
@@ -57,7 +57,7 @@ export class MethodService {
     return updated;
   }
 
-  async removeMethod(id: number): Promise<void> {
+  async remove(id: number): Promise<void> {
     const deleted = await this.methodRepository.deleteOne(id);
     if (!deleted) {
       throw new NotFoundException(`Method with id ${id} not found`);
