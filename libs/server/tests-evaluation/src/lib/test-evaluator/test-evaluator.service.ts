@@ -3,11 +3,12 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
 import { TestEvaluatorRepository } from './test-evaluator.repository';
 import { CreateTestEvaluatorDto } from './dto/create-test-evaluator.dto';
 import { UpdateTestEvaluatorDto } from './dto/update-test-evaluator.dto';
 import { TestEvaluatorEntity } from './entities/test-evaluator.entity';
-import { UsersService } from '@server/users';
+import { UserEntity, UserRole, UsersService } from '@server/users';
 
 @Injectable()
 export class TestEvaluatorService {
@@ -15,6 +16,13 @@ export class TestEvaluatorService {
     private readonly repository: TestEvaluatorRepository,
     private readonly usersService: UsersService
   ) {}
+
+  @OnEvent('user.created')
+  async handleUserCreated(user: UserEntity) {
+    if (user.role === UserRole.EVALUATOR) {
+      await this.repository.createOne({ user_id: user.id });
+    }
+  }
 
   async create(dto: CreateTestEvaluatorDto): Promise<TestEvaluatorEntity> {
     await this.usersService.getOneUser(dto.user_id);
