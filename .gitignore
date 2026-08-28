@@ -51,4 +51,3 @@ vite.config.*.timestamp*
 .env
 .env.*
 !.env.example
-apps/ui/src/features/competencies/components/step3-observation-object.tsx

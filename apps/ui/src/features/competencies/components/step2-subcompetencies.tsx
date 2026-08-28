@@ -8,16 +8,19 @@ export function Step2SubCompetencies({ list, onAdd, onNext, onPrev }: any) {
   const [output, setOutput] = useState('');
   const [action, setAction] = useState('');
   const [threshold, setThreshold] = useState('');
+  // campo per l'Oggetto di Osservazione
+  const [obsDescription, setObsDescription] = useState('');
 
   function handleAdd(e: React.FormEvent) {
     e.preventDefault();
-    onAdd({ title, weight, input, output, action, threshold });
+    onAdd({ title, weight, input, output, action, threshold, obsDescription });
     setTitle('');
     setWeight('');
     setInput('');
     setOutput('');
     setAction('');
     setThreshold('');
+    setObsDescription('');
   }
 
   return (
@@ -30,11 +33,13 @@ export function Step2SubCompetencies({ list, onAdd, onNext, onPrev }: any) {
           <h4>Sottocompetenze attuali ({list.length}):</h4>
           <ul>
             {list.map((item: any, index: number) => (
-              <li key={index}>
-                {item.title} ( Peso: {item.weight}, Input: {item.input}
-                Output: {item.output}
-                Azione: {item.action}
-                Soglia: {item.threshold})
+              <li key={index} style={{ marginBottom: '1rem' }}>
+                <strong>{item.title}</strong> ( Peso: {item.weight}, Input:{' '}
+                {item.input}, Output: {item.output}, Azione: {item.action},
+                Soglia: {item.threshold}), ) <br />
+                <span style={{ color: 'gray', fontSize: '0.9em' }}>
+                  Oggetto: {item.obsDescription}
+                </span>
               </li>
             ))}
           </ul>
@@ -42,8 +47,6 @@ export function Step2SubCompetencies({ list, onAdd, onNext, onPrev }: any) {
 
         {/* FORM PER AGGIUNGERNE UNA NUOVA */}
         <form onSubmit={handleAdd} className={styles.form}>
-          {/* TUO COMPITO: Incolla qui i 3 <div className={styles.field}> per Titolo, Peso e Soglia.
-                   (Usa setTitle, setWeight, ecc. negli onChange) */}
           <div className={styles.field}>
             <label>
               Titolo <span className={styles.requiredAsterisk}>*</span>
@@ -113,6 +116,21 @@ export function Step2SubCompetencies({ list, onAdd, onNext, onPrev }: any) {
               className={styles.input}
               value={threshold}
               onChange={(e) => setThreshold(e.target.value)}
+            />
+          </div>
+
+          <div className={styles.field}>
+            <label>
+              Descrizione Oggetto di osservazione
+              <span className={styles.requiredAsterisk}>*</span>
+            </label>
+            <input
+              type="text"
+              required
+              className={styles.input}
+              value={obsDescription}
+              onChange={(e) => setObsDescription(e.target.value)}
+              placeholder="es. Documento PDF di sintesi"
             />
           </div>
 
