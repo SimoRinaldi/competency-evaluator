@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom';
 import { LoginPage } from '../features/auth/login.page';
 import { AppLayout } from '../features/layouts/app-layout';
 import { RegisterPage } from '../features/auth/register.page';
+import { CreateCompetencyPage } from '../features/competencies/create-competency.page';
 
 export function App() {
   return (
@@ -26,6 +27,8 @@ export function App() {
             </div>
           }
         />
+
+        <Route path="/competencies/new" element={<CreateCompetencyPage />} />
 
         {/* Qui sotto in futuro aggiungeremo altre rotte, es. /utenti, /competenze ecc. */}
       </Route>
