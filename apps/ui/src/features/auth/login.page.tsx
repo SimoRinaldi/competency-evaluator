@@ -27,15 +27,13 @@ export function LoginPage() {
       <div className={`${styles.card} ${styles.cardSmall}`}>
         <h2 className={styles.title}>Accedi</h2>
 
-        {error && (
-          <div className={styles.error}>
-            {error}
-          </div>
-        )}
+        {error && <div className={styles.error}>{error}</div>}
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.field}>
-            <label>Email</label>
+            <label>
+              Email <span className={styles.requiredAsterisk}>*</span>
+            </label>
             <input
               type="email"
               required
@@ -45,7 +43,9 @@ export function LoginPage() {
             />
           </div>
           <div className={styles.field}>
-            <label>Password</label>
+            <label>
+              Password <span className={styles.requiredAsterisk}>*</span>
+            </label>
             <input
               type="password"
               required
@@ -60,8 +60,7 @@ export function LoginPage() {
         </form>
 
         <div className={styles.message} style={{ marginTop: '1rem' }}>
-          Non hai un account?{' '}
-          <Link to="/register">Registrati qui</Link>
+          Non hai un account? <Link to="/register">Registrati qui</Link>
         </div>
       </div>
     </div>

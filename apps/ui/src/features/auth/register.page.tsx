@@ -28,15 +28,13 @@ export function RegisterPage() {
       <div className={`${styles.card} ${styles.cardSmall}`}>
         <h2 className={styles.title}>Crea un Account</h2>
 
-        {error && (
-          <div className={styles.error}>
-            {error}
-          </div>
-        )}
+        {error && <div className={styles.error}>{error}</div>}
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.field}>
-            <label>Nome Completo</label>
+            <label>
+              Nome <span className={styles.requiredAsterisk}>*</span>
+            </label>
             <input
               type="text"
               required
@@ -47,7 +45,9 @@ export function RegisterPage() {
           </div>
 
           <div className={styles.field}>
-            <label>Email</label>
+            <label>
+              Email <span className={styles.requiredAsterisk}>*</span>
+            </label>
             <input
               type="email"
               required
@@ -58,7 +58,9 @@ export function RegisterPage() {
           </div>
 
           <div className={styles.field}>
-            <label>Password</label>
+            <label>
+              Password <span className={styles.requiredAsterisk}>*</span>
+            </label>
             <input
               type="password"
               required
@@ -69,7 +71,9 @@ export function RegisterPage() {
           </div>
 
           <div className={styles.field}>
-            <label>Ruolo</label>
+            <label>
+              Ruolo <span className={styles.requiredAsterisk}>*</span>
+            </label>
             <select
               className={styles.input}
               value={role}
@@ -88,8 +92,7 @@ export function RegisterPage() {
         </form>
 
         <div className={styles.message} style={{ marginTop: '1rem' }}>
-          Hai già un account?{' '}
-          <Link to="/login">Accedi qui</Link>
+          Hai già un account? <Link to="/login">Accedi qui</Link>
         </div>
       </div>
     </div>
