@@ -5,10 +5,13 @@ import {
   OneToOne,
   JoinColumn,
   OneToMany,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import type { Relation } from 'typeorm';
 import { UserEntity } from '@server/users';
 import { RubricLevelAssignmentEntity } from '../../rubric-level-assignment/entities/rubric-level-assignment.entity';
+import { TestEntity } from '@server/tests-management';
 
 @Entity('test_evaluator')
 export class TestEvaluatorEntity {
@@ -27,4 +30,18 @@ export class TestEvaluatorEntity {
     (assignment) => assignment.evaluator
   )
   assignments?: Relation<RubricLevelAssignmentEntity>[];
+
+  @ManyToMany(() => TestEntity)
+  @JoinTable({
+    name: 'test_evaluation',
+    joinColumn: {
+      name: 'test_evaluator_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'test_id',
+      referencedColumnName: 'id',
+    },
+  })
+  tests?: Relation<TestEntity>[];
 }

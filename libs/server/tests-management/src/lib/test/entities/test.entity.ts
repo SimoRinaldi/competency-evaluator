@@ -4,7 +4,6 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
-  OneToMany,
   ManyToMany,
   JoinTable,
 } from 'typeorm';
@@ -27,9 +26,6 @@ export class TestEntity {
   @JoinColumn({ name: 'test_designer_id' })
   test_designer?: Relation<TestDesignerEntity>;
 
-  @OneToMany('TestExecutionEntity', 'test')
-  test_executions?: unknown[];
-
   @ManyToMany(() => SubCompetencyEntity)
   @JoinTable({
     name: 'test_subcompetency',
@@ -43,18 +39,5 @@ export class TestEntity {
     },
   })
   subcompetencies?: Relation<SubCompetencyEntity>[];
-
-  @ManyToMany('TestEvaluatorEntity')
-  @JoinTable({
-    name: 'test_evaluation',
-    joinColumn: {
-      name: 'test_id',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'test_evaluator_id',
-      referencedColumnName: 'id',
-    },
-  })
-  evaluators?: unknown[];
 }
+

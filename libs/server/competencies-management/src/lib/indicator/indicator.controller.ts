@@ -63,7 +63,7 @@ export class IndicatorController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.TEST_DESIGNER)
+  @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Modifica un indicatore esistente' })
   @ApiParam({

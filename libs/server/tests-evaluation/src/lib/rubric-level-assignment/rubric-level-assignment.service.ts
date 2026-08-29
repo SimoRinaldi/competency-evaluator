@@ -33,7 +33,7 @@ export class RubricLevelAssignmentService {
       );
     }
 
-    await this.validateBinaryRank(dto.indicator_id, Number(dto.rubric_rank));
+    await this.validateRubricRank(dto.indicator_id, Number(dto.rubric_rank));
 
     return this.rubricLevelAssignmentsRepository.createOne(dto);
   }
@@ -67,7 +67,7 @@ export class RubricLevelAssignmentService {
 
     if (dto.rubric_rank !== undefined) {
       const targetIndicatorId = dto.indicator_id ?? rla.indicator_id;
-      await this.validateBinaryRank(
+      await this.validateRubricRank(
         targetIndicatorId,
         Number(dto.rubric_rank)
       );
@@ -101,7 +101,7 @@ export class RubricLevelAssignmentService {
     );
   }
 
-  private async validateBinaryRank(
+  async validateRubricRank(
     indicator_id: number,
     rank: number
   ): Promise<void> {

@@ -8,8 +8,8 @@ import {
 } from 'typeorm';
 import type { Relation } from 'typeorm';
 import { EvaluatedUserEntity } from '../../evaluated-user/entities/evaluated-user.entity';
-import { TestEntity } from '@server/tests-management';
 import { TestOutputEntity } from '../../test-output/entities/test-output.entity';
+import { TestEntity } from '@server/tests-management';
 
 @Entity('test_execution')
 export class TestExecutionEntity {
@@ -28,7 +28,7 @@ export class TestExecutionEntity {
   @Column({ type: 'numeric', nullable: true })
   max_score?: string | null;
 
-  @ManyToOne(() => TestEntity, (test) => test.test_executions, {
+  @ManyToOne(() => TestEntity, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'test_id' })
