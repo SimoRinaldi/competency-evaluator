@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, ValidationPipe } from '@nestjs/common';
 import { CompetenciesManagementService } from './competencies-management.service';
 import { CreateCompetencyChainDto } from './dto/create-chain.dto';
 
@@ -9,7 +9,7 @@ export class CompetenciesManagementController {
   ) {}
 
   @Post('chain')
-  async createChain(@Body() dto: CreateCompetencyChainDto) {
+  async createChain(@Body(ValidationPipe) dto: CreateCompetencyChainDto) {
     return this.competenciesManagementService.handleCreateCompetencyChain(dto);
   }
 }

@@ -21,8 +21,9 @@ export class CreateIndicatorDto {
   @ApiProperty({
     example: 1,
     description: 'ID del set di rubriche associato',
-    required: true,
+    required: false,
   })
+  @IsOptional()
   @IsInt()
   rubric_set_id?: number;
 

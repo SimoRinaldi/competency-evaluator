@@ -15,5 +15,5 @@ export class CreateObservationObjectDto {
   @IsNotEmpty()
   @IsInt()
   @IsPositive()
-  subcompetency_id?: number;
+  subcompetency_id!: number;
 }

@@ -11,11 +11,11 @@ import { UserRole } from './user-role.enum';
 export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
-  name: string;
+  name!: string;
 
   @IsEmail()
   @IsNotEmpty()
-  email: string;
+  email!: string;
 
   @IsString()
   @IsNotEmpty()
@@ -30,10 +30,11 @@ export class CreateUserDto {
   //    message:
   //        'Password troppo debole: min 8 caratteri, maiuscola, minuscola, numero e simbolo (? ^ ! # @)',
   // })
-  password: string;
+  password!: string;
 
+  @IsNotEmpty()
   @IsEnum(UserRole, {
     message: 'Valid role required among USER or ADMIN',
   })
-  role: UserRole;
+  role!: UserRole;
 }
