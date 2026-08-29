@@ -6,6 +6,8 @@ import { TestsEvaluationService } from './tests-evaluation.service';
 import { ServerHistoricalScoresModule } from '@server/historical-scores';
 import { ServerTestsExecutionModule } from '@server/tests-execution';
 
+import { TestsEvaluationController } from './tests-evaluation.controller';
+
 @Module({
   imports: [
     ServerCompetenciesManagementModule,
@@ -14,7 +16,7 @@ import { ServerTestsExecutionModule } from '@server/tests-execution';
     ServerHistoricalScoresModule,
     ServerTestsExecutionModule,
   ],
-  controllers: [],
+  controllers: [TestsEvaluationController],
   providers: [TestsEvaluationService],
   exports: [
     RubricLevelAssignmentModule,

@@ -1,8 +1,9 @@
 export * from './lib/tests-evaluation.module';
 export * from './lib/tests-evaluation.service';
+export * from './lib/tests-evaluation.controller';
+export * from './lib/dto/submit-evaluation.dto';
 
 // Entità per relazioni esterne
-export * from './lib/test-evaluator/entities/test-evaluator.entity'
 export * from './lib/rubric-level-assignment/entities/rubric-level-assignment.entity';
 export * from './lib/test-evaluator/entities/test-evaluator.entity';
 

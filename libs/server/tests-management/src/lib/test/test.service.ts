@@ -1,5 +1,11 @@
-import { Injectable, NotFoundException, InternalServerErrorException, HttpException } from '@nestjs/common';
-import { DataSource } from 'typeorm';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  InternalServerErrorException,
+  HttpException,
+} from '@nestjs/common';
+import { DataSource, In } from 'typeorm';
 import { TestDesignerRepository } from '../test-designer/test-designer.repository';
 import { TestEntity } from './entities/test.entity';
 import { CreateTestDto } from './dto/create-test.dto';
@@ -25,6 +31,12 @@ export class TestService {
       );
     }
 
+    if (!dto.subcompetency_ids || dto.subcompetency_ids.length === 0) {
+      throw new BadRequestException(
+        'Il test deve contenere almeno una sotto-competenza.'
+      );
+    }
+
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -32,11 +44,34 @@ export class TestService {
     try {
       const manager = queryRunner.manager;
 
+      // 0. Verifica che tutte le sotto-competenze esistano e appartengano alla STESSA competenza
+      const subcompetencies = await manager.find(SubCompetencyEntity, {
+        where: { id: In(dto.subcompetency_ids) },
+      });
+
+      if (subcompetencies.length !== dto.subcompetency_ids.length) {
+        const foundIds = new Set(subcompetencies.map((s) => s.id));
+        const missingIds = dto.subcompetency_ids.filter((id) => !foundIds.has(id));
+        throw new NotFoundException(
+          `Sotto-competenze non trovate per gli ID: ${missingIds.join(', ')}`
+        );
+      }
+
+      const uniqueCompetencyIds = new Set(
+        subcompetencies.map((s) => s.competency_id)
+      );
+
+      if (uniqueCompetencyIds.size > 1) {
+        throw new BadRequestException(
+          'Tutte le sotto-competenze selezionate per il test devono appartenere alla medesima competenza.'
+        );
+      }
+
       // 1. Creazione e salvataggio dell'entità Test con le relative sotto-competenze
       const test = manager.create(TestEntity, {
         assessment_situation: dto.assessment_situation,
         test_designer_id: dto.test_designer_id,
-        subcompetencies: dto.subcompetency_ids.map((id) => ({ id } as SubCompetencyEntity))
+        subcompetencies: subcompetencies,
       });
       const savedTest = await manager.save(test);
 

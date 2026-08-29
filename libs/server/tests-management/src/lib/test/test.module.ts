@@ -7,11 +7,14 @@ import { TestService } from './test.service';
 import { TestRepository } from './test.repository';
 import { TestDesignerModule } from '../test-designer/test-designer.module';
 
+import { SubCompetencyModule } from '@server/competencies-management';
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([TestEntity]),
     ServerUsersModule,
     TestDesignerModule,
+    SubCompetencyModule,
   ],
   controllers: [TestController],
   providers: [TestService, TestRepository],
