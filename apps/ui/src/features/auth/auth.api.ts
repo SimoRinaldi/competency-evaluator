@@ -1,3 +1,5 @@
+export type UserRole = 'USER' | 'ADMIN' | 'TEST_DESIGNER' | 'EVALUATOR';
+
 const API_URL = 'http://localhost:3333/api';
 
 export async function login(email: string, password: string) {
@@ -9,15 +11,33 @@ export async function login(email: string, password: string) {
     body: JSON.stringify({ email, password }),
   });
 
-  if (!response.ok) {
-    throw new Error('Credenziali non valide');
-  }
+  if (!response.ok) throw new Error('Credenziali non valide');
 
   const data = await response.json();
 
   localStorage.setItem('access_token', data.access_token);
 
   return data;
+}
+
+export async function register(
+  name: string,
+  email: string,
+  password: string,
+  role: UserRole
+) {
+  const response = await fetch(`${API_URL}/auth/register`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ name, email, password, role }),
+  });
+
+  if (!response.ok)
+    throw new Error('Errore durante la registrazione. Controlla i dati.');
+
+  return response.json();
 }
 
 export async function fetchCurrentUser() {
@@ -35,4 +55,3 @@ export async function fetchCurrentUser() {
 
   return response.json();
 }
-

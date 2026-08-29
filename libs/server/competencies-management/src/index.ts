@@ -12,6 +12,10 @@ export * from './lib/observation-object/entities/observation-object.entity';
 export * from './lib/indicator/entities/indicator.entity';
 
 // Servizi e sub-moduli esportati per interoperabilità
+export * from './lib/competency/competency.service';
+export * from './lib/competency/competency.module';
+export * from './lib/subcompetency/subcompetency.service';
+export * from './lib/subcompetency/subcompetency.module';
 export * from './lib/indicator/indicator.service';
 export * from './lib/indicator/indicator.module';
 export * from './lib/rubric/rubric.service';

@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { login } from './auth.api';
+import { register, UserRole } from './auth.api';
 import styles from '../css/shared.module.css';
 
-export function LoginPage() {
+export function RegisterPage() {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState<UserRole>('USER');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
@@ -14,22 +16,34 @@ export function LoginPage() {
     setError('');
 
     try {
-      await login(email, password);
-      // Se il login va a buon fine, passa alla dashboard
-      navigate('/');
+      await register(name, email, password, role);
+      navigate('/login');
     } catch (err: any) {
-      setError(err.message || 'Errore durante il login');
+      setError(err.message || 'Errore durante la registrazione');
     }
   }
 
   return (
     <div className={styles.page}>
       <div className={`${styles.card} ${styles.cardSmall}`}>
-        <h2 className={styles.title}>Accedi</h2>
+        <h2 className={styles.title}>Crea un Account</h2>
 
         {error && <div className={styles.error}>{error}</div>}
 
         <form onSubmit={handleSubmit} className={styles.form}>
+          <div className={styles.field}>
+            <label>
+              Nome <span className={styles.requiredAsterisk}>*</span>
+            </label>
+            <input
+              type="text"
+              required
+              className={styles.input}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+
           <div className={styles.field}>
             <label>
               Email <span className={styles.requiredAsterisk}>*</span>
@@ -42,6 +56,7 @@ export function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
+
           <div className={styles.field}>
             <label>
               Password <span className={styles.requiredAsterisk}>*</span>
@@ -54,13 +69,30 @@ export function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
+
+          <div className={styles.field}>
+            <label>
+              Ruolo <span className={styles.requiredAsterisk}>*</span>
+            </label>
+            <select
+              className={styles.input}
+              value={role}
+              onChange={(e) => setRole(e.target.value as UserRole)}
+            >
+              <option value={'USER'}>Utente</option>
+              <option value={'ADMIN'}>Amministratore</option>
+              <option value={'TEST_DESIGNER'}>Test designer</option>
+              <option value={'EVALUATOR'}>Valutatore</option>
+            </select>
+          </div>
+
           <button type="submit" className={styles.button}>
-            Entra
+            Registrati
           </button>
         </form>
 
         <div className={styles.message} style={{ marginTop: '1rem' }}>
-          Non hai un account? <Link to="/register">Registrati qui</Link>
+          Hai già un account? <Link to="/login">Accedi qui</Link>
         </div>
       </div>
     </div>

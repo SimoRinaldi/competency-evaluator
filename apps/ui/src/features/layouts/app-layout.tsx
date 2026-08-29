@@ -1,4 +1,5 @@
 import { Outlet, useNavigate, Link } from 'react-router-dom';
+import styles from '../css/shared.module.css';
 
 export function AppLayout() {
   const navigate = useNavigate();
@@ -9,31 +10,26 @@ export function AppLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Navbar superiore */}
-      <nav className="bg-blue-600 text-white p-4 shadow-md">
-        <div className="container mx-auto flex justify-between items-center">
-          <div className="text-xl font-bold">
-            <Link to="/">Competency Evaluator</Link>
-          </div>
+    <>
+      <nav className={styles.navbar}>
+        <div className={styles.navBrand} onClick={() => navigate('/')}>
+          Competency Evaluator
+        </div>
+
+        <div className={styles.navLinks}>
+          <button onClick={() => navigate('/')}>Dashboard</button>
           
-          <div className="flex gap-4 items-center">
-            <Link to="/" className="hover:text-blue-200">Dashboard</Link>
-            <button 
-              onClick={handleLogout} 
-              className="bg-blue-700 hover:bg-blue-800 px-3 py-1 rounded"
-            >
+          <div className={styles.userSection}>
+            <button className={styles.dangerButton} onClick={handleLogout}>
               Esci
             </button>
           </div>
         </div>
       </nav>
 
-      {/* Contenuto principale delle pagine */}
-      <main className="container mx-auto flex-grow p-4 mt-4">
-        {/* L'Outlet è il segnaposto dove react-router renderizzerà le nostre pagine (es. Dashboard) */}
+      <main className={styles.page}>
         <Outlet />
       </main>
-    </div>
+    </>
   );
 }
