@@ -1,0 +1,32 @@
+{
+    "extends": "../../../tsconfig.base.json",
+    "compilerOptions": {
+        "outDir": "./dist",
+        "declaration": true,
+        "types": [
+            "node"
+        ],
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "strict": true
+    },
+    "include": [
+        "src/**/*.ts"
+    ],
+    "exclude": [
+        "jest.config.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts"
+    ],
+    "references": [
+        {
+            "path": "../competencies-management/tsconfig.lib.json"
+        },
+        {
+            "path": "../users/tsconfig.lib.json"
+        },
+        {
+            "path": "../security/tsconfig.lib.json"
+        }
+    ]
+}

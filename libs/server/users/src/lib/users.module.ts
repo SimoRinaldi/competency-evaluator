@@ -1,18 +1,15 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './user.entity';
-import { ServerUsersController } from './users.controller';
-import { ServerUsersService } from './users.service';
 import { UsersRepository } from './users.repository';
+import { UsersService } from './users.service';
+import { UsersController } from './users.controller';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserEntity])],
-  controllers: [ServerUsersController],
-  providers: [
-    ServerUsersService,
-    UsersRepository
-  ],
-  exports: [ServerUsersService]
+  imports: [TypeOrmModule.forFeature([UserEntity]), EventEmitterModule.forRoot()],
+  controllers: [UsersController],
+  providers: [UsersRepository, UsersService],
+  exports: [UsersRepository, UsersService],
 })
 export class ServerUsersModule {}
-

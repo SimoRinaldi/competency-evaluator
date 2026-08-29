@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, ParseIntPipe, ParseEnumPipe, ValidationPipe, UseGuards } from '@nestjs/common';
-import { ServerUsersService } from './users.service';
+import { UsersService } from './users.service';
 import { ApiTags, ApiBody, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -8,8 +8,8 @@ import { CurrentUser, JwtAuthGuard, Roles, RolesGuard } from '@server/security';
 
 @ApiTags('Users APIs')
 @Controller('users')
-export class ServerUsersController {
-  constructor(private serverUsersService: ServerUsersService) {}
+export class UsersController {
+  constructor(private usersService: UsersService) {}
 
     @Get() // GET /users or /users?role=value
     @UseGuards(JwtAuthGuard,RolesGuard)
@@ -17,7 +17,7 @@ export class ServerUsersController {
     @ApiBearerAuth()
     @ApiQuery({ name: 'role', required: false, enum: UserRole })
     getUsers(@Query('role', new ParseEnumPipe(UserRole, {optional: true})) role?: UserRole) {
-        return this.serverUsersService.getUsers(role);
+        return this.usersService.getUsers(role);
     }
 
     @Get('me')
@@ -37,7 +37,7 @@ export class ServerUsersController {
     @Roles(UserRole.ADMIN,UserRole.USER)
     @ApiBearerAuth()
     getOneUser(@Param('id', ParseIntPipe) id: number) {
-        return this.serverUsersService.getOneUser(id);
+        return this.usersService.getOneUser(id);
     }
 
     @Post() // POST /users
@@ -54,7 +54,7 @@ export class ServerUsersController {
         },
     })
     create(@Body(ValidationPipe) user: CreateUserDto) {
-        return this.serverUsersService.create(user);
+        return this.usersService.create(user);
     }
 
     @Patch(':id') // PATCH /users/:id
@@ -74,7 +74,7 @@ export class ServerUsersController {
     })
     update(@Param('id', ParseIntPipe) id: number, @Body(ValidationPipe) userUpdate: UpdateUserDto) {
         //return {id, ...userUpdate};
-        return this.serverUsersService.update(id,userUpdate);
+        return this.usersService.update(id,userUpdate);
     }
 
     @Delete(':id') // DELETE /users/:id
@@ -82,6 +82,6 @@ export class ServerUsersController {
     @Roles(UserRole.ADMIN)
     @ApiBearerAuth()
     removeUser(@Param('id', ParseIntPipe) id: number) {
-        return this.serverUsersService.removeUser(id);    
+        return this.usersService.removeUser(id);    
     }
 }

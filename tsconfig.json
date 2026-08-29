@@ -26,6 +26,21 @@
     },
     {
       "path": "./libs/server/security"
+    },
+    {
+      "path": "./libs/server/tests-management"
+    },
+    {
+      "path": "./libs/server/tests-execution"
+    },
+    {
+      "path": "./libs/server/competencies-management"
+    },
+    {
+      "path": "./libs/server/historical-scores"
+    },
+    {
+      "path": "./libs/server/tests-evaluation"
     }
   ]
 }

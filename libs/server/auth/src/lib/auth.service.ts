@@ -1,5 +1,5 @@
 import { NotFoundException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { ServerUsersService } from '@server/users';
+import { UsersService } from '@server/users';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { AuthenticatedUser } from './interfaces/authenticated-user.interface';
@@ -9,7 +9,7 @@ import { RegisterDto } from './dto/register.dto';
 @Injectable()
 export class ServerAuthService {
     // Injecting the used services
-    constructor(private readonly usersService: ServerUsersService,
+    constructor(private readonly usersService: UsersService,
         private readonly jwtService: JwtService) {}
 
     async validateUser(email: string, password: string): Promise<AuthenticatedUser> {

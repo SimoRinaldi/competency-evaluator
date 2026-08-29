@@ -1,4 +1,3 @@
-import { CreateUserDto } from "@server/users";
+import { CreateUserDto } from '@server/users';
 
 export class RegisterDto extends CreateUserDto {}
-

@@ -23,6 +23,21 @@
   ],
   "references": [
     {
+      "path": "../../libs/server/competencies-management/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/server/tests-execution/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/server/tests-management/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/server/historical-scores/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/server/tests-evaluation/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/server/auth/tsconfig.lib.json"
     },
     {
