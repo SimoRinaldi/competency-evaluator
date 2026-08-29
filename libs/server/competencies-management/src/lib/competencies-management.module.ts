@@ -7,10 +7,12 @@ import { MethodModule } from './method/method.module';
 import { RubricModule } from './rubric/rubric.module';
 import { ObservationObjectModule } from './observation-object/observation-object.module';
 import { IndicatorModule } from './indicator/indicator.module';
+import { CompetenciesManagementService } from './competencies-management.service';
+import { CompetenciesManagementController } from './competencies-management.controller';
 
 @Module({
-  controllers: [],
-  providers: [],
+  controllers: [CompetenciesManagementController],
+  providers: [CompetenciesManagementService],
   exports: [
     CompetencyModule,
     SubCompetencyModule,
@@ -20,6 +22,7 @@ import { IndicatorModule } from './indicator/indicator.module';
     RubricModule,
     ObservationObjectModule,
     IndicatorModule,
+    CompetenciesManagementService
   ],
   imports: [
     CompetencyModule,
