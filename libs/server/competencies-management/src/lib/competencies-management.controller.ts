@@ -2,7 +2,7 @@ import { Controller, Post, Body } from '@nestjs/common';
 import { CompetenciesManagementService } from './competencies-management.service';
 import { CreateCompetencyChainDto } from './dto/create-chain.dto';
 
-@Controller('competencies-management')
+@Controller('competencies_management')
 export class CompetenciesManagementController {
   constructor(
     private readonly competenciesManagementService: CompetenciesManagementService
