@@ -24,3 +24,12 @@ export async function createCompetency(
 
   return response.json();
 }
+
+export async function fetchRubrics() {
+  const response = await fetch(`${API_URL}/rubrics`, {
+    headers: getAuthHeaders(),
+  });
+
+  if (!response.ok) throw new Error('Errore nel caricamento delle rubriche');
+  return response.json();
+}

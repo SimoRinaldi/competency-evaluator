@@ -4,6 +4,7 @@ import { createCompetency } from './competencies.api';
 import styles from '../css/shared.module.css';
 import { Step1Competency } from './components/step1-competency';
 import { Step2SubCompetencies } from './components/step2-subcompetencies';
+import { Step3Indicators } from './components/step3-indicators';
 
 export function CreateCompetencyPage() {
   const navigate = useNavigate();
@@ -17,6 +18,10 @@ export function CreateCompetencyPage() {
   });
 
   const [subCompetencies, setSubCompetencies] = useState<any[]>([]);
+
+  const [indicators, setIndicators] = useState<any>([]);
+
+  const [newRubrics, setNewRubrics] = useState<any>([]);
 
   return (
     <div className={styles.page}>
@@ -49,6 +54,22 @@ export function CreateCompetencyPage() {
             onAdd={(newSub) => setSubCompetencies([...subCompetencies, newSub])}
             onNext={() => setStep(3)}
             onPrev={() => setStep(1)}
+          />
+        )}
+
+        {step === 3 && (
+          <Step3Indicators
+            subCompetencies={subCompetencies}
+            indicators={indicators}
+            onAdd={(newIndicator: any) =>
+              setIndicators([...indicators, newIndicator])
+            }
+            newRubrics={newRubrics}
+            onAddRubric={(newRubric: any) =>
+              setNewRubrics([...newRubrics, newRubric])
+            }
+            onNext={() => setStep(4)}
+            onPrev={() => setStep(2)}
           />
         )}
       </div>
