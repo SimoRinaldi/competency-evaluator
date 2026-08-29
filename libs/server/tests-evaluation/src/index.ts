@@ -2,6 +2,7 @@ export * from './lib/tests-evaluation.module';
 export * from './lib/tests-evaluation.service';
 
 // Entità per relazioni esterne
+export * from './lib/test-evaluator/entities/test-evaluator.entity'
 export * from './lib/rubric-level-assignment/entities/rubric-level-assignment.entity';
 export * from './lib/test-evaluator/entities/test-evaluator.entity';
 

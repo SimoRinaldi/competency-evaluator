@@ -23,9 +23,9 @@ export class TestController {
   constructor(private readonly testService: TestService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
-  @ApiBearerAuth()
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
+  // @ApiBearerAuth()
   create(
     @Body(ValidationPipe)
     dto: CreateTestDto

@@ -31,7 +31,8 @@ export class CreateTestDto {
   @IsNotEmpty()
   test_designer_id!: number;
 
-  @ApiPropertyOptional({
+  @ApiProperty({
+    required: true,
     description: 'Array di ID delle sotto-competenze valutate in questo test',
     example: [1, 2, 3],
     type: [Number],
@@ -39,6 +40,28 @@ export class CreateTestDto {
   @IsArray()
   @IsInt({ each: true })
   @IsPositive({ each: true })
+  @IsNotEmpty()
+  subcompetency_ids!: number[];
+
+  @ApiPropertyOptional({
+    description: 'Array di ID dei Test Evaluator assegnati a questo test',
+    example: [1, 2],
+    type: [Number],
+  })
+  @IsArray()
+  @IsInt({ each: true })
+  @IsPositive({ each: true })
   @IsOptional()
-  subcompetency_ids?: number[];
+  evaluator_ids?: number[];
+
+  @ApiPropertyOptional({
+    description: 'Array di ID degli Evaluated User assegnati a questo test',
+    example: [1, 2, 3],
+    type: [Number],
+  })
+  @IsArray()
+  @IsInt({ each: true })
+  @IsPositive({ each: true })
+  @IsOptional()
+  evaluated_user_ids?: number[];
 }
