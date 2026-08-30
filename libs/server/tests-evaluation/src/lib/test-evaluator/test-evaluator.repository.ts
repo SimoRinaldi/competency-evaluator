@@ -19,21 +19,21 @@ export class TestEvaluatorRepository {
 
   async findAll(): Promise<TestEvaluatorEntity[]> {
     return this.repository.find({
-      relations: ['user'],
+      relations: ['user', 'tests'],
     });
   }
 
   async findById(id: number): Promise<TestEvaluatorEntity | null> {
     return this.repository.findOne({
       where: { id },
-      relations: ['user'],
+      relations: ['user', 'tests'],
     });
   }
 
   async findByUserId(user_id: number): Promise<TestEvaluatorEntity | null> {
     return this.repository.findOne({
       where: { user_id },
-      relations: ['user'],
+      relations: ['user', 'tests'],
     });
   }
 
