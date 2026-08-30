@@ -6,20 +6,22 @@ import { LoginPage } from '../features/auth/login.page';
 import { RegisterPage } from '../features/auth/register.page';
 import { AppLayout } from '../features/layouts/app-layout';
 import { CreateCompetencyPage } from '../features/competencies/create-competency.page';
-import { Toaster } from '../components/ui/sonner';
+import { FeedbackProvider } from '../providers/feedback-provider';
+import { PageContainer } from '../components/page-container';
 
 const Placeholder = ({ title }: { title: string }) => (
-  <div className="bg-white p-6 rounded shadow">
-    <h1 className="text-2xl font-bold mb-4">{title}</h1>
-    <p className="text-gray-600">Questa pagina è in costruzione.</p>
-  </div>
+  <PageContainer title={title} description="Questa pagina è in costruzione.">
+    <div className="flex h-40 items-center justify-center rounded-lg border border-dashed text-muted-foreground">
+      Contenuto in arrivo...
+    </div>
+  </PageContainer>
 );
 
 export function App() {
   return (
-    <AuthProvider>
-      <Toaster />
-      <Routes>
+    <FeedbackProvider>
+      <AuthProvider>
+        <Routes>
         {/* Rotte pubbliche per ospiti (Login e Registrazione) */}
         <Route element={<PublicRoute />}>
           <Route path="/login" element={<LoginPage />} />
@@ -33,14 +35,14 @@ export function App() {
             <Route
               path="/"
               element={
-                <div className="bg-white p-6 rounded shadow">
-                  <h1 className="text-2xl font-bold mb-4">
-                    Pannello di controllo
-                  </h1>
-                  <p className="text-gray-600">
-                    Benvenuto nella tua dashboard.
-                  </p>
-                </div>
+                <PageContainer title="Pannello di controllo" description="Benvenuto nella tua dashboard.">
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                    <div className="rounded-xl border bg-card text-card-foreground shadow p-6">
+                      <h3 className="font-semibold leading-none tracking-tight">Novità</h3>
+                      <p className="text-sm text-muted-foreground mt-2">Nessun nuovo aggiornamento.</p>
+                    </div>
+                  </div>
+                </PageContainer>
               }
             />
 
@@ -79,7 +81,8 @@ export function App() {
         {/* Rotta di fallback: reindirizza alla home (o al login se non autenticati) */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </AuthProvider>
+      </AuthProvider>
+    </FeedbackProvider>
   );
 }
 

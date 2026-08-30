@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { UserRole } from './auth.api';
 import { useAuth } from './auth-context';
+import { useFeedback } from '../../providers/feedback-provider';
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -26,24 +27,24 @@ export function RegisterPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState<UserRole>('USER');
-  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { register } = useAuth();
+  const { showError, showSuccess } = useFeedback();
   const navigate = useNavigate();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError('');
     setIsLoading(true);
 
     try {
       await register(name, email, password, role);
+      showSuccess("Registrazione completata", "Ora puoi effettuare l'accesso.");
       navigate('/login');
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setError(err.message);
+        showError(err.message, "Errore di Registrazione");
       } else {
-        setError('Errore durante la registrazione');
+        showError('Errore durante la registrazione', "Errore di Registrazione");
       }
     } finally {
       setIsLoading(false);
@@ -63,11 +64,6 @@ export function RegisterPage() {
           <CardContent>
             <form onSubmit={handleSubmit}>
               <FieldGroup>
-                {error && (
-                  <div className="text-sm font-medium text-destructive">
-                    {error}
-                  </div>
-                )}
                 
                 <Field>
                   <FieldLabel htmlFor="name">Nome</FieldLabel>

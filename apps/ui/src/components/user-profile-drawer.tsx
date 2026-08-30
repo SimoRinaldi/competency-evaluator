@@ -1,6 +1,7 @@
 import * as React from "react"
 import { toast } from "sonner"
 import { useAuth } from "../features/auth/auth-context"
+import { useFeedback } from "../providers/feedback-provider"
 import { updateProfile } from "../features/auth/auth.api"
 import { Button } from "./ui/button"
 import {
@@ -34,6 +35,7 @@ export function UserProfileDrawer({
   onOpenChange: (open: boolean) => void
 }) {
   const { user, refreshUser } = useAuth()
+  const { showError, showSuccess } = useFeedback()
 
   const [name, setName] = React.useState("")
   const [email, setEmail] = React.useState("")
@@ -41,53 +43,51 @@ export function UserProfileDrawer({
   const [oldPassword, setOldPassword] = React.useState("")
   const [newPassword, setNewPassword] = React.useState("")
   const [confirmPassword, setConfirmPassword] = React.useState("")
-  const [showPassword, setShowPassword] = React.useState(false)
-  const [errorMessage, setErrorMessage] = React.useState<string | null>(null)
+  const [showOldPassword, setShowOldPassword] = React.useState(false)
+  const [showNewPassword, setShowNewPassword] = React.useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false)
 
   React.useEffect(() => {
-    if (user && open) {
+    if (open && user) {
       setName(user.name)
       setEmail(user.email)
       setOldPassword("")
       setNewPassword("")
       setConfirmPassword("")
-      setShowPassword(false)
     }
-  }, [user, open])
-
-  if (!user) return null
+  }, [open, user])
 
   async function handleSave() {
     try {
       if (!name || name.trim() === "") {
-        setErrorMessage("Il nome non può essere vuoto.");
+        showError("Il nome non può essere vuoto.");
         return;
       }
 
       if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        setErrorMessage("Inserisci un indirizzo email valido.");
+        showError("Inserisci un indirizzo email valido.");
         return;
       }
 
       if (oldPassword || newPassword || confirmPassword) {
         if (!oldPassword) {
-          setErrorMessage("Inserisci la vecchia password per poterne impostare una nuova.");
+          showError("Inserisci la vecchia password per poterne impostare una nuova.");
           return;
         }
         if (newPassword !== confirmPassword) {
-          setErrorMessage("Le nuove password non coincidono.");
+          showError("Le nuove password non coincidono.");
           return;
         }
         if (newPassword.length < 8) {
-          setErrorMessage("La nuova password deve contenere almeno 8 caratteri.");
+          showError("La nuova password deve contenere almeno 8 caratteri.");
           return;
         }
         if (!/[A-Z]/.test(newPassword)) {
-          setErrorMessage("La nuova password deve contenere almeno una lettera maiuscola.");
+          showError("La nuova password deve contenere almeno una lettera maiuscola.");
           return;
         }
         if (!/[?^!#@]/.test(newPassword)) {
-          setErrorMessage("La nuova password deve contenere almeno un simbolo speciale tra ? ^ ! # @");
+          showError("La nuova password deve contenere almeno un simbolo speciale tra ? ^ ! # @");
           return;
         }
         
@@ -98,13 +98,13 @@ export function UserProfileDrawer({
 
       await refreshUser();
       onOpenChange(false);
-      toast.success("Profilo aggiornato", {
-        description: "Le modifiche sono state salvate con successo.",
-      })
+      showSuccess("Profilo aggiornato", "Le modifiche sono state salvate con successo.");
     } catch (e: any) {
-      setErrorMessage(e.message || "Si è verificato un errore durante l'aggiornamento.");
+      showError(e.message || "Si è verificato un errore durante l'aggiornamento.");
     }
   }
+
+  if (!user) return null
 
   return (
     <>
@@ -164,7 +164,7 @@ export function UserProfileDrawer({
               <div className="relative">
                 <Input
                   id="oldPassword"
-                  type={showPassword ? "text" : "password"}
+                  type={showOldPassword ? "text" : "password"}
                   value={oldPassword}
                   onChange={(e) => setOldPassword(e.target.value)}
                   placeholder="Inserisci password attuale"
@@ -175,10 +175,10 @@ export function UserProfileDrawer({
                   variant="ghost"
                   size="icon"
                   className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-muted-foreground hover:text-foreground"
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={() => setShowOldPassword(!showOldPassword)}
                   tabIndex={-1}
                 >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showOldPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
               </div>
             </div>
@@ -188,12 +188,22 @@ export function UserProfileDrawer({
               <div className="relative">
                 <Input
                   id="newPassword"
-                  type={showPassword ? "text" : "password"}
+                  type={showNewPassword ? "text" : "password"}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="Inserisci nuova password"
                   className="pr-10"
                 />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-muted-foreground hover:text-foreground"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  tabIndex={-1}
+                >
+                  {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </Button>
               </div>
             </div>
 
@@ -202,12 +212,22 @@ export function UserProfileDrawer({
               <div className="relative">
                 <Input
                   id="confirmPassword"
-                  type={showPassword ? "text" : "password"}
+                  type={showConfirmPassword ? "text" : "password"}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Conferma nuova password"
                   className="pr-10"
                 />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-muted-foreground hover:text-foreground"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  tabIndex={-1}
+                >
+                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </Button>
               </div>
             </div>
           </div>
@@ -243,23 +263,6 @@ export function UserProfileDrawer({
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
-
-    <AlertDialog open={!!errorMessage} onOpenChange={(open) => !open && setErrorMessage(null)}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle className="flex items-center gap-2">
-            <TriangleAlert className="h-5 w-5 text-destructive" />
-            Errore di Salvataggio
-          </AlertDialogTitle>
-          <AlertDialogDescription>
-            {errorMessage}
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogAction onClick={() => setErrorMessage(null)}>Ho capito</AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
   </>
   )
 }

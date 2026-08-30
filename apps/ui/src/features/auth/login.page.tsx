@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from './auth-context';
+import { useFeedback } from '../../providers/feedback-provider';
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -22,9 +23,9 @@ export function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
+  const { showError, showSuccess } = useFeedback();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -32,18 +33,17 @@ export function LoginPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError('');
     setIsLoading(true);
 
     try {
       await login(email, password);
-      // Se il login va a buon fine, naviga alla rotta precedente o alla dashboard
+      showSuccess("Accesso effettuato", "Benvenuto nella piattaforma.");
       navigate(from, { replace: true });
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setError(err.message);
+        showError(err.message, "Errore di Accesso");
       } else {
-        setError('Errore durante il login');
+        showError('Errore durante il login', "Errore di Accesso");
       }
     } finally {
       setIsLoading(false);
@@ -63,11 +63,6 @@ export function LoginPage() {
           <CardContent>
             <form onSubmit={handleSubmit}>
               <FieldGroup>
-                {error && (
-                  <div className="text-sm font-medium text-destructive">
-                    {error}
-                  </div>
-                )}
                 <Field>
                   <FieldLabel htmlFor="email">Email</FieldLabel>
                   <Input
