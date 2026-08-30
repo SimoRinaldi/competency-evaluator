@@ -17,7 +17,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { Loader2, AlertCircle, Check, Send } from 'lucide-react';
+import { Loader2, AlertCircle, Check, Send, FileText, Download } from 'lucide-react';
 import { fetchCurrentUser } from '../auth/auth.api';
 import { 
   getEvaluatorProfile, 
@@ -183,6 +183,33 @@ export function UserEvaluationModal({
                   </div>
                 </div>
 
+                {/* File dell'utente */}
+                <div className="space-y-2">
+                  <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">File Consegnati</h3>
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                    {execution.test_outputs && execution.test_outputs.length > 0 ? (
+                      <div className="space-y-3">
+                        {execution.test_outputs.map((out: any, i: number) => (
+                          <div key={i} className="flex items-center justify-between p-3 bg-white rounded-md border border-slate-200 shadow-sm">
+                            <div className="flex items-center gap-3">
+                              <FileText className="h-5 w-5 text-slate-400" />
+                              <div className="flex flex-col">
+                                <span className="text-sm font-medium text-slate-700">{out.name}</span>
+                                {out.description && <span className="text-xs text-slate-500">{out.description}</span>}
+                              </div>
+                            </div>
+                            <Button variant="outline" size="sm" className="gap-2" type="button">
+                              <Download className="h-4 w-4" /> Scarica file
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-slate-500 italic">Nessun file caricato per questa esecuzione.</p>
+                    )}
+                  </div>
+                </div>
+
                 {/* Sottocompetenze e Indicatori */}
                 <div className="space-y-6 pt-4 border-t border-slate-100">
                   <div className="flex items-center justify-between">
@@ -197,47 +224,58 @@ export function UserEvaluationModal({
                   {test.subcompetencies?.length === 0 ? (
                     <p className="text-sm text-slate-500 italic">Nessuna sottocompetenza associata.</p>
                   ) : (
-                    <div className="space-y-8">
+                    <div className="space-y-10">
                       {test.subcompetencies?.map((sc) => (
-                        <div key={sc.id} className="space-y-4">
-                          <h4 className="text-base font-bold text-sky-700 bg-sky-50 p-3 rounded-md border border-sky-100">
+                        <div key={sc.id} className="space-y-6">
+                          <h4 className="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2">
                             {sc.title}
                           </h4>
                           
-                          <div className="space-y-6 pl-2 border-l-2 border-sky-100 ml-2">
+                          <div className="space-y-8 pl-1">
                             {sc.observation_object?.indicators?.map((indicator) => (
-                              <div key={indicator.id} className="space-y-3">
-                                <p className="text-sm font-medium text-slate-700">
+                              <div key={indicator.id} className="space-y-4">
+                                <p className="text-base font-semibold text-slate-700">
                                   {indicator.description}
                                 </p>
                                 
-                                <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                                <div className="flex flex-col gap-3">
                                   {indicator.rubric_set?.levels?.map((level) => {
                                     const isSelected = evaluations[indicator.id] === level.rank;
                                     return (
-                                      <button
+                                      <label
                                         key={level.id}
-                                        type="button"
-                                        disabled={isEvaluated}
-                                        onClick={() => handleSelectLevel(indicator.id, level.rank)}
-                                        className={`text-left p-3 rounded-lg border transition-all ${
+                                        className={`flex items-start gap-4 p-4 rounded-lg border transition-all cursor-pointer ${
                                           isSelected
                                             ? "border-sky-500 bg-sky-50 ring-1 ring-sky-500"
                                             : isEvaluated 
-                                              ? "border-slate-200 opacity-50 cursor-not-allowed" 
+                                              ? "border-slate-200 opacity-60 cursor-not-allowed" 
                                               : "border-slate-200 hover:border-sky-300 hover:bg-slate-50"
                                         }`}
                                       >
-                                        <div className="flex items-center justify-between mb-1.5">
-                                          <span className={`font-bold text-sm ${isSelected ? "text-sky-700" : "text-slate-500"}`}>
+                                        <div className="pt-0.5">
+                                          <div className={`h-5 w-5 rounded-full border flex items-center justify-center ${isSelected ? 'border-sky-600' : 'border-slate-300 bg-white'}`}>
+                                            {isSelected && <div className="h-2.5 w-2.5 rounded-full bg-sky-600" />}
+                                          </div>
+                                        </div>
+                                        <div className="flex-1 flex flex-col">
+                                          <span className={`font-bold text-sm ${isSelected ? "text-sky-800" : "text-slate-700"}`}>
                                             Livello {level.rank}
                                           </span>
-                                          {isSelected && <Check className="h-4 w-4 text-sky-600" />}
+                                          <span className={`text-sm mt-1 leading-relaxed ${isSelected ? "text-slate-800" : "text-slate-600"}`}>
+                                            {level.description}
+                                          </span>
                                         </div>
-                                        <div className={`text-xs leading-relaxed ${isSelected ? "text-slate-800 font-medium" : "text-slate-500"}`}>
-                                          {level.description}
-                                        </div>
-                                      </button>
+                                        {/* Input radio nascosto per accessibilità */}
+                                        <input 
+                                          type="radio" 
+                                          name={`indicator-${indicator.id}`} 
+                                          value={level.rank}
+                                          checked={isSelected}
+                                          disabled={isEvaluated}
+                                          onChange={() => handleSelectLevel(indicator.id, level.rank)}
+                                          className="sr-only"
+                                        />
+                                      </label>
                                     );
                                   })}
                                 </div>
