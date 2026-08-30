@@ -93,7 +93,7 @@ export function AdminDashboardPage() {
     <div className="p-8 w-full max-w-6xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard Admin</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Gestione Competenze</h1>
           <p className="text-muted-foreground mt-2">
             Gestisci le competenze del sistema.
           </p>
