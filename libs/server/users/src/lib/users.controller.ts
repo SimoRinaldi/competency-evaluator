@@ -13,7 +13,7 @@ export class UsersController {
 
     @Get() // GET /users or /users?role=value
     @UseGuards(JwtAuthGuard,RolesGuard)
-    @Roles(UserRole.ADMIN)
+    @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
     @ApiBearerAuth()
     @ApiQuery({ name: 'role', required: false, enum: UserRole })
     getUsers(@Query('role', new ParseEnumPipe(UserRole, {optional: true})) role?: UserRole) {

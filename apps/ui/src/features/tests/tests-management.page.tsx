@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { PageContainer } from '@/components/page-container';
-import { fetchTests, ApiTest, ApiCompetency, ApiSubCompetency, ApiUser, fetchCompetencies, fetchSubCompetencies, fetchUsers, fetchTestDesigners, createTest } from './tests.api';
+import { fetchTests, ApiTest, ApiCompetency, ApiSubCompetency, ApiUser, fetchCompetencies, fetchSubCompetencies, fetchUsers, fetchTestDesigners, createTest, fetchEvaluatedUsers, fetchTestEvaluators } from './tests.api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -62,24 +62,39 @@ export function TestsManagementPage() {
 
   async function loadModalData() {
     try {
-      const [compRes, subRes, allUsers] = await Promise.all([
-        fetchCompetencies().catch(() => []),
-        fetchSubCompetencies().catch(() => []),
-        fetchUsers().catch(() => []),
+      const [compRes, subRes, evaluatedUsersRes, testEvaluatorsRes] = await Promise.all([
+        fetchCompetencies(),
+        fetchSubCompetencies(),
+        fetchEvaluatedUsers(),
+        fetchTestEvaluators(),
       ]);
 
       setCompetencies(compRes);
       setSubCompetencies(subRes);
 
-      const students = allUsers.filter((u: ApiUser) => u.role === 'USER');
-      const evals = allUsers.filter(
-        (u: ApiUser) => u.role === 'EVALUATOR' || u.role === 'TEST_DESIGNER'
-      );
+      const students = evaluatedUsersRes
+        .filter((eu: any) => eu.user)
+        .map((eu: any) => ({
+          ...eu.user,
+          id: eu.id, // the ID passed to the backend must be the EvaluatedUser ID
+        }));
+
+      const evaluators = testEvaluatorsRes
+        .filter((te: any) => te.user)
+        .map((te: any) => ({
+          ...te.user,
+          id: te.id, // the ID passed to the backend must be the TestEvaluator ID
+        }));
 
       setUsers(students);
-      setEvaluators(evals);
+      setEvaluators(evaluators);
     } catch (err) {
-      console.error('Failed to load modal data', err);
+      console.error('Failed to fetch modal data', err);
+      // Fallback empty if needed so UI doesn't crash completely, but now we know it failed
+      setCompetencies([]);
+      setSubCompetencies([]);
+      setUsers([]);
+      setEvaluators([]);
     }
   }
 

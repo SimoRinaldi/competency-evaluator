@@ -39,6 +39,12 @@ export interface ApiTestEvaluator {
   user?: ApiUser;
 }
 
+export interface ApiEvaluatedUser {
+  id: number;
+  user_id: number;
+  user?: ApiUser;
+}
+
 export interface ApiTestDesigner {
   id: number;
   user_id: number;
@@ -64,292 +70,91 @@ export interface CreateTestPayload {
   evaluated_user_ids?: number[];
 }
 
-// ==========================================
-// DATI MOCK DI FALLBACK (CONFORMI ALLE ENTITÀ)
-// ==========================================
 
-export const MOCK_COMPETENCIES: ApiCompetency[] = [
-  {
-    id: 1,
-    title: 'Sviluppo Web e Architetture Software',
-    weight: 4,
-    threshold: 60,
-  },
-  {
-    id: 2,
-    title: 'Database Design e Ottimizzazione Query',
-    weight: 3,
-    threshold: 50,
-  },
-  {
-    id: 3,
-    title: 'Sicurezza delle Applicazioni Web e Autenticazione',
-    weight: 5,
-    threshold: 70,
-  },
-];
-
-export const MOCK_SUBCOMPETENCIES: ApiSubCompetency[] = [
-  {
-    id: 101,
-    title: 'Creazione di API RESTful con NestJS',
-    weight: 2,
-    threshold: 60,
-    competency_id: 1,
-    input: 'Specifiche API e contratti Swagger',
-    action: 'Implementazione controller, service e dto',
-    output: 'Endpoints funzionanti e testati',
-  },
-  {
-    id: 102,
-    title: 'Gestione dello Stato e Componenti con React',
-    weight: 2,
-    threshold: 60,
-    competency_id: 1,
-    input: 'Design mockups e requisiti interazione utente',
-    action: 'Sviluppo componenti UI modulari con React hooks',
-    output: 'Interfaccia reattiva e accessibile',
-  },
-  {
-    id: 103,
-    title: 'Integrazione Client-Server tramite Axios',
-    weight: 1,
-    threshold: 50,
-    competency_id: 1,
-    input: 'Contratti di rete e token JWT',
-    action: 'Configurazione client HTTP e gestione errori',
-    output: 'Flusso dati asincrono stabile',
-  },
-  {
-    id: 104,
-    title: 'Configurazione Build System e Monorepo con Nx',
-    weight: 2,
-    threshold: 55,
-    competency_id: 1,
-    input: 'Requisiti di architettura modulare',
-    action: 'Impostazione workspace Nx, project graphs e caching',
-    output: 'Pipeline di build e test ottimizzata',
-  },
-  {
-    id: 201,
-    title: 'Modellazione Entità e Relazioni con TypeORM',
-    weight: 3,
-    threshold: 55,
-    competency_id: 2,
-    input: 'Schema concettuale e requisiti di dominio',
-    action: 'Definizione entity TypeORM, vincoli e indici',
-    output: 'Schema database relazionale consistente',
-  },
-  {
-    id: 202,
-    title: 'Scrittura ed Esecuzione di Migrazioni',
-    weight: 2,
-    threshold: 50,
-    competency_id: 2,
-    input: 'Modifiche allo schema esistente',
-    action: 'Generazione e applicazione file di migrazione',
-    output: 'Database aggiornato in modo non distruttivo',
-  },
-  {
-    id: 203,
-    title: 'Ottimizzazione Query SQL e Execution Plan',
-    weight: 3,
-    threshold: 65,
-    competency_id: 2,
-    input: 'Query lente e log di esecuzione DB',
-    action: 'Indicizzazione mirata e refactoring delle join',
-    output: 'Tempi di risposta delle query conformi agli SLA',
-  },
-  {
-    id: 301,
-    title: 'Autenticazione con JWT e Strategie Passport',
-    weight: 3,
-    threshold: 70,
-    competency_id: 3,
-    input: 'Credenziali utente e requisiti di sessione',
-    action: 'Configurazione JWT Guard, LocalStrategy e hashing bcrypt',
-    output: 'Flusso di autenticazione sicuro',
-  },
-  {
-    id: 302,
-    title: 'Controllo degli Accessi Basato sui Ruoli (RBAC)',
-    weight: 2,
-    threshold: 65,
-    competency_id: 3,
-    input: 'Matrice permessi e ruoli utente',
-    action: 'Applicazione di decoratori e role guards su endpoint protetti',
-    output: 'Protezione delle risorse da accessi non autorizzati',
-  },
-  {
-    id: 303,
-    title: 'Sanitizzazione Input e Prevenzione Injection',
-    weight: 3,
-    threshold: 75,
-    competency_id: 3,
-    input: 'Dati forniti dall utente da form e request body',
-    action: 'Configurazione validation pipes e parameterized queries',
-    output: 'Resistenza agli attacchi di iniezione',
-  },
-];
-
-export const MOCK_USERS: ApiUser[] = [
-  { id: 1, name: 'Mario Rossi', email: 'mario.rossi@example.com', role: 'USER' },
-  { id: 2, name: 'Giulia Bianchi', email: 'giulia.bianchi@example.com', role: 'USER' },
-  { id: 3, name: 'Luca Verdi', email: 'luca.verdi@example.com', role: 'USER' },
-  { id: 4, name: 'Chiara Esposito', email: 'chiara.esposito@example.com', role: 'USER' },
-  { id: 5, name: 'Alessandro Moretti', email: 'alessandro.moretti@example.com', role: 'USER' },
-  { id: 6, name: 'Francesca Romano', email: 'francesca.romano@example.com', role: 'USER' },
-  { id: 7, name: 'Matteo Colombo', email: 'matteo.colombo@example.com', role: 'USER' },
-  { id: 8, name: 'Federica Ricci', email: 'federica.ricci@example.com', role: 'USER' },
-  { id: 9, name: 'Davide Marino', email: 'davide.marino@example.com', role: 'USER' },
-  { id: 10, name: 'Sara Greco', email: 'sara.greco@example.com', role: 'USER' },
-  { id: 16, name: 'Prof. Marco Ferrari', email: 'marco.ferrari@example.com', role: 'EVALUATOR' },
-  { id: 17, name: 'Dott.ssa Elena Galli', email: 'elena.galli@example.com', role: 'EVALUATOR' },
-  { id: 18, name: 'Ing. Roberto Conti', email: 'roberto.conti@example.com', role: 'EVALUATOR' },
-  { id: 19, name: 'Prof.ssa Anna Serra', email: 'anna.serra@example.com', role: 'EVALUATOR' },
-  { id: 20, name: 'Dott. Stefano Bellini', email: 'stefano.bellini@example.com', role: 'EVALUATOR' },
-  { id: 21, name: 'Prof. Giovanni Testa', email: 'giovanni.testa@example.com', role: 'TEST_DESIGNER' },
-];
 
 export async function fetchCompetencies(): Promise<ApiCompetency[]> {
-  try {
-    const response = await fetch(`${API_URL}/competencies`, {
-      headers: getAuthHeaders(),
-    });
-    if (response.ok) {
-      const data = await response.json();
-      if (Array.isArray(data) && data.length > 0) {
-        return data;
-      }
-    }
-  } catch (err) {
-    console.warn('API /competencies non raggiungibile o non autorizzata. Utilizzo mockup.', err);
+  const response = await fetch(`${API_URL}/competencies`, {
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) {
+    throw new Error(`Errore API /competencies: ${response.statusText}`);
   }
-  return MOCK_COMPETENCIES;
+  return await response.json();
 }
 
 export async function fetchSubCompetencies(): Promise<ApiSubCompetency[]> {
-  try {
-    const response = await fetch(`${API_URL}/subcompetencies`, {
-      headers: getAuthHeaders(),
-    });
-    if (response.ok) {
-      const data = await response.json();
-      if (Array.isArray(data) && data.length > 0) {
-        return data;
-      }
-    }
-  } catch (err) {
-    console.warn('API /subcompetencies non raggiungibile o non autorizzata. Utilizzo mockup.', err);
+  const response = await fetch(`${API_URL}/subcompetencies`, {
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) {
+    throw new Error(`Errore API /subcompetencies: ${response.statusText}`);
   }
-  return MOCK_SUBCOMPETENCIES;
+  return await response.json();
 }
 
 export async function fetchUsers(role?: string): Promise<ApiUser[]> {
-  try {
-    const url = role ? `${API_URL}/users?role=${role}` : `${API_URL}/users`;
-    const response = await fetch(url, {
-      headers: getAuthHeaders(),
-    });
-    if (response.ok) {
-      const data = await response.json();
-      if (Array.isArray(data) && data.length > 0) {
-        return data;
-      }
-    }
-  } catch (err) {
-    console.warn('API /users non raggiungibile o non autorizzata. Utilizzo mockup.', err);
+  const url = role ? `${API_URL}/users?role=${role}` : `${API_URL}/users`;
+  const response = await fetch(url, {
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) {
+    throw new Error(`Errore API /users: ${response.statusText}`);
   }
-  return role ? MOCK_USERS.filter((u) => u.role === role) : MOCK_USERS;
+  return await response.json();
+}
+
+export async function fetchEvaluatedUsers(): Promise<ApiEvaluatedUser[]> {
+  const response = await fetch(`${API_URL}/evaluated_users`, {
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) {
+    throw new Error(`Errore API /evaluated_users: ${response.statusText}`);
+  }
+  return await response.json();
 }
 
 export async function fetchTestEvaluators(): Promise<ApiTestEvaluator[]> {
-  try {
-    const response = await fetch(`${API_URL}/test_evaluators`, {
-      headers: getAuthHeaders(),
-    });
-    if (response.ok) {
-      return await response.json();
-    }
-  } catch (err) {
-    console.warn('API /test_evaluators non raggiungibile. Utilizzo mockup.', err);
+  const response = await fetch(`${API_URL}/test_evaluators`, {
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) {
+    throw new Error(`Errore API /test_evaluators: ${response.statusText}`);
   }
-  return [];
+  return await response.json();
 }
 
 export async function fetchTestDesigners(): Promise<ApiTestDesigner[]> {
-  try {
-    const response = await fetch(`${API_URL}/test_designers`, {
-      headers: getAuthHeaders(),
-    });
-    if (response.ok) {
-      return await response.json();
-    }
-  } catch (err) {
-    console.warn('API /test_designers non raggiungibile. Utilizzo mockup.', err);
+  const response = await fetch(`${API_URL}/test_designers`, {
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) {
+    throw new Error(`Errore API /test_designers: ${response.statusText}`);
   }
-  return [];
+  return await response.json();
 }
 
 export async function createTest(payload: CreateTestPayload) {
-  try {
-    const response = await fetch(`${API_URL}/tests`, {
-      method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(payload),
-    });
+  const response = await fetch(`${API_URL}/tests`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(payload),
+  });
 
-    if (response.ok) {
-      return await response.json();
-    }
-
-    const errorBody = await response.json().catch(() => ({ message: 'Errore API' }));
-    console.warn('Server ha risposto con errore su POST /tests. Simulazione successo mock.', errorBody);
-  } catch (err) {
-    console.warn('Server non raggiungibile su POST /tests. Simulazione salvataggio mock.', err);
+  if (!response.ok) {
+    const errorBody = await response.json().catch(() => ({ message: 'Errore API sconosciuto' }));
+    throw new Error(errorBody.message || `Errore API POST /tests: ${response.statusText}`);
   }
-
-  // Simulazione creazione test riuscita (fallback mock se il backend o jwt fallisce)
-  return {
-    id: Math.floor(Math.random() * 1000) + 1,
-    assessment_situation: payload.assessment_situation,
-    test_designer_id: payload.test_designer_id,
-    subcompetencies: payload.subcompetency_ids.map((id) => ({ id })),
-  };
+  return await response.json();
 }
 
-export const MOCK_TESTS: ApiTest[] = [
-  {
-    id: 1,
-    assessment_situation: 'Valutazione Sviluppo Web e Architetture Software',
-    test_designer_id: 21,
-    test_designer: { id: 21, user_id: 21, user: MOCK_USERS.find(u => u.id === 21) },
-    executions_count: 5,
-    subcompetencies: [MOCK_SUBCOMPETENCIES[0], MOCK_SUBCOMPETENCIES[1]],
-  },
-  {
-    id: 2,
-    assessment_situation: 'Test sulle Competenze Database',
-    test_designer_id: 21,
-    test_designer: { id: 21, user_id: 21, user: MOCK_USERS.find(u => u.id === 21) },
-    executions_count: 0,
-    subcompetencies: [MOCK_SUBCOMPETENCIES[4], MOCK_SUBCOMPETENCIES[5]],
-  }
-];
+
 
 export async function fetchTests(): Promise<ApiTest[]> {
-  try {
-    const response = await fetch(`${API_URL}/tests`, {
-      headers: getAuthHeaders(),
-    });
-    if (response.ok) {
-      const data = await response.json();
-      if (Array.isArray(data)) {
-        return data;
-      }
-    }
-  } catch (err) {
-    console.warn('API /tests non raggiungibile o non autorizzata. Utilizzo mockup.', err);
+  const response = await fetch(`${API_URL}/tests`, {
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) {
+    throw new Error(`Errore API /tests: ${response.statusText}`);
   }
-  return MOCK_TESTS;
+  return await response.json();
 }
