@@ -76,6 +76,19 @@ export async function submitEvaluation(data: { rubric_rank: number; indicator_id
     headers: getAuthHeaders(),
     body: JSON.stringify(data),
   });
-  if (!response.ok) throw new Error('Errore salvataggio valutazione');
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || 'Errore salvataggio valutazione');
+  }
+  return response.json();
+}
+
+export async function updateTestExecution(id: number | string, data: { test_score?: string; max_score?: string }) {
+  const response = await fetch(`${API_URL}/test_executions/${id}`, {
+    method: 'PATCH',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) throw new Error('Errore aggiornamento test execution');
   return response.json();
 }
