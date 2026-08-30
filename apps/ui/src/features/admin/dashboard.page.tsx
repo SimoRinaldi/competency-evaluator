@@ -16,9 +16,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Pencil, Plus, Search } from "lucide-react";
+import { Pencil, Plus, Search, BookX } from "lucide-react";
 
 type Competency = {
   id: number;
@@ -88,6 +96,44 @@ export function AdminDashboardPage() {
     },
     onGlobalFilterChange: setGlobalFilter,
   });
+
+  if (!loading && data.length === 0) {
+    return (
+      <div className="p-8 w-full max-w-6xl mx-auto space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Gestione Competenze</h1>
+            <p className="text-muted-foreground mt-2">
+              Gestisci le competenze del sistema.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Link to="/admin/users">
+              <Button variant="outline">Gestione Utenti</Button>
+            </Link>
+          </div>
+        </div>
+        <Empty className="mt-8">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <BookX />
+            </EmptyMedia>
+            <EmptyTitle>Nessuna competenza</EmptyTitle>
+            <EmptyDescription>
+              Al momento non è presente alcuna competenza a sistema. Inizia creandone una.
+            </EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <Link to="/competencies/new">
+              <Button>
+                <Plus className="mr-2 h-4 w-4" /> Crea Competenza
+              </Button>
+            </Link>
+          </EmptyContent>
+        </Empty>
+      </div>
+    );
+  }
 
   return (
     <div className="p-8 w-full max-w-6xl mx-auto space-y-6">
