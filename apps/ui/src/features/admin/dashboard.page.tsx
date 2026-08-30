@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/empty";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Pencil, Plus, Search, BookX } from "lucide-react";
+import { Pencil, Plus, Search, BookX, ArrowUpRight } from "lucide-react";
 
 type Competency = {
   id: number;
@@ -97,25 +97,11 @@ export function AdminDashboardPage() {
     onGlobalFilterChange: setGlobalFilter,
   });
 
-  const PageAction = (
-    <div className="flex gap-2">
-      <Link to="/users">
-        <Button variant="outline">Gestione Utenti</Button>
-      </Link>
-      <Link to="/competencies/new">
-        <Button>
-          <Plus className="mr-2 h-4 w-4" /> Crea Competenza
-        </Button>
-      </Link>
-    </div>
-  );
-
   if (!loading && data.length === 0) {
     return (
       <PageContainer 
         title="Gestione Competenze" 
         description="Gestisci le competenze del sistema."
-        action={PageAction}
       >
         <Empty className="mt-8">
           <EmptyHeader>
@@ -124,16 +110,23 @@ export function AdminDashboardPage() {
             </EmptyMedia>
             <EmptyTitle>Nessuna competenza</EmptyTitle>
             <EmptyDescription>
-              Al momento non è presente alcuna competenza a sistema. Inizia creandone una.
+              Non hai ancora creato nessuna competenza nel sistema.
+              Inizia creandone una per popolare il database.
             </EmptyDescription>
           </EmptyHeader>
-          <EmptyContent>
+          <EmptyContent className="flex-row justify-center gap-2">
             <Link to="/competencies/new">
               <Button>
                 <Plus className="mr-2 h-4 w-4" /> Crea Competenza
               </Button>
             </Link>
+            <Button variant="outline">Importa</Button>
           </EmptyContent>
+          <Button variant="link" className="text-muted-foreground" size="sm" asChild>
+            <a href="#">
+              Scopri di più <ArrowUpRight className="ml-1 h-3 w-3" />
+            </a>
+          </Button>
         </Empty>
       </PageContainer>
     );
@@ -143,7 +136,6 @@ export function AdminDashboardPage() {
     <PageContainer 
       title="Gestione Competenze" 
       description="Gestisci le competenze del sistema."
-      action={PageAction}
     >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4">
         <div className="relative w-full sm:max-w-sm">
@@ -155,12 +147,19 @@ export function AdminDashboardPage() {
             className="!pl-10"
           />
         </div>
-        <div className="text-sm font-medium text-muted-foreground">
-          Totale competenze: {data.length}
+        <div className="flex items-center gap-4">
+          <div className="text-sm font-medium text-muted-foreground hidden sm:block">
+            Totale: {data.length}
+          </div>
+          <Link to="/competencies/new">
+            <Button>
+              <Plus className="mr-2 h-4 w-4" /> Crea Competenza
+            </Button>
+          </Link>
         </div>
       </div>
 
-      <div className="rounded-md border bg-card text-card-foreground shadow-sm">
+      <div className="rounded-md border bg-card text-card-foreground shadow-sm p-4 overflow-hidden">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -197,7 +196,7 @@ export function AdminDashboardPage() {
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className="py-3">
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
