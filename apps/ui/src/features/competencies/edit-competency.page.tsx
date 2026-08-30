@@ -70,7 +70,7 @@ export function EditCompetencyPage({ competencyId: propId }: { competencyId?: st
 
   // Funzione per salvare la sottocompetenza dalla modale/panel
   const handleSaveSubCompetency = (subData: any) => {
-    let updatedSubs = [...subCompetencies];
+    const updatedSubs = [...subCompetencies];
     if (activeSubIndex === -1) {
       updatedSubs.push(subData);
     } else {

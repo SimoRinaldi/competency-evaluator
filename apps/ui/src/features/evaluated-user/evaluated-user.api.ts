@@ -56,3 +56,15 @@ export async function getUserExecutions(userId: number) {
   if (!response.ok) return []; // Nessuna esecuzione trovata, restituisce array vuoto
   return response.json();
 }
+
+export async function getCompetencyHistoricalScores(userId: number) {
+  const response = await fetch(`${API_URL}/competency_historical_scores/by-user/${userId}`, { headers: getAuthHeaders() });
+  if (!response.ok) return [];
+  return response.json();
+}
+
+export async function getSubCompetencyHistoricalScores(userId: number) {
+  const response = await fetch(`${API_URL}/subcompetency_historical_scores/by-user/${userId}`, { headers: getAuthHeaders() });
+  if (!response.ok) return [];
+  return response.json();
+}

@@ -61,6 +61,16 @@ export class SubCompetencyHistoricalScoreRepository {
       .getMany();
   }
 
+  async findByUser(
+    user_id: number,
+  ): Promise<SubCompetencyHistoricalScoreEntity[]> {
+    return this.repository.find({
+      where: { user_id },
+      relations: ['subcompetency'],
+      order: { subcompetency_id: 'ASC' }
+    });
+  }
+
   async updateOne(
     score: SubCompetencyHistoricalScoreEntity,
     dto: UpdateSubCompetencyHistoricalScoreDto

@@ -64,6 +64,12 @@ export class SubCompetencyHistoricalScoreService {
       return acquiredSubCompetencies;
     }
 
+  async findByUser(
+    user_id: number,
+  ): Promise <SubCompetencyHistoricalScoreEntity[]> {
+    return this.repository.findByUser(user_id);
+  }
+
   async update(
     id: number,
     dto: UpdateSubCompetencyHistoricalScoreDto
