@@ -1,7 +1,3 @@
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-
 export function Step1Competency({ data, onChange, onNext }: any) {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -23,52 +19,55 @@ export function Step1Competency({ data, onChange, onNext }: any) {
         <div className="flex flex-col md:flex-row gap-6">
           {/* Titolo */}
           <div className="space-y-2 flex-1">
-            <Label>
+            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               Titolo <span className="text-red-500">*</span>
-            </Label>
-            <Input
+            </label>
+            <input
               type="text"
               required
               value={data.title}
               onChange={(e) => onChange({ ...data, title: e.target.value })}
               placeholder="es. Definire l'idea progettuale"
+              className="flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
             />
           </div>
 
           {/* Peso */}
           <div className="space-y-2 w-full md:w-32 shrink-0">
-            <Label>
+            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               Peso (1-5) <span className="text-red-500">*</span>
-            </Label>
-            <Input
+            </label>
+            <input
               type="number"
               min="1"
               max="5"
               required
               value={data.weight}
               onChange={(e) => onChange({ ...data, weight: e.target.value })}
+              className="flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
             />
           </div>
 
           {/* Soglia */}
           <div className="space-y-2 w-full md:w-36 shrink-0">
-            <Label>
+            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               Soglia minima <span className="text-red-500">*</span>
-            </Label>
-            <Input
+            </label>
+            <input
               type="number"
               min="1"
               required
               value={data.threshold}
               onChange={(e) => onChange({ ...data, threshold: e.target.value })}
+              className="flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
             />
           </div>
         </div>
 
         <div className="flex justify-end border-t border-slate-200 pt-6">
-          <Button type="submit" className="bg-slate-900 hover:bg-slate-800 text-white px-8">
+          <button type="submit" className="inline-flex h-10 items-center justify-center rounded-md bg-slate-900 px-8 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50">
             Avanti
-          </Button>
+          </button>
         </div>
       </form>
     </div>

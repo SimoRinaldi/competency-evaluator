@@ -1,10 +1,21 @@
 import { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from './auth-context';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Field,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 
 export function LoginPage() {
   const [email, setEmail] = useState('');
@@ -38,62 +49,61 @@ export function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle className="text-2xl">Bentornato</CardTitle>
-          <CardDescription>
-            Inserisci la tua email e password per accedere.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="grid gap-4">
-            {error && (
-              <div className="text-sm font-medium text-destructive">
-                {error}
-              </div>
-            )}
-            
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="mario@esempio.it"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={isLoading}
-              />
-            </div>
-            
-            <div className="grid gap-2">
-              <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
-              </div>
-              <Input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={isLoading}
-              />
-            </div>
-            
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Accesso in corso...' : 'Entra'}
-            </Button>
-          </form>
-          
-          <div className="mt-4 text-center text-sm">
-            Non hai un account?{' '}
-            <Link to="/register" className="underline">
-              Registrati
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="flex min-h-screen items-center justify-center bg-muted/50 p-4">
+      <div className="flex flex-col gap-6 w-full max-w-sm">
+        <Card>
+          <CardHeader>
+            <CardTitle>Bentornato</CardTitle>
+            <CardDescription>
+              Inserisci la tua email e password per accedere.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit}>
+              <FieldGroup>
+                {error && (
+                  <div className="text-sm font-medium text-destructive">
+                    {error}
+                  </div>
+                )}
+                <Field>
+                  <FieldLabel htmlFor="email">Email</FieldLabel>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="mario@esempio.it"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={isLoading}
+                  />
+                </Field>
+                <Field>
+                  <div className="flex items-center">
+                    <FieldLabel htmlFor="password">Password</FieldLabel>
+                  </div>
+                  <Input
+                    id="password"
+                    type="password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={isLoading}
+                  />
+                </Field>
+                <Field className="flex flex-col gap-2 mt-2">
+                  <Button type="submit" disabled={isLoading} className="w-full">
+                    {isLoading ? 'Accesso in corso...' : 'Accedi'}
+                  </Button>
+                  <FieldDescription className="text-center">
+                    Non hai un account? <Link to="/register" className="underline underline-offset-4 hover:text-primary">Registrati</Link>
+                  </FieldDescription>
+                </Field>
+              </FieldGroup>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

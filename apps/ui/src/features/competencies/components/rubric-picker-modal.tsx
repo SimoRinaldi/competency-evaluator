@@ -1,8 +1,6 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-
 export function RubricPickerModal({ isOpen, onClose, dbRubrics, newRubrics, onSelect, onCreateNew }: any) {
-  
+  if (!isOpen) return null;
+
   // Funzione helper per disegnare i livelli di una rubrica orizzontalmente (versione compatta)
   const renderLevels = (levels: any[]) => {
     // ordiniamo per rank per sicurezza
@@ -20,11 +18,18 @@ export function RubricPickerModal({ isOpen, onClose, dbRubrics, newRubrics, onSe
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[90vw] md:max-w-5xl max-h-[85vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-xl">Seleziona una Rubrica di Valutazione</DialogTitle>
-        </DialogHeader>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div className="w-full max-w-[90vw] md:max-w-5xl max-h-[85vh] overflow-y-auto rounded-lg border bg-white p-6 shadow-lg relative">
+        <button 
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+          aria-label="Close"
+        >
+          &times;
+        </button>
+        <div className="mb-4">
+          <h2 className="text-xl font-semibold leading-none tracking-tight">Seleziona una Rubrica di Valutazione</h2>
+        </div>
 
         <div className="space-y-6 mt-2">
           
@@ -39,9 +44,12 @@ export function RubricPickerModal({ isOpen, onClose, dbRubrics, newRubrics, onSe
                       <div className="flex-1 min-w-0">
                         {renderLevels(r.levels)}
                       </div>
-                      <Button onClick={() => onSelect(`temp_${idx}`)} variant="outline" size="sm" className="whitespace-nowrap h-7 text-xs px-3 bg-white">
+                      <button 
+                        onClick={() => onSelect(`temp_${idx}`)} 
+                        className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-1 text-xs h-7 font-medium whitespace-nowrap hover:bg-gray-100"
+                      >
                         Seleziona
-                      </Button>
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -62,9 +70,12 @@ export function RubricPickerModal({ isOpen, onClose, dbRubrics, newRubrics, onSe
                       <div className="flex-1 min-w-0">
                         {renderLevels(r.levels)}
                       </div>
-                      <Button onClick={() => onSelect(`db_${r.id}`)} variant="outline" size="sm" className="whitespace-nowrap h-7 text-xs px-3">
+                      <button 
+                        onClick={() => onSelect(`db_${r.id}`)} 
+                        className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-1 text-xs h-7 font-medium whitespace-nowrap hover:bg-gray-100"
+                      >
                         Seleziona
-                      </Button>
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -74,13 +85,16 @@ export function RubricPickerModal({ isOpen, onClose, dbRubrics, newRubrics, onSe
 
           <div className="pt-2 border-t border-slate-200 flex justify-between items-center mt-4">
             <span className="text-slate-500 text-xs">Non trovi quella giusta?</span>
-            <Button onClick={onCreateNew} className="bg-slate-900 hover:bg-slate-800 text-white h-8 text-xs px-4">
+            <button 
+              onClick={onCreateNew} 
+              className="inline-flex h-8 items-center justify-center rounded-md bg-slate-900 px-4 py-2 text-xs font-medium text-white hover:bg-slate-800"
+            >
               + Crea Nuova Rubrica
-            </Button>
+            </button>
           </div>
 
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 }

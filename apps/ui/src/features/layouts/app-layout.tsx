@@ -1,6 +1,6 @@
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/auth-context';
-import styles from '../css/shared.module.css';
+import { Button } from '../../components/ui/button';
 
 export function AppLayout() {
   const navigate = useNavigate();
@@ -12,35 +12,34 @@ export function AppLayout() {
   }
 
   return (
-    <>
-      <nav className={styles.navbar}>
+    <div className="min-h-screen bg-slate-50 flex flex-col">
+      <nav className="h-16 bg-white shadow-sm flex items-center justify-between px-8 border-b">
         <div
-          className={styles.navBrand}
+          className="font-bold text-lg cursor-pointer text-slate-900"
           onClick={() => navigate('/')}
-          style={{ cursor: 'pointer' }}
         >
           Competency Evaluator
         </div>
 
-        <div className={styles.navLinks}>
-          <button onClick={() => navigate('/')}>Dashboard</button>
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" onClick={() => navigate('/')}>Dashboard</Button>
           
-          <div className={styles.userSection}>
+          <div className="flex items-center gap-2">
             {user && (
-              <span className="text-sm text-gray-600 mr-2 font-medium">
+              <span className="text-sm text-slate-600 font-medium">
                 {user.name} ({user.role})
               </span>
             )}
-            <button className={styles.dangerButton} onClick={handleLogout}>
+            <Button variant="destructive" onClick={handleLogout}>
               Esci
-            </button>
+            </Button>
           </div>
         </div>
       </nav>
 
-      <main className={styles.page}>
+      <main className="flex-1 p-8 flex justify-center items-start">
         <Outlet />
       </main>
-    </>
+    </div>
   );
 }

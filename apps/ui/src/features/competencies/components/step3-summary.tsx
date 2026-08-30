@@ -1,5 +1,3 @@
-import { Button } from '@/components/ui/button';
-
 export function Step3Summary({ competencyData, subCompetencies, onSave, onEditStep1, onEditStep2, isLoading, error }: any) {
   return (
     <div className="space-y-6 pb-10">
@@ -22,7 +20,13 @@ export function Step3Summary({ competencyData, subCompetencies, onSave, onEditSt
       <div className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm">
         <div className="bg-slate-50 border-b border-slate-200 px-4 py-3 flex justify-between items-center">
           <h3 className="font-semibold text-slate-800 text-sm uppercase tracking-wide">1. Dati Generali</h3>
-          <Button variant="outline" size="sm" className="h-7 text-xs px-3" onClick={onEditStep1}>Modifica</Button>
+          <button 
+            type="button" 
+            onClick={onEditStep1} 
+            className="inline-flex h-7 items-center justify-center rounded-md border border-slate-200 bg-transparent px-3 text-xs font-medium hover:bg-slate-100"
+          >
+            Modifica
+          </button>
         </div>
         <div className="p-4 space-y-3">
           <div>
@@ -38,7 +42,13 @@ export function Step3Summary({ competencyData, subCompetencies, onSave, onEditSt
           <h3 className="font-semibold text-slate-800 text-sm uppercase tracking-wide">
             2. Sottocompetenze ({subCompetencies.length})
           </h3>
-          <Button variant="outline" size="sm" className="h-7 text-xs px-3" onClick={onEditStep2}>Modifica</Button>
+          <button 
+            type="button" 
+            onClick={onEditStep2} 
+            className="inline-flex h-7 items-center justify-center rounded-md border border-slate-200 bg-transparent px-3 text-xs font-medium hover:bg-slate-100"
+          >
+            Modifica
+          </button>
         </div>
         
         {subCompetencies.length === 0 ? (
@@ -101,14 +111,14 @@ export function Step3Summary({ competencyData, subCompetencies, onSave, onEditSt
 
       {/* BOTTONE FINALE */}
       <div className="pt-4 flex justify-end">
-        <Button 
-          size="lg" 
+        <button 
+          type="button"
           onClick={onSave}
           disabled={isLoading || subCompetencies.length === 0}
-          className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 shadow-sm disabled:bg-slate-300 transition-colors"
+          className="inline-flex h-11 items-center justify-center rounded-md bg-emerald-600 px-8 text-sm font-bold text-white shadow-sm transition-colors hover:bg-emerald-700 disabled:bg-slate-300 disabled:opacity-50 disabled:pointer-events-none"
         >
           {isLoading ? 'Salvataggio in corso...' : 'Salva intera Competenza'}
-        </Button>
+        </button>
       </div>
     </div>
   );
