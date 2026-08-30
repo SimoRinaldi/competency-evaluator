@@ -57,8 +57,9 @@ export function App() {
 
               {/* Rotte esclusive per ADMIN */}
               <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
-                <Route path="/competencies" element={<Placeholder title="Gestione Competenze" />} />
+                <Route path="/competencies" element={<AdminDashboardPage />} />
                 <Route path="/competencies/new" element={<CreateCompetencyPage />} />
+                <Route path="/competencies/edit/:id" element={<EditCompetencyPage />} />
                 <Route path="/rubrics" element={<Placeholder title="Gestione Rubriche" />} />
                 <Route path="/users" element={<Placeholder title="Gestione Utenti" />} />
                 <Route

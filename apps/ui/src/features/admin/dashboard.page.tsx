@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getCompetencies } from "../competencies/competencies.api";
+import { PageContainer } from "../../components/page-container";
 import {
   ColumnDef,
   flexRender,
@@ -35,7 +36,6 @@ type Competency = {
   threshold: number;
 };
 
-// Rimossa la colonna ID come richiesto
 const columns: ColumnDef<Competency>[] = [
   {
     accessorKey: "title",
@@ -97,22 +97,26 @@ export function AdminDashboardPage() {
     onGlobalFilterChange: setGlobalFilter,
   });
 
+  const PageAction = (
+    <div className="flex gap-2">
+      <Link to="/users">
+        <Button variant="outline">Gestione Utenti</Button>
+      </Link>
+      <Link to="/competencies/new">
+        <Button>
+          <Plus className="mr-2 h-4 w-4" /> Crea Competenza
+        </Button>
+      </Link>
+    </div>
+  );
+
   if (!loading && data.length === 0) {
     return (
-      <div className="p-8 w-full max-w-6xl mx-auto space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Gestione Competenze</h1>
-            <p className="text-muted-foreground mt-2">
-              Gestisci le competenze del sistema.
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Link to="/admin/users">
-              <Button variant="outline">Gestione Utenti</Button>
-            </Link>
-          </div>
-        </div>
+      <PageContainer 
+        title="Gestione Competenze" 
+        description="Gestisci le competenze del sistema."
+        action={PageAction}
+      >
         <Empty className="mt-8">
           <EmptyHeader>
             <EmptyMedia variant="icon">
@@ -131,34 +135,17 @@ export function AdminDashboardPage() {
             </Link>
           </EmptyContent>
         </Empty>
-      </div>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="p-8 w-full max-w-6xl mx-auto space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Gestione Competenze</h1>
-          <p className="text-muted-foreground mt-2">
-            Gestisci le competenze del sistema.
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Link to="/admin/users">
-            <Button variant="outline">
-              Gestione Utenti
-            </Button>
-          </Link>
-          <Link to="/competencies/new">
-            <Button>
-              <Plus className="mr-2 h-4 w-4" /> Crea Competenza
-            </Button>
-          </Link>
-        </div>
-      </div>
-
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-2">
+    <PageContainer 
+      title="Gestione Competenze" 
+      description="Gestisci le competenze del sistema."
+      action={PageAction}
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4">
         <div className="relative w-full sm:max-w-sm">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
@@ -225,13 +212,13 @@ export function AdminDashboardPage() {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  Nessuna competenza trovata.
+                  Nessuna competenza trovata per la ricerca.
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </div>
-    </div>
+    </PageContainer>
   );
 }
