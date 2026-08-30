@@ -8,6 +8,8 @@ import { AppLayout } from '../features/layouts/app-layout';
 import { CreateCompetencyPage } from '../features/competencies/create-competency.page';
 import { FeedbackProvider } from '../providers/feedback-provider';
 import { PageContainer } from '../components/page-container';
+import { UserTestsPage } from '../features/evaluated-user/user-tests.page';
+import { EvaluatedUserTestPage } from '../features/evaluated-user/evaluated-user-test.page';
 
 const Placeholder = ({ title }: { title: string }) => (
   <PageContainer title={title} description="Questa pagina è in costruzione.">
@@ -88,16 +90,19 @@ export function App() {
               <Route element={<ProtectedRoute allowedRoles={['USER']} />}>
                 <Route
                   path="/my-tests/todo"
-                  element={<Placeholder title="Test che devi ancora fare" />}
+                  element={<UserTestsPage filter="todo" />}
                 />
-                <Route
-                  path="/my-tests/pending"
-                  element={<Placeholder title="Test in attesa di valutazione" />}
+                <Route 
+                  path="/my-tests/completed" 
+                  element={<UserTestsPage filter="completed" />} 
                 />
-                <Route path="/my-tests/completed" element={<Placeholder title="Test valutati" />} />
                 <Route
                   path="/my-tests/history"
-                  element={<Placeholder title="Risultati storici" />}
+                  element={<Placeholder title="Storico punteggi" />}
+                />
+                <Route
+                  path="/evaluated-user/tests/:id"
+                  element={<EvaluatedUserTestPage />}
                 />
               </Route>
             </Route>

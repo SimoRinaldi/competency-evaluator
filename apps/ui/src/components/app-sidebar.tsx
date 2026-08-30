@@ -90,9 +90,8 @@ const navGroups = [
     title: "I Miei Test",
     items: [
       { title: "Test da fare", url: "/my-tests/todo", roles: ["USER"], icon: FileEdit },
-      { title: "In attesa di valutazione", url: "/my-tests/pending", roles: ["USER"], icon: Hourglass },
       { title: "Test valutati", url: "/my-tests/completed", roles: ["USER"], icon: Award },
-      { title: "Risultati storici", url: "/my-tests/history", roles: ["USER"], icon: LineChart },
+      { title: "Storico punteggi", url: "/my-tests/history", roles: ["USER"], icon: LineChart },
     ]
   }
 ]
