@@ -35,7 +35,7 @@ export async function getUserById(id: string | number): Promise<User> {
 
 export async function updateUser(
   id: string | number,
-  data: { name: string; email: string; role: UserRole }
+  data: { name?: string; email?: string; role?: UserRole }
 ) {
   const response = await fetch(`${API_URL}/users/${id}`, {
     method: 'PATCH',

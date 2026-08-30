@@ -26,7 +26,7 @@ export function UserFormPage({ userId, onSuccess }: { userId?: string, onSuccess
     name: "",
     email: "",
     password: "", 
-    role: "USER" as UserRole,
+    role: "" as UserRole,
   });
 
   useEffect(() => {
@@ -60,7 +60,6 @@ export function UserFormPage({ userId, onSuccess }: { userId?: string, onSuccess
         await updateUser(id as string, {
           name: formData.name,
           email: formData.email,
-          role: formData.role,
         });
       } else {
         await createUser({
@@ -175,12 +174,13 @@ export function UserFormPage({ userId, onSuccess }: { userId?: string, onSuccess
                 <div className="grid gap-2">
                   <Label htmlFor="role">Ruolo nel sistema</Label>
                   <Select
-                    value={formData.role}
+                    value={formData.role || undefined}
+                    disabled={isEditing}
                     onValueChange={(val) =>
                       setFormData({ ...formData, role: val as UserRole })
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-white">
                       <SelectValue placeholder="Seleziona un ruolo" />
                     </SelectTrigger>
                     <SelectContent>

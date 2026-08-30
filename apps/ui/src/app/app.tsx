@@ -12,6 +12,7 @@ import { EditCompetencyPage } from '../features/competencies/edit-competency.pag
 import { AdminDashboardPage } from '../features/admin/dashboard.page';
 import { UsersDashboardPage } from '../features/admin/users-dashboard.page';
 import { UserFormPage } from '../features/admin/user-form.page';
+import { RubricsDashboardPage } from '../features/admin/rubrics-dashboard.page';
 
 const Placeholder = ({ title }: { title: string }) => (
   <PageContainer title={title} description="Questa pagina è in costruzione.">
@@ -60,7 +61,7 @@ export function App() {
                 <Route path="/competencies" element={<AdminDashboardPage />} />
                 <Route path="/competencies/new" element={<CreateCompetencyPage />} />
                 <Route path="/competencies/edit/:id" element={<EditCompetencyPage />} />
-                <Route path="/rubrics" element={<Placeholder title="Gestione Rubriche" />} />
+                <Route path="/rubrics" element={<RubricsDashboardPage />} />
                 <Route path="/users" element={<UsersDashboardPage />} />
                 <Route path="/users/new" element={<UserFormPage />} />
                 <Route path="/users/edit/:id" element={<UserFormPage />} />
