@@ -28,14 +28,14 @@ export class TestRepository {
   async findAll(): Promise<TestEntity[]> {
     return this.repository.find({
       order: { id: 'ASC' },
-      relations: ['test_designer', 'subcompetencies'],
+      relations: ['test_designer', 'subcompetencies', 'subcompetencies.observation_object', 'subcompetencies.observation_object.indicators', 'subcompetencies.observation_object.indicators.rubric_set', 'subcompetencies.observation_object.indicators.rubric_set.levels'],
     });
   }
 
   async findById(id: number): Promise<TestEntity | null> {
     return this.repository.findOne({
       where: { id },
-      relations: ['test_designer', 'subcompetencies'],
+      relations: ['test_designer', 'subcompetencies', 'subcompetencies.observation_object', 'subcompetencies.observation_object.indicators', 'subcompetencies.observation_object.indicators.rubric_set', 'subcompetencies.observation_object.indicators.rubric_set.levels'],
     });
   }
 
@@ -43,7 +43,7 @@ export class TestRepository {
     return this.repository.find({
       where: { test_designer_id },
       order: { id: 'ASC' },
-      relations: ['test_designer', 'subcompetencies'],
+      relations: ['test_designer', 'subcompetencies', 'subcompetencies.observation_object', 'subcompetencies.observation_object.indicators', 'subcompetencies.observation_object.indicators.rubric_set', 'subcompetencies.observation_object.indicators.rubric_set.levels'],
     });
   }
 
