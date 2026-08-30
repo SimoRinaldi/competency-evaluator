@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createCompetency } from './competencies.api';
-import styles from '../css/shared.module.css';
 import { Step1Competency } from './components/step1-competency';
 import { SubCompetencyPanel } from './components/sub-competency-panel';
 import { Step3Summary } from './components/step3-summary';
@@ -45,7 +44,7 @@ export function CreateCompetencyPage() {
 
   // Funzione per salvare la sottocompetenza dalla modale/panel
   const handleSaveSubCompetency = (subData: any) => {
-    let updatedSubs = [...subCompetencies];
+    const updatedSubs = [...subCompetencies];
     if (activeSubIndex === -1) {
       updatedSubs.push(subData);
     } else {
