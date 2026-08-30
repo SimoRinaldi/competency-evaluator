@@ -4,16 +4,6 @@ import { CreateRubricModal } from './create-rubric-modal';
 import { RubricPickerModal } from './rubric-picker-modal';
 import { MetadataPickerModal } from './metadata-picker-modal';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-
 export function SubCompetencyPanel({ 
   initialData, 
   newRubrics, setNewRubrics,
@@ -180,42 +170,45 @@ export function SubCompetencyPanel({
         
         <div className="flex flex-col md:flex-row gap-6">
           <div className="space-y-2 flex-1">
-            <Label>
+            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               Titolo Sottocompetenza <span className="text-red-500">*</span>
-            </Label>
-            <Input
+            </label>
+            <input
               type="text"
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Es. Comunicazione scritta"
+              className="flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
             />
           </div>
 
           <div className="space-y-2 w-full md:w-32">
-            <Label>
+            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               Peso (1-5) <span className="text-red-500">*</span>
-            </Label>
-            <Input
+            </label>
+            <input
               type="number"
               min="1"
               max="5"
               required
               value={weight}
               onChange={(e) => setWeight(e.target.value)}
+              className="flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
             />
           </div>
 
           <div className="space-y-2 w-full md:w-32">
-            <Label>
+            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               Soglia minima <span className="text-red-500">*</span>
-            </Label>
-            <Input
+            </label>
+            <input
               type="number"
               min="1"
               required
               value={threshold}
               onChange={(e) => setThreshold(e.target.value)}
+              className="flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
             />
           </div>
         </div>
@@ -223,7 +216,7 @@ export function SubCompetencyPanel({
         {/* --- CAMPI AGGIUNTIVI OPZIONALI --- */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
           <div className="space-y-2">
-            <Label>Input</Label>
+            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Input</label>
             <textarea
               className="flex min-h-[80px] w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900"
               value={subInput}
@@ -232,7 +225,7 @@ export function SubCompetencyPanel({
             />
           </div>
           <div className="space-y-2">
-            <Label>Azione da svolgere</Label>
+            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Azione da svolgere</label>
             <textarea
               className="flex min-h-[80px] w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900"
               value={subAction}
@@ -241,7 +234,7 @@ export function SubCompetencyPanel({
             />
           </div>
           <div className="space-y-2">
-            <Label>Output</Label>
+            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Output</label>
             <textarea
               className="flex min-h-[80px] w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900"
               value={subOutput}
@@ -255,51 +248,52 @@ export function SubCompetencyPanel({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
           <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/60 flex flex-col justify-between">
             <div className="space-y-3 mb-4">
-              <Label className="text-slate-700 font-bold">Strumenti</Label>
+              <label className="text-sm font-bold leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-slate-700">Strumenti</label>
               <div className="content-start">
                 {renderSelectedBadges(dbTools, newTools, selectedTools)}
               </div>
             </div>
-            <Button type="button" variant="outline" className="w-full bg-white hover:bg-slate-100" onClick={() => setPickerType('tools')}>
+            <button type="button" onClick={() => setPickerType('tools')} className="inline-flex h-10 w-full items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium hover:bg-gray-100">
               Scegli / Crea Strumenti
-            </Button>
+            </button>
           </div>
           
           <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/60 flex flex-col justify-between">
             <div className="space-y-3 mb-4">
-              <Label className="text-slate-700 font-bold">Metodi</Label>
+              <label className="text-sm font-bold leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-slate-700">Metodi</label>
               <div className="content-start">
                 {renderSelectedBadges(dbMethods, newMethods, selectedMethods)}
               </div>
             </div>
-            <Button type="button" variant="outline" className="w-full bg-white hover:bg-slate-100" onClick={() => setPickerType('methods')}>
+            <button type="button" onClick={() => setPickerType('methods')} className="inline-flex h-10 w-full items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium hover:bg-gray-100">
               Scegli / Crea Metodi
-            </Button>
+            </button>
           </div>
           
           <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/60 flex flex-col justify-between">
             <div className="space-y-3 mb-4">
-              <Label className="text-slate-700 font-bold">Conoscenze (Skills)</Label>
+              <label className="text-sm font-bold leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-slate-700">Conoscenze (Skills)</label>
               <div className="content-start">
                 {renderSelectedBadges(dbSkills, newSkills, selectedSkills)}
               </div>
             </div>
-            <Button type="button" variant="outline" className="w-full bg-white hover:bg-slate-100" onClick={() => setPickerType('skills')}>
+            <button type="button" onClick={() => setPickerType('skills')} className="inline-flex h-10 w-full items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium hover:bg-gray-100">
               Scegli / Crea Conoscenze
-            </Button>
+            </button>
           </div>
         </div>
 
         <div className="space-y-2 pt-2">
-          <Label>
+          <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
             Descrizione Oggetto di Osservazione <span className="text-red-500">*</span>
-          </Label>
-          <Input
+          </label>
+          <input
             type="text"
             required
             value={obsDescription}
             onChange={(e) => setObsDescription(e.target.value)}
             placeholder="Es. Tema di italiano"
+            className="flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
           />
         </div>
       </div>
@@ -339,17 +333,18 @@ export function SubCompetencyPanel({
             {/* RIGA 1: Descrizione e Peso */}
             <div className="flex gap-4">
               <div className="flex-1 space-y-2">
-                <Label>Descrizione <span className="text-red-500">*</span></Label>
-                <Input
+                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Descrizione <span className="text-red-500">*</span></label>
+                <input
                   type="text"
                   value={indDesc}
                   onChange={(e) => setIndDesc(e.target.value)}
                   placeholder="Es. Usa punteggiatura corretta"
+                  className="flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
                 />
               </div>
               <div className="w-32 space-y-2">
-                <Label>Peso (1-5) <span className="text-red-500">*</span></Label>
-                <Input
+                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Peso (1-5) <span className="text-red-500">*</span></label>
+                <input
                   type="number"
                   min="1"
                   max="5"
@@ -360,6 +355,7 @@ export function SubCompetencyPanel({
                       setIndWeight(e.target.value);
                     }
                   }}
+                  className="flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
                 />
               </div>
             </div>
@@ -367,25 +363,25 @@ export function SubCompetencyPanel({
             {/* RIGA 2: Rubrica e Bottone Aggiungi */}
             <div className="flex gap-4 items-end">
               <div className="flex-1 space-y-2">
-                <Label>Rubrica Valutazione <span className="text-red-500">*</span></Label>
+                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Rubrica Valutazione <span className="text-red-500">*</span></label>
                 <div className="flex gap-2 items-stretch">
                   <div className={`flex-1 px-3 py-2 border rounded-md text-sm ${indRubricId ? 'bg-blue-50/50 border-blue-200' : 'bg-white border-slate-200 text-slate-500'}`}>
                     {indRubricId ? <RubricLevelsPreview rubric={getSelectedRubric(indRubricId)} /> : "Nessuna selezionata"}
                   </div>
-                  <Button type="button" variant="outline" className="h-auto px-6 bg-white" onClick={() => setIsRubricPickerOpen(true)}>
+                  <button type="button" onClick={() => setIsRubricPickerOpen(true)} className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-6 py-2 text-sm font-medium hover:bg-gray-100 h-auto">
                     Scegli
-                  </Button>
+                  </button>
                 </div>
               </div>
 
-              <Button
+              <button
                 type="button"
                 disabled={!indDesc.trim() || !indWeight || parseInt(indWeight) < 1 || parseInt(indWeight) > 5 || !indRubricId}
-                className="bg-slate-900 text-white hover:bg-slate-800 shadow-sm disabled:bg-slate-300 h-10"
+                className="inline-flex h-10 items-center justify-center rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-slate-800 disabled:bg-slate-300 disabled:pointer-events-none"
                 onClick={handleAddIndicator}
               >
                 + Aggiungi
-              </Button>
+              </button>
             </div>
           </div>
         </div>
@@ -396,17 +392,17 @@ export function SubCompetencyPanel({
       {/* --- BOTTONI SALVATAGGIO --- */}
       <div className="flex justify-end gap-3">
         {initialData && (
-          <Button type="button" variant="outline" onClick={onCancel}>
+          <button type="button" onClick={onCancel} className="inline-flex h-10 items-center justify-center rounded-md border border-gray-300 bg-transparent px-4 py-2 text-sm font-medium hover:bg-gray-100">
             Annulla Modifiche
-          </Button>
+          </button>
         )}
-        <Button 
+        <button 
           type="submit" 
           disabled={indicators.length === 0}
-          className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm disabled:bg-slate-300 disabled:cursor-not-allowed"
+          className="inline-flex h-10 items-center justify-center rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-emerald-700 disabled:bg-slate-300 disabled:cursor-not-allowed disabled:pointer-events-none"
         >
           Conferma Sottocompetenza
-        </Button>
+        </button>
       </div>
 
       {/* ===================== MODALE 1: SCELTA RUBRICA VISUALE ===================== */}
@@ -426,17 +422,26 @@ export function SubCompetencyPanel({
       />
 
       {/* ===================== MODALE 2: CREAZIONE RUBRICA ===================== */}
-      <Dialog open={isRubricModalOpen} onOpenChange={setIsRubricModalOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Crea Nuova Rubrica</DialogTitle>
-          </DialogHeader>
-
-          <CreateRubricModal
-            onSave={handleAddCustomRubric}
-          />
-        </DialogContent>
-      </Dialog>
+      {isRubricModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-md rounded-lg border bg-white p-6 shadow-lg relative">
+            <button 
+              type="button"
+              onClick={() => setIsRubricModalOpen(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+              aria-label="Close"
+            >
+              &times;
+            </button>
+            <div className="mb-4">
+              <h2 className="text-lg font-semibold leading-none tracking-tight">Crea Nuova Rubrica</h2>
+            </div>
+            <CreateRubricModal
+              onSave={handleAddCustomRubric}
+            />
+          </div>
+        </div>
+      )}
 
       {/* ===================== MODALE METADATI ===================== */}
       {pickerType && (
