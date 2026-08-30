@@ -38,6 +38,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
+import { UserEvaluationModal } from "./user-evaluation-modal";
+
 export function TestEvaluationPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -46,27 +48,30 @@ export function TestEvaluationPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [globalFilter, setGlobalFilter] = useState("");
+  const [selectedExecutionId, setSelectedExecutionId] = useState<string | number | null>(null);
+
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      const user = await fetchCurrentUser();
+      const profile = await getEvaluatorProfile(user.id);
+      const currentTest = profile.tests.find(t => t.id === Number(id));
+      
+      if (!currentTest) {
+        throw new Error("Test non trovato o non assegnato a te.");
+      }
+      setTest(currentTest);
+
+      const execs = await getTestExecutions(id as string);
+      setExecutions(execs);
+    } catch (err: any) {
+      setError(err.message || "Errore nel caricamento dei dati.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function loadData() {
-      try {
-        const user = await fetchCurrentUser();
-        const profile = await getEvaluatorProfile(user.id);
-        const currentTest = profile.tests.find(t => t.id === Number(id));
-        
-        if (!currentTest) {
-          throw new Error("Test non trovato o non assegnato a te.");
-        }
-        setTest(currentTest);
-
-        const execs = await getTestExecutions(id as string);
-        setExecutions(execs);
-      } catch (err: any) {
-        setError(err.message || "Errore nel caricamento dei dati.");
-      } finally {
-        setLoading(false);
-      }
-    }
     loadData();
   }, [id]);
 
@@ -109,7 +114,7 @@ export function TestEvaluationPage() {
             <Button 
               variant={isEvaluated ? "outline" : "default"} 
               size="sm"
-              onClick={() => navigate(`/evaluator/tests/${id}/execution/${exec.id}`)}
+              onClick={() => setSelectedExecutionId(exec.id)}
               className={isEvaluated ? "text-green-600 border-green-200 bg-green-50 gap-1.5" : "gap-1.5"}
             >
               {isEvaluated ? <Eye className="h-3.5 w-3.5" /> : null}
@@ -266,6 +271,19 @@ export function TestEvaluationPage() {
             </Table>
           </div>
         </div>
+      )}
+
+      {selectedExecutionId && (
+        <UserEvaluationModal
+          testId={id as string}
+          executionId={selectedExecutionId}
+          isOpen={!!selectedExecutionId}
+          onClose={() => setSelectedExecutionId(null)}
+          onSubmitted={() => {
+            setSelectedExecutionId(null);
+            loadData();
+          }}
+        />
       )}
     </PageContainer>
   );
