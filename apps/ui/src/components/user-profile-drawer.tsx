@@ -97,8 +97,7 @@ export function UserProfileDrawer({
   if (!user) return null
 
   return (
-    <>
-      <Drawer
+    <Drawer
         open={open}
       onOpenChange={onOpenChange}
       direction="right"
@@ -253,6 +252,5 @@ export function UserProfileDrawer({
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
-  </>
   )
 }

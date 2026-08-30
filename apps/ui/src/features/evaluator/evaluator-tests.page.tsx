@@ -117,8 +117,13 @@ export function EvaluatorTestsPage({ filter }: { filter: 'pending' | 'completed'
 
   const sortedTests = useMemo(() => {
     return [...filteredTests].sort((a, b) => {
-      let valA: any = a[sortColumn as keyof EvaluatorTest];
-      let valB: any = b[sortColumn as keyof EvaluatorTest];
+      let valA: any = a[sortColumn as keyof typeof a];
+      let valB: any = b[sortColumn as keyof typeof b];
+      
+      if (sortColumn === 'score') {
+        valA = (a as any).score || 0;
+        valB = (b as any).score || 0;
+      }
       
       if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
       if (valA > valB) return sortDirection === 'asc' ? 1 : -1;

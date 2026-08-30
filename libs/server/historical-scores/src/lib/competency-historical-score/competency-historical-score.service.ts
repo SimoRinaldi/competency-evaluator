@@ -64,6 +64,12 @@ export class CompetencyHistoricalScoreService {
     return acquiredCompetencies;
   }
 
+  async findByUser(
+    user_id: number,
+  ): Promise <CompetencyHistoricalScoreEntity[]> {
+    return this.repository.findByUser(user_id);
+  }
+
   async update(
     id: number,
     dto: UpdateCompetencyHistoricalScoreDto
