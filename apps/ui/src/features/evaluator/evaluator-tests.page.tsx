@@ -179,7 +179,7 @@ export function EvaluatorTestsPage({ filter }: { filter: 'pending' | 'completed'
                   <div className="flex items-center gap-1">Descrizione test {getSortIcon('assessment_situation')}</div>
                 </TableHead>
                 <TableHead className="w-48 cursor-pointer select-none font-semibold text-slate-700" onClick={() => handleSort('pendingCount')}>
-                  <div className="flex items-center gap-1">Stato Esecuzioni {getSortIcon('pendingCount')}</div>
+                  <div className="flex items-center gap-1">Stato {getSortIcon('pendingCount')}</div>
                 </TableHead>
                 <TableHead className="w-24 text-right font-semibold text-slate-700 whitespace-nowrap">Azioni</TableHead>
               </TableRow>
@@ -246,7 +246,7 @@ export function EvaluatorTestsPage({ filter }: { filter: 'pending' | 'completed'
                     <TableCell className="text-right">
                       {test.pendingCount > 0 ? (
                         <Button size="sm" className="h-7 px-2.5 text-xs gap-1.5" onClick={() => navigate(`/evaluator/tests/${test.id}`)}>
-                          <Eye className="h-3.5 w-3.5" /> Valuta
+                          <Eye className="h-3.5 w-3.5" /> Seleziona
                         </Button>
                       ) : (
                         <Button size="sm" variant="secondary" className="h-7 px-2.5 text-xs gap-1.5" onClick={() => navigate(`/evaluator/tests/${test.id}`)}>
