@@ -18,6 +18,7 @@ const Placeholder = ({ title }: { title: string }) => (
 );
 import { EditCompetencyPage } from '../features/competencies/edit-competency.page';
 import { AdminDashboardPage } from '../features/admin/dashboard.page';
+import { UsersDashboardPage } from '../features/admin/users-dashboard.page';
 
 export function App() {
   return (

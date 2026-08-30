@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getCompetencies } from "../competencies/competencies.api";
+import { getUsers, User } from "../users/users.api";
 import {
   ColumnDef,
   flexRender,
@@ -20,34 +20,26 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Pencil, Plus, Search } from "lucide-react";
 
-type Competency = {
-  id: number;
-  title: string;
-  weight: number;
-  threshold: number;
-};
-
-// Rimossa la colonna ID come richiesto
-const columns: ColumnDef<Competency>[] = [
+const columns: ColumnDef<User>[] = [
   {
-    accessorKey: "title",
-    header: "Titolo",
+    accessorKey: "name",
+    header: "Nome",
   },
   {
-    accessorKey: "weight",
-    header: "Peso",
+    accessorKey: "email",
+    header: "Email",
   },
   {
-    accessorKey: "threshold",
-    header: "Soglia",
+    accessorKey: "role",
+    header: "Ruolo",
   },
   {
     id: "actions",
     cell: ({ row }) => {
-      const comp = row.original;
+      const user = row.original;
       return (
         <div className="flex justify-end">
-          <Link to={`/competencies/edit/${comp.id}`}>
+          <Link to={`/admin/users/edit/${user.id}`}>
             <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
               <span className="sr-only">Modifica</span>
               <Pencil className="h-4 w-4" />
@@ -59,15 +51,15 @@ const columns: ColumnDef<Competency>[] = [
   },
 ];
 
-export function AdminDashboardPage() {
-  const [data, setData] = useState<Competency[]>([]);
+export function UsersDashboardPage() {
+  const [data, setData] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [globalFilter, setGlobalFilter] = useState("");
 
   useEffect(() => {
     async function loadData() {
       try {
-        const result = await getCompetencies();
+        const result = await getUsers();
         setData(result);
       } catch (e) {
         console.error(e);
@@ -93,20 +85,21 @@ export function AdminDashboardPage() {
     <div className="p-8 w-full max-w-6xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard Admin</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Gestione Utenti</h1>
           <p className="text-muted-foreground mt-2">
-            Gestisci le competenze del sistema.
+            Visualizza, crea e modifica gli utenti di sistema.
           </p>
         </div>
         <div className="flex gap-2">
-          <Link to="/admin/users">
+          {/* Pulsante per tornare alle Competenze */}
+          <Link to="/">
             <Button variant="outline">
-              Gestione Utenti
+              Competenze
             </Button>
           </Link>
-          <Link to="/competencies/new">
+          <Link to="/admin/users/new">
             <Button>
-              <Plus className="mr-2 h-4 w-4" /> Crea Competenza
+              <Plus className="mr-2 h-4 w-4" /> Crea Utente
             </Button>
           </Link>
         </div>
@@ -116,14 +109,14 @@ export function AdminDashboardPage() {
         <div className="relative w-full sm:max-w-sm">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Cerca per titolo..."
+            placeholder="Cerca per nome o email..."
             value={globalFilter ?? ""}
             onChange={(event) => setGlobalFilter(String(event.target.value))}
             className="!pl-10"
           />
         </div>
         <div className="text-sm font-medium text-muted-foreground">
-          Totale competenze: {data.length}
+          Totale utenti: {data.length}
         </div>
       </div>
 
@@ -179,7 +172,7 @@ export function AdminDashboardPage() {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  Nessuna competenza trovata.
+                  Nessun utente trovato.
                 </TableCell>
               </TableRow>
             )}
