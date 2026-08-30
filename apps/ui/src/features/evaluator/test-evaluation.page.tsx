@@ -29,6 +29,14 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export function TestEvaluationPage() {
   const { id } = useParams();
@@ -75,18 +83,18 @@ export function TestEvaluationPage() {
     },
     {
       id: "status",
-      header: "Stato",
+      header: "Stato Valutazione",
       cell: ({ row }) => {
         const exec = row.original;
         const isEvaluated = exec.test_score !== null && exec.test_score !== undefined;
         return isEvaluated ? (
-          <div className="flex items-center text-green-600 font-medium gap-2">
-            <CheckCircle2 className="h-4 w-4" /> Valutato ({exec.test_score}/{exec.max_score})
-          </div>
+          <span className="inline-flex items-center text-xs font-semibold text-green-700 bg-green-100 px-2.5 py-1 rounded-full gap-1.5 border border-green-200">
+            <CheckCircle2 className="h-3.5 w-3.5" /> Valutato ({exec.test_score}/{exec.max_score})
+          </span>
         ) : (
-          <div className="flex items-center text-amber-600 font-medium gap-2">
-            <Circle className="h-4 w-4" /> Da Valutare
-          </div>
+          <span className="inline-flex items-center text-xs font-semibold text-amber-700 bg-amber-100 px-2.5 py-1 rounded-full gap-1.5 border border-amber-200">
+            <Circle className="h-3.5 w-3.5" /> Da Valutare
+          </span>
         );
       },
     },
@@ -156,8 +164,8 @@ export function TestEvaluationPage() {
       description="Visualizza e valuta le esecuzioni degli utenti per questo test."
     >
       <div className="mb-4">
-        <Button variant="ghost" onClick={() => navigate(-1)} className="pl-0 text-muted-foreground hover:text-foreground">
-          <ChevronLeft className="mr-2 h-4 w-4" /> Torna alla lista
+        <Button variant="ghost" onClick={() => navigate('/evaluations/pending')} className="pl-0 text-muted-foreground hover:text-foreground">
+          <ChevronLeft className="mr-2 h-4 w-4" /> Torna alla lista dei test
         </Button>
       </div>
 
@@ -167,13 +175,6 @@ export function TestEvaluationPage() {
         </div>
       ) : (
         <div className="flex flex-col gap-6">
-          <div className="rounded-md border bg-card text-card-foreground shadow-sm p-6">
-            <h2 className="text-xl font-semibold mb-2">Situation Assessment</h2>
-            <div className="prose prose-slate max-w-none text-muted-foreground whitespace-pre-wrap">
-              {test?.assessment_situation}
-            </div>
-          </div>
-
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4">
             <div className="relative w-full sm:max-w-sm">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -184,8 +185,26 @@ export function TestEvaluationPage() {
                 className="!pl-10"
               />
             </div>
-            <div className="text-sm font-medium text-muted-foreground hidden sm:block">
-              Totale Utenti: {executions.length}
+            <div className="flex items-center gap-4">
+              <div className="text-sm font-medium text-muted-foreground hidden sm:block">
+                Totale Utenti: {executions.length}
+              </div>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline">
+                    Descrizione Test
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md w-full">
+                  <DialogHeader>
+                    <DialogTitle>Descrizione Test</DialogTitle>
+                    <DialogDescription>Dettagli del test da valutare</DialogDescription>
+                  </DialogHeader>
+                  <div className="mt-4 prose prose-sm text-slate-700 whitespace-pre-wrap max-h-[60vh] overflow-y-auto">
+                    {test?.assessment_situation}
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
 
