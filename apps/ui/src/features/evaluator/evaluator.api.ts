@@ -48,3 +48,34 @@ export async function getTestExecutions(testId: string | number): Promise<TestEx
   if (!response.ok) throw new Error('Errore durante il caricamento delle esecuzioni');
   return response.json();
 }
+export type RubricLevel = { id: number; rank: number; title: string; description: string; };
+export type RubricSet = { id: number; yes_no: boolean; levels: RubricLevel[]; };
+export type Indicator = { id: number; description: string; weight: number; rubric_set: RubricSet; };
+export type ObservationObject = { id: number; description: string; indicators: Indicator[]; };
+export type SubCompetency = { id: number; title: string; weight: number; observation_object: ObservationObject; };
+
+export type FullTest = Test & {
+  subcompetencies: SubCompetency[];
+};
+
+export async function getFullTest(testId: string | number): Promise<FullTest> {
+  const response = await fetch(`${API_URL}/tests/${testId}`, { headers: getAuthHeaders() });
+  if (!response.ok) throw new Error('Errore caricamento test');
+  return response.json();
+}
+
+export async function getTestExecutionById(executionId: string | number): Promise<TestExecution & { test_outputs?: any[] }> {
+  const response = await fetch(`${API_URL}/test_executions/${executionId}`, { headers: getAuthHeaders() });
+  if (!response.ok) throw new Error('Errore caricamento test execution');
+  return response.json();
+}
+
+export async function submitEvaluation(data: { rubric_rank: number; indicator_id: number; test_execution_id: number; evaluator_id: number }) {
+  const response = await fetch(`${API_URL}/rubric_level_assignments`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) throw new Error('Errore salvataggio valutazione');
+  return response.json();
+}
