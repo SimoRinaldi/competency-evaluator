@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, ParseIntPipe, ParseEnumPipe, ValidationPipe, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, ParseIntPipe, ParseEnumPipe, ValidationPipe, UseGuards, BadRequestException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ApiTags, ApiBody, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -25,6 +25,39 @@ export class UsersController {
     @ApiBearerAuth()
     getMe(@CurrentUser() user:unknown) {
         return user;
+    }
+
+    @Patch('me')
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @ApiBody({
+        schema: {
+            type: 'object',
+            properties: {
+                name: { type: 'string', example: 'Mario Rossi' },
+                email: { type: 'string', example: 'mario.rossi@example.com' },
+                oldPassword: { type: 'string', example: 'OldPass1!' },
+                newPassword: { type: 'string', example: 'NewPass1!' }
+            },
+        },
+    })
+    async updateMe(@CurrentUser() user: any, @Body() body: any) {
+        // Remove 'role' to prevent users from escalating their own privileges
+        const { role, oldPassword, newPassword, ...allowedUpdates } = body;
+        
+        if (newPassword && !oldPassword) {
+            throw new BadRequestException('La vecchia password è richiesta per impostarne una nuova');
+        }
+
+        if (oldPassword && newPassword) {
+            await this.usersService.updatePassword(user.id, oldPassword, newPassword);
+        }
+
+        if (Object.keys(allowedUpdates).length > 0) {
+            await this.usersService.update(user.id, allowedUpdates);
+        }
+
+        return { message: 'Profilo aggiornato con successo' };
     }
 
     @Get('interns') // GET /users/interns

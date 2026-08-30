@@ -71,6 +71,19 @@ export class UsersService {
     return updated;
   }
 
+  async updatePassword(id: number, oldPass: string, newPass: string): Promise<void> {
+    const user = await this.usersRepository.findById(id);
+    if (!user) throw new NotFoundException(`User with id ${id} not found`);
+
+    const passwordMatches = await bcrypt.compare(oldPass, user.passwordHash);
+    if (!passwordMatches) {
+      throw new ConflictException('La vecchia password non è corretta');
+    }
+
+    const newHash = await bcrypt.hash(newPass, 10);
+    await this.usersRepository.updatePasswordHash(id, newHash);
+  }
+
   async removeUser(id: number): Promise<void> {
     const deleted = await this.usersRepository.deleteOne(id);
     if (!deleted) {

@@ -1,45 +1,30 @@
-import { Outlet, useNavigate } from 'react-router-dom';
-import { useAuth } from '../auth/auth-context';
-import { Button } from '../../components/ui/button';
+import { Outlet } from 'react-router-dom';
+import { AppSidebar } from '../../components/app-sidebar';
+import { SiteHeader } from '../../components/site-header';
+import { SidebarProvider, SidebarInset } from '../../components/ui/sidebar';
+import React from 'react';
 
 export function AppLayout() {
-  const navigate = useNavigate();
-  const { user, logout } = useAuth();
-
-  function handleLogout() {
-    logout();
-    navigate('/login');
-  }
-
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      <nav className="h-16 bg-white shadow-sm flex items-center justify-between px-8 border-b">
-        <div
-          className="font-bold text-lg cursor-pointer text-slate-900"
-          onClick={() => navigate('/')}
-        >
-          Competency Evaluator
-        </div>
-
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" onClick={() => navigate('/')}>Dashboard</Button>
-          
-          <div className="flex items-center gap-2">
-            {user && (
-              <span className="text-sm text-slate-600 font-medium">
-                {user.name} ({user.role})
-              </span>
-            )}
-            <Button variant="destructive" onClick={handleLogout}>
-              Esci
-            </Button>
+    <SidebarProvider
+      style={
+        {
+          "--sidebar-width": "calc(var(--spacing) * 72)",
+          "--header-height": "calc(var(--spacing) * 12)",
+        } as React.CSSProperties
+      }
+    >
+      <AppSidebar variant="inset" />
+      <SidebarInset>
+        <SiteHeader />
+        <div className="flex flex-1 flex-col">
+          <div className="@container/main flex flex-1 flex-col gap-2 bg-slate-50">
+            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 px-4 lg:px-6">
+              <Outlet />
+            </div>
           </div>
         </div>
-      </nav>
-
-      <main className="flex-1 p-8 flex justify-center items-start">
-        <Outlet />
-      </main>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
