@@ -9,7 +9,7 @@ import { UpdateTestEvaluatorDto } from './dto/update-test-evaluator.dto';
 export class TestEvaluatorRepository {
   constructor(
     @InjectRepository(TestEvaluatorEntity)
-    private readonly repository: Repository<TestEvaluatorEntity>
+    private readonly repository: Repository<TestEvaluatorEntity>,
   ) {}
 
   async createOne(dto: CreateTestEvaluatorDto): Promise<TestEvaluatorEntity> {
@@ -20,6 +20,13 @@ export class TestEvaluatorRepository {
   async findAll(): Promise<TestEvaluatorEntity[]> {
     return this.repository.find({
       relations: ['user', 'tests'],
+    });
+  }
+
+  async findByTestId(testId: number): Promise<TestEvaluatorEntity[]> {
+    return this.repository.find({
+      where: { tests: { id: testId } },
+      relations: ['user'],
     });
   }
 
@@ -39,7 +46,7 @@ export class TestEvaluatorRepository {
 
   async updateOne(
     evaluator: TestEvaluatorEntity,
-    dto: UpdateTestEvaluatorDto
+    dto: UpdateTestEvaluatorDto,
   ): Promise<TestEvaluatorEntity> {
     if (dto.user_id !== undefined) evaluator.user_id = dto.user_id;
     return this.repository.save(evaluator);

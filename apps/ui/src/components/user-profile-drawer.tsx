@@ -1,5 +1,4 @@
 import * as React from "react"
-import { toast } from "sonner"
 import { useAuth } from "../features/auth/auth-context"
 import { useFeedback } from "../providers/feedback-provider"
 import { updateProfile } from "../features/auth/auth.api"
@@ -16,16 +15,7 @@ import {
 import { Input } from "./ui/input"
 import { Label } from "./ui/label"
 import { Separator } from "./ui/separator"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "./ui/alert-dialog"
-import { Save, Eye, EyeOff, TriangleAlert } from "lucide-react"
+import { Save, Eye, EyeOff } from "lucide-react"
 
 export function UserProfileDrawer({
   open,
