@@ -49,6 +49,14 @@ export class TestEvaluatorController {
     return this.service.findOne(id);
   }
 
+  @Get('by-user/:userId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.EVALUATOR)
+  @ApiBearerAuth()
+  findByUserId(@Param('userId', ParseIntPipe) userId: number) {
+    return this.service.findByUserId(userId);
+  }
+
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
