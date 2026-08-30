@@ -9,6 +9,9 @@ import { CreateCompetencyPage } from '../features/competencies/create-competency
 import { FeedbackProvider } from '../providers/feedback-provider';
 import { PageContainer } from '../components/page-container';
 import { UserTestsPage } from '../features/evaluated-user/user-tests.page';
+import { EvaluatorTestsPage } from '../features/evaluator/evaluator-tests.page';
+import { TestEvaluationPage } from '../features/evaluator/test-evaluation.page';
+import { UserEvaluationPage } from '../features/evaluator/user-evaluation.page';
 
 import { TestsManagementPage } from '../features/tests/tests-management.page';
 import { CreateTestPage } from '../features/tests/create-test.page';
@@ -81,11 +84,19 @@ export function App() {
               <Route element={<ProtectedRoute allowedRoles={['EVALUATOR']} />}>
                 <Route
                   path="/evaluations/pending"
-                  element={<Placeholder title="Test da Valutare" />}
+                  element={<EvaluatorTestsPage filter="pending" />}
                 />
                 <Route
                   path="/evaluations/completed"
-                  element={<Placeholder title="Test Valutati" />}
+                  element={<EvaluatorTestsPage filter="completed" />}
+                />
+                <Route
+                  path="/evaluator/tests/:id"
+                  element={<TestEvaluationPage />}
+                />
+                <Route
+                  path="/evaluator/tests/:id/execution/:executionId"
+                  element={<UserEvaluationPage />}
                 />
               </Route>
 
