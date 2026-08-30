@@ -27,6 +27,16 @@ import {
 } from "@/components/ui/empty";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { CreateCompetencyPage } from "../competencies/create-competency.page";
+import { EditCompetencyPage } from "../competencies/edit-competency.page";
 import { Pencil, Plus, Search, BookX, ArrowUpRight } from "lucide-react";
 
 type Competency = {
@@ -55,12 +65,17 @@ const columns: ColumnDef<Competency>[] = [
       const comp = row.original;
       return (
         <div className="flex justify-end">
-          <Link to={`/competencies/edit/${comp.id}`}>
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-              <span className="sr-only">Modifica</span>
-              <Pencil className="h-4 w-4" />
-            </Button>
-          </Link>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                <span className="sr-only">Modifica</span>
+                <Pencil className="h-4 w-4" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-[95vw] xl:max-w-[1400px] w-full h-[90vh] p-0 flex flex-col md:flex-row overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
+              <EditCompetencyPage competencyId={comp.id.toString()} />
+            </DialogContent>
+          </Dialog>
         </div>
       );
     },
@@ -115,11 +130,16 @@ export function AdminDashboardPage() {
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent className="flex-row justify-center gap-2">
-            <Link to="/competencies/new">
-              <Button>
-                <Plus className="mr-2 h-4 w-4" /> Crea Competenza
-              </Button>
-            </Link>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="mr-2 h-4 w-4" /> Crea Competenza
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-[95vw] xl:max-w-[1400px] w-full h-[90vh] p-0 flex flex-col md:flex-row overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
+                <CreateCompetencyPage />
+              </DialogContent>
+            </Dialog>
             <Button variant="outline">Importa</Button>
           </EmptyContent>
           <Button variant="link" className="text-muted-foreground" size="sm" asChild>
@@ -151,22 +171,27 @@ export function AdminDashboardPage() {
           <div className="text-sm font-medium text-muted-foreground hidden sm:block">
             Totale: {data.length}
           </div>
-          <Link to="/competencies/new">
-            <Button>
-              <Plus className="mr-2 h-4 w-4" /> Crea Competenza
-            </Button>
-          </Link>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" /> Crea Competenza
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-[95vw] xl:max-w-[1400px] w-full h-[90vh] p-0 flex flex-col md:flex-row overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
+              <CreateCompetencyPage />
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
-      <div className="rounded-md border bg-card text-card-foreground shadow-sm p-4 overflow-hidden">
+      <div className="rounded-md border bg-card text-card-foreground shadow-sm overflow-hidden">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} className="px-4">
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -196,7 +221,7 @@ export function AdminDashboardPage() {
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="py-3">
+                    <TableCell key={cell.id} className="px-4 py-1.5">
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()

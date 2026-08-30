@@ -87,6 +87,7 @@
     "@nestjs/jwt": "^11.0.2",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.0",
+    "@tanstack/react-table": "^8.21.3",
     "axios": "^1.6.0",
     "bcrypt": "^6.0.0",
     "bootstrap": "^5.3.8",

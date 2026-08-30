@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Step1Competency } from './components/step1-competency';
 import { SubCompetencyPanel } from './components/sub-competency-panel';
 import { Step3Summary } from './components/step3-summary';
+import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 export function CreateCompetencyPage() {
   // Menu principale: 1 = Competenza, 2 = Sottocompetenze, 3 = Riepilogo
@@ -101,170 +102,177 @@ export function CreateCompetencyPage() {
   const isStep3Enabled = subCompetencies.length > 0;
 
   return (
-    <div className="min-h-screen bg-muted/30 flex justify-center items-start py-10 px-4">
-      {/* Contenitore Principale */}
-      <div className="flex w-full max-w-6xl bg-card rounded-xl shadow-xl overflow-hidden border border-border">
-        {/* COLONNA SINISTRA: SIDEBAR */}
-        <div className="w-72 shrink-0 p-8 border-r border-border bg-muted/30">
-          <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-8">
-            Creazione Guidata
-          </h2>
+    <>
+      {/* COLONNA SINISTRA: SIDEBAR STEPS */}
+      <div className="w-full md:w-72 shrink-0 p-6 md:p-8 border-b md:border-b-0 md:border-r border-slate-200 bg-slate-50/50 flex flex-col md:block">
+        <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 md:mb-8 hidden md:block">
+          Creazione Guidata
+        </h2>
 
-          <ul className="flex flex-col gap-6 relative">
-            {/* Linea verticale che congiunge gli step */}
-            <div className="absolute left-[15px] top-4 bottom-4 w-[2px] bg-slate-200 -z-10"></div>
+        <ul className="flex flex-row md:flex-col gap-2 md:gap-6 relative overflow-x-auto md:overflow-visible pb-2 md:pb-0">
+          {/* Linea verticale (solo desktop) */}
+          <div className="hidden md:block absolute left-[15px] top-4 bottom-[calc(100%-12rem)] w-[2px] bg-slate-200 -z-10"></div>
 
-            {/* STEP 1 */}
-            <li className="relative">
-              <button
-                onClick={() => setActiveMenu(1)}
-                className="flex items-start gap-4 text-left w-full group"
-              >
-                <div
-                  className={`flex shrink-0 items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-all ${
-                    activeMenu === 1
-                      ? 'bg-primary text-primary-foreground shadow-md scale-110'
-                      : isStep1Valid
-                      ? 'bg-card border-2 border-border text-primary group-hover:border-slate-400'
-                      : 'bg-muted text-muted-foreground'
-                  }`}
-                >
-                  1
-                </div>
-                <div className="pt-1.5">
-                  <div
-                    className={`font-semibold transition-colors ${
-                      activeMenu === 1
-                        ? 'text-primary'
-                        : 'text-muted-foreground group-hover:text-primary'
-                    }`}
-                  >
-                    Competenza
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-0.5">Dati generali</div>
-                </div>
-              </button>
-            </li>
-
-            {/* STEP 2 e Lista */}
-            <li className="relative">
-              <button
-                onClick={() => setActiveMenu(2)}
-                disabled={!isStep2Enabled}
-                className={`flex items-start gap-4 text-left w-full group ${
-                  !isStep2Enabled ? 'cursor-not-allowed opacity-60' : ''
+          {/* STEP 1 */}
+          <li className="relative shrink-0">
+            <button
+              onClick={() => setActiveMenu(1)}
+              className="flex items-center md:items-start gap-2 md:gap-4 text-left group"
+            >
+              <div
+                className={`flex shrink-0 items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-all ${
+                  activeMenu === 1
+                    ? 'bg-primary text-primary-foreground shadow-md scale-110'
+                    : isStep1Valid
+                    ? 'bg-white border-2 border-slate-300 text-slate-900 group-hover:border-slate-400'
+                    : 'bg-slate-100 text-slate-400'
                 }`}
               >
+                1
+              </div>
+              <div className="pt-1.5 hidden md:block">
                 <div
-                  className={`flex shrink-0 items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-all ${
-                    activeMenu === 2
-                      ? 'bg-primary text-primary-foreground shadow-md scale-110'
-                      : subCompetencies.length > 0
-                      ? 'bg-card border-2 border-border text-primary group-hover:border-slate-400'
-                      : 'bg-muted text-muted-foreground'
+                  className={`font-semibold transition-colors ${
+                    activeMenu === 1
+                      ? 'text-slate-900'
+                      : 'text-slate-500 group-hover:text-slate-900'
                   }`}
                 >
-                  2
+                  Competenza
                 </div>
-                <div className="pt-1.5">
-                  <div
-                    className={`font-semibold transition-colors ${
-                      activeMenu === 2
-                        ? 'text-primary'
-                        : 'text-muted-foreground group-hover:text-primary'
-                    }`}
-                  >
-                    Sottocompetenze
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-0.5">
-                    {subCompetencies.length > 0
-                      ? `${subCompetencies.length} inserit${
-                          subCompetencies.length === 1 ? 'a' : 'e'
-                        }`
-                      : 'Definizione struttura'}
-                  </div>
+                <div className="text-xs text-slate-400 mt-0.5">Dati generali</div>
+              </div>
+            </button>
+          </li>
+
+          {/* STEP 2 */}
+          <li className="relative shrink-0 flex flex-col">
+            <button
+              onClick={() => setActiveMenu(2)}
+              disabled={!isStep2Enabled}
+              className={`flex items-center md:items-start gap-2 md:gap-4 text-left group ${
+                !isStep2Enabled ? 'cursor-not-allowed opacity-60' : ''
+              }`}
+            >
+              <div
+                className={`flex shrink-0 items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-all ${
+                  activeMenu === 2
+                    ? 'bg-primary text-primary-foreground shadow-md scale-110'
+                    : subCompetencies.length > 0
+                    ? 'bg-white border-2 border-slate-300 text-slate-900 group-hover:border-slate-400'
+                    : 'bg-slate-100 text-slate-400'
+                }`}
+              >
+                2
+              </div>
+              <div className="pt-1.5 hidden md:block">
+                <div
+                  className={`font-semibold transition-colors ${
+                    activeMenu === 2
+                      ? 'text-slate-900'
+                      : 'text-slate-500 group-hover:text-slate-900'
+                  }`}
+                >
+                  Sottocompetenze
                 </div>
-              </button>
+                <div className="text-xs text-slate-400 mt-0.5">
+                  {subCompetencies.length > 0
+                    ? `${subCompetencies.length} inserit${
+                        subCompetencies.length === 1 ? 'a' : 'e'
+                      }`
+                    : 'Definizione struttura'}
+                </div>
+              </div>
+            </button>
 
-              {/* LISTA SOTTOCOMPETENZE */}
-              {subCompetencies.length > 0 && (
-                <ul className="flex flex-col gap-1 pl-[38px] mt-4 mb-2">
-                  {subCompetencies.map((sub, idx) => (
-                    <li key={idx}>
-                      <button
-                        onClick={() => {
-                          setActiveMenu(2);
-                          setActiveSubIndex(idx);
-                        }}
-                        disabled={!isStep1Valid}
-                        className={`text-left text-sm w-full py-1.5 px-3 rounded-md transition-colors border-l-2 ${
-                          activeSubIndex === idx && activeMenu === 2
-                            ? 'border-slate-900 bg-muted text-primary font-bold'
-                            : 'border-transparent font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 hover:border-border'
-                        }`}
-                      >
-                        <span className="truncate block w-full">
-                          {sub.title || `Sottocompetenza ${idx + 1}`}
-                        </span>
-                      </button>
-                    </li>
-                  ))}
-
-                  {/* BOTTONE + NUOVA */}
-                  <li className="mt-1">
+            {/* LISTA SOTTOCOMPETENZE (Solo Desktop) */}
+            {subCompetencies.length > 0 && (
+              <ul className="hidden md:flex flex-col gap-1 pl-[38px] mt-4 mb-2">
+                {subCompetencies.map((sub, idx) => (
+                  <li key={idx}>
                     <button
-                      onClick={handleCreateNewSub}
+                      onClick={() => {
+                        setActiveMenu(2);
+                        setActiveSubIndex(idx);
+                      }}
                       disabled={!isStep1Valid}
-                      className={`text-left text-sm transition-colors flex items-center gap-2 py-1.5 px-3 rounded-md border-l-2 ${
-                        activeSubIndex === -1 && activeMenu === 2
-                          ? 'border-slate-900 bg-muted text-primary font-bold'
-                          : 'border-transparent font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 hover:border-border'
+                      className={`text-left text-sm w-full py-1.5 px-3 rounded-md transition-colors border-l-2 ${
+                        activeSubIndex === idx && activeMenu === 2
+                          ? 'border-slate-900 bg-slate-100 text-slate-900 font-bold'
+                          : 'border-transparent font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-100/50 hover:border-slate-300'
                       }`}
                     >
-                      <span>+ Aggiungi un'altra</span>
+                      <span className="truncate block w-full max-w-[150px]">
+                        {sub.title || `Sottocompetenza ${idx + 1}`}
+                      </span>
                     </button>
                   </li>
-                </ul>
-              )}
-            </li>
+                ))}
 
-            {/* STEP 3 */}
-            <li className="relative">
-              <button
-                onClick={() => setActiveMenu(3)}
-                disabled={!isStep3Enabled}
-                className={`flex items-start gap-4 text-left w-full group ${
-                  !isStep3Enabled ? 'cursor-not-allowed opacity-60' : ''
-                }`}
-              >
-                <div
-                  className={`flex shrink-0 items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-all ${
-                    activeMenu === 3
-                      ? 'bg-primary text-primary-foreground shadow-md scale-110'
-                      : 'bg-muted text-muted-foreground'
-                  }`}
-                >
-                  3
-                </div>
-                <div className="pt-1.5">
-                  <div
-                    className={`font-semibold transition-colors ${
-                      activeMenu === 3
-                        ? 'text-primary'
-                        : 'text-muted-foreground group-hover:text-primary'
+                {/* BOTTONE + NUOVA */}
+                <li className="mt-1">
+                  <button
+                    onClick={handleCreateNewSub}
+                    disabled={!isStep1Valid}
+                    className={`text-left text-sm transition-colors flex items-center gap-2 py-1.5 px-3 rounded-md border-l-2 ${
+                      activeSubIndex === -1 && activeMenu === 2
+                        ? 'border-slate-900 bg-slate-100 text-slate-900 font-bold'
+                        : 'border-transparent font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-100/50 hover:border-slate-300'
                     }`}
                   >
-                    Riepilogo
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-0.5">Verifica e salva</div>
-                </div>
-              </button>
-            </li>
-          </ul>
-        </div>
+                    <span>+ Aggiungi un'altra</span>
+                  </button>
+                </li>
+              </ul>
+            )}
+          </li>
 
-        {/* COLONNA DESTRA: AREA PRINCIPALE */}
-        <div className="flex-1 p-10 bg-card">
+          {/* STEP 3 */}
+          <li className="relative shrink-0">
+            <button
+              onClick={() => setActiveMenu(3)}
+              disabled={!isStep3Enabled}
+              className={`flex items-center md:items-start gap-2 md:gap-4 text-left group ${
+                !isStep3Enabled ? 'cursor-not-allowed opacity-60' : ''
+              }`}
+            >
+              <div
+                className={`flex shrink-0 items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-all ${
+                  activeMenu === 3
+                    ? 'bg-primary text-primary-foreground shadow-md scale-110'
+                    : 'bg-slate-100 text-slate-400'
+                }`}
+              >
+                3
+              </div>
+              <div className="pt-1.5 hidden md:block">
+                <div
+                  className={`font-semibold transition-colors ${
+                    activeMenu === 3
+                      ? 'text-slate-900'
+                      : 'text-slate-500 group-hover:text-slate-900'
+                  }`}
+                >
+                  Riepilogo
+                </div>
+                <div className="text-xs text-slate-400 mt-0.5">Verifica e salva</div>
+              </div>
+            </button>
+          </li>
+        </ul>
+      </div>
+
+      {/* COLONNA DESTRA: AREA PRINCIPALE */}
+      <div className="flex-1 flex flex-col bg-white h-full overflow-hidden">
+        <DialogHeader className="p-4 md:p-8 md:pb-4 border-b border-slate-100 md:border-b-0">
+          <DialogTitle className="text-xl md:text-2xl font-bold text-slate-800">
+            {activeMenu === 1 && "Dati generali"}
+            {activeMenu === 2 && "Sottocompetenze"}
+            {activeMenu === 3 && "Riepilogo"}
+          </DialogTitle>
+        </DialogHeader>
+        
+        <div className="flex-1 overflow-y-auto px-4 md:px-8 pb-4 pt-4 md:pt-0">
           {activeMenu === 1 && (
             <Step1Competency
               data={competencyData}
@@ -303,6 +311,6 @@ export function CreateCompetencyPage() {
           )}
         </div>
       </div>
-    </div>
+    </>
   );
 }

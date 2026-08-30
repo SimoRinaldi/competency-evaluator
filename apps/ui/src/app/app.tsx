@@ -8,6 +8,10 @@ import { AppLayout } from '../features/layouts/app-layout';
 import { CreateCompetencyPage } from '../features/competencies/create-competency.page';
 import { FeedbackProvider } from '../providers/feedback-provider';
 import { PageContainer } from '../components/page-container';
+import { EditCompetencyPage } from '../features/competencies/edit-competency.page';
+import { AdminDashboardPage } from '../features/admin/dashboard.page';
+import { UsersDashboardPage } from '../features/admin/users-dashboard.page';
+import { UserFormPage } from '../features/admin/user-form.page';
 
 const Placeholder = ({ title }: { title: string }) => (
   <PageContainer title={title} description="Questa pagina è in costruzione.">
@@ -16,10 +20,6 @@ const Placeholder = ({ title }: { title: string }) => (
     </div>
   </PageContainer>
 );
-import { EditCompetencyPage } from '../features/competencies/edit-competency.page';
-import { AdminDashboardPage } from '../features/admin/dashboard.page';
-import { UsersDashboardPage } from '../features/admin/users-dashboard.page';
-import { UserFormPage } from '../features/admin/user-form.page';
 
 export function App() {
   return (
@@ -61,7 +61,9 @@ export function App() {
                 <Route path="/competencies/new" element={<CreateCompetencyPage />} />
                 <Route path="/competencies/edit/:id" element={<EditCompetencyPage />} />
                 <Route path="/rubrics" element={<Placeholder title="Gestione Rubriche" />} />
-                <Route path="/users" element={<Placeholder title="Gestione Utenti" />} />
+                <Route path="/users" element={<UsersDashboardPage />} />
+                <Route path="/users/new" element={<UserFormPage />} />
+                <Route path="/users/edit/:id" element={<UserFormPage />} />
                 <Route
                   path="/tests-overview"
                   element={<Placeholder title="Visualizzazione Test (Admin)" />}
