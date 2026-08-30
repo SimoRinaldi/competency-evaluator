@@ -1,17 +1,13 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { createCompetency } from './competencies.api';
 import { Step1Competency } from './components/step1-competency';
 import { SubCompetencyPanel } from './components/sub-competency-panel';
 import { Step3Summary } from './components/step3-summary';
 
 export function CreateCompetencyPage() {
-  const navigate = useNavigate();
-
   // Menu principale: 1 = Competenza, 2 = Sottocompetenze, 3 = Riepilogo
   const [activeMenu, setActiveMenu] = useState(1);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState('');
+  const [isSubmitting] = useState(false);
+  const [submitError] = useState('');
 
   // Sottocompetenza attiva?
   // -1 = Nessuna, 0, 1, 2 = Indice dell'array
