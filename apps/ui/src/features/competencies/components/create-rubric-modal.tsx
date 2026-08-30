@@ -18,7 +18,12 @@ export function CreateRubricModal({ onSave }: any) {
   }
 
   function handleSaveClick() {
-    const levelsToSave = isBinary ? levels.slice(0, 2) : levels;
+    const levelsToSave = isBinary 
+      ? [
+          { description: levels[0].description, rank: 1 },
+          { description: levels[1].description, rank: 5 }
+        ]
+      : levels;
 
     if (levelsToSave.some((l) => l.description.trim() === '')) {
       alert('Compila tutti i livelli della rubrica prima di salvare!');

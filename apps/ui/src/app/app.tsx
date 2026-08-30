@@ -15,6 +15,11 @@ import { UserEvaluationPage } from '../features/evaluator/user-evaluation.page';
 
 import { TestsManagementPage } from '../features/tests/tests-management.page';
 import { CreateTestPage } from '../features/tests/create-test.page';
+import { EditCompetencyPage } from '../features/competencies/edit-competency.page';
+import { AdminDashboardPage } from '../features/admin/dashboard.page';
+import { UsersDashboardPage } from '../features/admin/users-dashboard.page';
+import { UserFormPage } from '../features/admin/user-form.page';
+import { RubricsDashboardPage } from '../features/admin/rubrics-dashboard.page';
 
 const Placeholder = ({ title }: { title: string }) => (
   <PageContainer title={title} description="Questa pagina � in costruzione.">
@@ -48,7 +53,7 @@ export function App() {
                   >
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                       <div className="rounded-xl border bg-card text-card-foreground shadow p-6">
-                        <h3 className="font-semibold leading-none tracking-tight">Novit�</h3>
+                        <h3 className="font-semibold leading-none tracking-tight">Novità</h3>
                         <p className="text-sm text-muted-foreground mt-2">
                           Nessun nuovo aggiornamento.
                         </p>
@@ -60,10 +65,13 @@ export function App() {
 
               {/* Rotte esclusive per ADMIN */}
               <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
-                <Route path="/competencies" element={<Placeholder title="Gestione Competenze" />} />
+                <Route path="/competencies" element={<AdminDashboardPage />} />
                 <Route path="/competencies/new" element={<CreateCompetencyPage />} />
-                <Route path="/rubrics" element={<Placeholder title="Gestione Rubriche" />} />
-                <Route path="/users" element={<Placeholder title="Gestione Utenti" />} />
+                <Route path="/competencies/edit/:id" element={<EditCompetencyPage />} />
+                <Route path="/rubrics" element={<RubricsDashboardPage />} />
+                <Route path="/users" element={<UsersDashboardPage />} />
+                <Route path="/users/new" element={<UserFormPage />} />
+                <Route path="/users/edit/:id" element={<UserFormPage />} />
                 <Route
                   path="/tests-overview"
                   element={<Placeholder title="Visualizzazione Test (Admin)" />}
@@ -90,10 +98,7 @@ export function App() {
                   path="/evaluations/completed"
                   element={<EvaluatorTestsPage filter="completed" />}
                 />
-                <Route
-                  path="/evaluator/tests/:id"
-                  element={<TestEvaluationPage />}
-                />
+                <Route path="/evaluator/tests/:id" element={<TestEvaluationPage />} />
                 <Route
                   path="/evaluator/tests/:id/execution/:executionId"
                   element={<UserEvaluationPage />}

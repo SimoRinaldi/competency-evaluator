@@ -1,14 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { getCompetencyById, updateCompetency } from './competencies.api';
+
 import { Step1Competency } from './components/step1-competency';
 import { SubCompetencyPanel } from './components/sub-competency-panel';
 import { Step3Summary } from './components/step3-summary';
 import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
-export function CreateCompetencyPage() {
+export function EditCompetencyPage({ competencyId: propId }: { competencyId?: string }) {
+  const navigate = useNavigate();
+  const { id: paramId } = useParams();
+  const id = propId || paramId;
+
   // Menu principale: 1 = Competenza, 2 = Sottocompetenze, 3 = Riepilogo
   const [activeMenu, setActiveMenu] = useState(1);
-  const [isSubmitting] = useState(false);
-  const [submitError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   // Sottocompetenza attiva?
   // -1 = Nessuna, 0, 1, 2 = Indice dell'array
@@ -19,6 +26,28 @@ export function CreateCompetencyPage() {
     weight: '',
     threshold: '',
   });
+
+  useEffect(() => {
+    if (!id) return;
+    async function loadCompetency() {
+      try {
+        const data = await getCompetencyById(id as string);
+        setCompetencyData({
+          title: data.title || '',
+          weight: data.weight?.toString() || '',
+          threshold: data.threshold?.toString() || '',
+        });
+        if (data.subcompetencies) {
+          setSubCompetencies(data.subcompetencies);
+        }
+        // Siccome stiamo modificando, sblocchiamo subito gli step successivi
+        setHasPassedStep1(true);
+      } catch (err) {
+        setSubmitError('Errore nel caricamento della competenza');
+      }
+    }
+    loadCompetency();
+  }, [id]);
 
   const isStep1Valid =
     competencyData.title.trim() !== '' &&
@@ -32,7 +61,7 @@ export function CreateCompetencyPage() {
   const [newTools, setNewTools] = useState<any[]>([]);
   const [newMethods, setNewMethods] = useState<any[]>([]);
   const [newSkills, setNewSkills] = useState<any[]>([]);
-
+  
   // Indica se l'utente ha mai cliccato "Avanti" nello step 1
   const [hasPassedStep1, setHasPassedStep1] = useState(false);
 
@@ -41,7 +70,7 @@ export function CreateCompetencyPage() {
 
   // Funzione per salvare la sottocompetenza dalla modale/panel
   const handleSaveSubCompetency = (subData: any) => {
-    const updatedSubs = [...subCompetencies];
+    let updatedSubs = [...subCompetencies];
     if (activeSubIndex === -1) {
       updatedSubs.push(subData);
     } else {
@@ -52,29 +81,23 @@ export function CreateCompetencyPage() {
 
     // --- GARBAGE COLLECTION ---
     // Eliminiamo dalla memoria globale i tools/methods/skills temporanei
-    // che l'utente aveva creato col bottone "+ Crea" ma che alla fine
+    // che l'utente aveva creato col bottone "+ Crea" ma che alla fine 
     // NON sono stati associati a NESSUNA sottocompetenza salvata.
     const referencedTools = new Set<string>();
     const referencedMethods = new Set<string>();
     const referencedSkills = new Set<string>();
 
-    updatedSubs.forEach((sub) => {
-      sub.tools.forEach((t: any) => {
-        if (String(t).startsWith('temp_')) referencedTools.add(String(t));
-      });
-      sub.methods.forEach((m: any) => {
-        if (String(m).startsWith('temp_')) referencedMethods.add(String(m));
-      });
-      sub.skills.forEach((s: any) => {
-        if (String(s).startsWith('temp_')) referencedSkills.add(String(s));
-      });
+    updatedSubs.forEach(sub => {
+       sub.tools.forEach((t: any) => { if (String(t).startsWith('temp_')) referencedTools.add(String(t)); });
+       sub.methods.forEach((m: any) => { if (String(m).startsWith('temp_')) referencedMethods.add(String(m)); });
+       sub.skills.forEach((s: any) => { if (String(s).startsWith('temp_')) referencedSkills.add(String(s)); });
     });
 
-    setNewTools(newTools.filter((t) => referencedTools.has(t.tempId)));
-    setNewMethods(newMethods.filter((m) => referencedMethods.has(m.tempId)));
-    setNewSkills(newSkills.filter((s) => referencedSkills.has(s.tempId)));
-
-    setFormResetKey((prev) => prev + 1);
+    setNewTools(newTools.filter(t => referencedTools.has(t.tempId)));
+    setNewMethods(newMethods.filter(m => referencedMethods.has(m.tempId)));
+    setNewSkills(newSkills.filter(s => referencedSkills.has(s.tempId)));
+    
+    setFormResetKey(prev => prev + 1);
   };
 
   function handleCreateNewSub() {
@@ -82,20 +105,29 @@ export function CreateCompetencyPage() {
       setHasPassedStep1(true);
       setActiveMenu(2);
       setActiveSubIndex(-1);
-      setFormResetKey((prev) => prev + 1);
+      setFormResetKey(prev => prev + 1);
     }
   }
 
   const handleFinalSave = async () => {
-    // API logic will go here
-    console.log('Dati pronti per il salvataggio:', {
-      competencyData,
-      subCompetencies,
-      newRubrics,
-      newTools,
-      newMethods,
-      newSkills,
-    });
+    setIsSubmitting(true);
+    setSubmitError('');
+    try {
+      if (id) {
+        await updateCompetency(
+          id,
+          competencyData.title,
+          parseInt(competencyData.weight),
+          parseInt(competencyData.threshold)
+          // Se l'API richiede anche le subCompetencies ecc., andranno aggiunte qui.
+        );
+        navigate('/admin/competencies'); // Modifica con la rotta desiderata per l'admin
+      }
+    } catch (error: any) {
+      setSubmitError(error.message || "Errore durante il salvataggio");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const isStep2Enabled = isStep1Valid && hasPassedStep1;
@@ -106,7 +138,7 @@ export function CreateCompetencyPage() {
       {/* COLONNA SINISTRA: SIDEBAR STEPS */}
       <div className="w-full md:w-72 shrink-0 p-6 md:p-8 border-b md:border-b-0 md:border-r border-slate-200 bg-slate-50/50 flex flex-col md:block">
         <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 md:mb-8 hidden md:block">
-          Creazione Guidata
+          Modifica Guidata
         </h2>
 
         <ul className="flex flex-row md:flex-col gap-2 md:gap-6 relative overflow-x-auto md:overflow-visible pb-2 md:pb-0">
