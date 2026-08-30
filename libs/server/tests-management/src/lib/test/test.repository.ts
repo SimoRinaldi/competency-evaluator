@@ -26,29 +26,26 @@ export class TestRepository {
   }
 
   async findAll(): Promise<TestEntity[]> {
-    const query = this.repository.createQueryBuilder('test')
-      .leftJoinAndSelect('test.test_designer', 'test_designer')
-      .leftJoinAndSelect('test_designer.user', 'user')
-      .leftJoinAndSelect('test.subcompetencies', 'subcompetencies')
-      .addSelect((subQuery) => {
-        return subQuery
-          .select('COUNT(*)', 'count')
-          .from('test_execution', 'te')
-          .where('te.test_id = test.id');
-      }, 'executions_count')
-      .orderBy('test.id', 'ASC');
-
-    const rawAndEntities = await query.getRawAndEntities();
-    return rawAndEntities.entities.map((entity, index) => {
-      entity.executions_count = parseInt(rawAndEntities.raw[index].executions_count || '0', 10);
-      return entity;
+    return this.repository.find({
+      order: { id: 'ASC' },
+      relations: [
+        'test_designer',
+        'test_designer.user',
+        'subcompetencies',
+        'subcompetencies.competency',
+      ],
     });
   }
 
   async findById(id: number): Promise<TestEntity | null> {
     return this.repository.findOne({
       where: { id },
-      relations: ['test_designer', 'subcompetencies'],
+      relations: [
+        'test_designer',
+        'test_designer.user',
+        'subcompetencies',
+        'subcompetencies.competency',
+      ],
     });
   }
 
@@ -56,7 +53,12 @@ export class TestRepository {
     return this.repository.find({
       where: { test_designer_id },
       order: { id: 'ASC' },
-      relations: ['test_designer', 'subcompetencies'],
+      relations: [
+        'test_designer',
+        'test_designer.user',
+        'subcompetencies',
+        'subcompetencies.competency',
+      ],
     });
   }
 

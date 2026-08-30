@@ -26,14 +26,14 @@ export class TestExecutionRepository {
   async findAll(): Promise<TestExecutionEntity[]> {
     return this.repository.find({
       order: { id: 'ASC' },
-      relations: ['test', 'evaluated_user', 'test_outputs'],
+      relations: ['test', 'evaluated_user', 'evaluated_user.user', 'test_outputs'],
     });
   }
 
   async findById(id: number): Promise<TestExecutionEntity | null> {
     return this.repository.findOne({
       where: { id },
-      relations: ['test', 'evaluated_user', 'test_outputs'],
+      relations: ['test', 'evaluated_user', 'evaluated_user.user', 'test_outputs'],
     });
   }
 
@@ -51,7 +51,7 @@ export class TestExecutionRepository {
     return this.repository.find({
       where: { user_id },
       order: { id: 'ASC' },
-      relations: ['test', 'evaluated_user', 'test_outputs'],
+      relations: ['test', 'evaluated_user', 'evaluated_user.user', 'test_outputs'],
     });
   }
 
@@ -59,7 +59,7 @@ export class TestExecutionRepository {
     return this.repository.find({
       where: { test_id },
       order: { id: 'ASC' },
-      relations: ['test', 'evaluated_user', 'test_outputs'],
+      relations: ['test', 'evaluated_user', 'evaluated_user.user', 'test_outputs'],
     });
   }
 

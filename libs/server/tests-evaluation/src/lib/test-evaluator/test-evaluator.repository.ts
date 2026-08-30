@@ -19,7 +19,7 @@ export class TestEvaluatorRepository {
 
   async findAll(): Promise<TestEvaluatorEntity[]> {
     return this.repository.find({
-      relations: ['user'],
+      relations: ['user', 'tests'],
     });
   }
 

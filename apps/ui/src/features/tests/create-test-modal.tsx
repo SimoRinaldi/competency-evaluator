@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/table';
 import { Search, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { ApiCompetency, ApiSubCompetency, ApiUser } from './tests.api';
+import { TestSummaryView } from './test-summary-view';
 
 const PAGE_SIZE = 4;
 
@@ -68,11 +69,42 @@ export function CreateTestModal({
   const [subSearch, setSubSearch] = useState<string>('');
   const [userSearch, setUserSearch] = useState<string>('');
   const [evaluatorSearch, setEvaluatorSearch] = useState<string>('');
+  const [compSearch, setCompSearch] = useState<string>('');
 
   // Stati paginazione
   const [subPage, setSubPage] = useState<number>(1);
   const [userPage, setUserPage] = useState<number>(1);
   const [evaluatorPage, setEvaluatorPage] = useState<number>(1);
+  const [compPage, setCompPage] = useState<number>(1);
+
+  // Reset del form alla chiusura
+  const resetForm = () => {
+    setActiveStep(1);
+    setAssessmentSituation('Valutazione delle competenze pratiche e teoriche');
+    setSelectedCompetencyId('');
+    setSelectedSubcompetencyIds([]);
+    setSelectedUserIds([]);
+    setSelectedEvaluatorIds([]);
+    setSubSearch('');
+    setUserSearch('');
+    setEvaluatorSearch('');
+    setCompSearch('');
+    setSubPage(1);
+    setUserPage(1);
+    setEvaluatorPage(1);
+    setCompPage(1);
+  };
+
+  const handleClose = () => {
+    resetForm();
+    onClose();
+  };
+
+  useEffect(() => {
+    if (!isOpen) {
+      resetForm();
+    }
+  }, [isOpen]);
 
   // Filtro Sottocompetenze
   const allSubcompetenciesForCompetency = useMemo(() => {
@@ -130,8 +162,6 @@ export function CreateTestModal({
   const [activeStep, setActiveStep] = useState(1);
 
   // Filtro Competenze (per la tabella step 1)
-  const [compSearch, setCompSearch] = useState<string>('');
-  const [compPage, setCompPage] = useState<number>(1);
   const filteredCompetencies = useMemo(() => {
     const q = compSearch.trim().toLowerCase();
     if (!q) return competencies;
@@ -222,8 +252,7 @@ export function CreateTestModal({
   const isConfirmDisabled =
     !selectedCompetencyId ||
     selectedSubcompetencyIds.length === 0 ||
-    selectedUserIds.length === 0 ||
-    selectedEvaluatorIds.length === 0 ||
+    assessmentSituation.trim() === '' ||
     isSubmitting;
 
   const handleConfirm = () => {
@@ -241,11 +270,9 @@ export function CreateTestModal({
   // Logica validazione step per step
   const isStep1Valid = assessmentSituation.trim() !== '' && selectedCompetencyId !== '';
   const isStep2Valid = selectedSubcompetencyIds.length > 0;
-  const isStep3Valid = selectedUserIds.length > 0;
-  const isStep4Valid = selectedEvaluatorIds.length > 0;
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent className="max-w-[95vw] xl:max-w-[1400px] w-full h-[90vh] p-0 flex flex-col md:flex-row overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
         
         {/* COLONNA SINISTRA: SIDEBAR STEPS */}
@@ -321,15 +348,15 @@ export function CreateTestModal({
                 <div className={`flex shrink-0 items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-all ${
                   activeStep === 3
                     ? 'bg-primary text-primary-foreground shadow-md scale-110'
-                    : isStep3Valid
+                    : selectedUserIds.length > 0
                     ? 'bg-white border-2 border-slate-300 text-slate-900 group-hover:border-slate-400'
-                    : 'bg-slate-100 text-slate-400'
+                    : 'bg-slate-100 text-slate-600 group-hover:text-slate-900'
                 }`}>
                   3
                 </div>
                 <div className="pt-1.5 hidden md:block">
                   <div className={`font-semibold transition-colors ${activeStep === 3 ? 'text-slate-900' : 'text-slate-500 group-hover:text-slate-900'}`}>
-                    Studenti
+                    Studenti <span className="text-xs text-slate-400 font-normal">(opzionale)</span>
                   </div>
                   <div className="text-xs text-slate-400 mt-0.5">
                     {selectedUserIds.length > 0 
@@ -344,21 +371,21 @@ export function CreateTestModal({
             <li className="relative shrink-0">
               <button
                 onClick={() => setActiveStep(4)}
-                disabled={!isStep1Valid || !isStep2Valid || !isStep3Valid}
-                className={`flex items-center md:items-start gap-2 md:gap-4 text-left group ${(!isStep1Valid || !isStep2Valid || !isStep3Valid) ? 'cursor-not-allowed opacity-60' : ''}`}
+                disabled={!isStep1Valid || !isStep2Valid}
+                className={`flex items-center md:items-start gap-2 md:gap-4 text-left group ${(!isStep1Valid || !isStep2Valid) ? 'cursor-not-allowed opacity-60' : ''}`}
               >
                 <div className={`flex shrink-0 items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-all ${
                   activeStep === 4
                     ? 'bg-primary text-primary-foreground shadow-md scale-110'
-                    : isStep4Valid
+                    : selectedEvaluatorIds.length > 0
                     ? 'bg-white border-2 border-slate-300 text-slate-900 group-hover:border-slate-400'
-                    : 'bg-slate-100 text-slate-400'
+                    : 'bg-slate-100 text-slate-600 group-hover:text-slate-900'
                 }`}>
                   4
                 </div>
                 <div className="pt-1.5 hidden md:block">
                   <div className={`font-semibold transition-colors ${activeStep === 4 ? 'text-slate-900' : 'text-slate-500 group-hover:text-slate-900'}`}>
-                    Valutatori
+                    Valutatori <span className="text-xs text-slate-400 font-normal">(opzionale)</span>
                   </div>
                   <div className="text-xs text-slate-400 mt-0.5">
                     {selectedEvaluatorIds.length > 0 
@@ -373,13 +400,13 @@ export function CreateTestModal({
             <li className="relative shrink-0">
               <button
                 onClick={() => setActiveStep(5)}
-                disabled={!isStep1Valid || !isStep2Valid || !isStep3Valid || !isStep4Valid}
-                className={`flex items-center md:items-start gap-2 md:gap-4 text-left group ${(!isStep1Valid || !isStep2Valid || !isStep3Valid || !isStep4Valid) ? 'cursor-not-allowed opacity-60' : ''}`}
+                disabled={!isStep1Valid || !isStep2Valid}
+                className={`flex items-center md:items-start gap-2 md:gap-4 text-left group ${(!isStep1Valid || !isStep2Valid) ? 'cursor-not-allowed opacity-60' : ''}`}
               >
                 <div className={`flex shrink-0 items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-all ${
                   activeStep === 5
                     ? 'bg-primary text-primary-foreground shadow-md scale-110'
-                    : (isStep1Valid && isStep2Valid && isStep3Valid && isStep4Valid)
+                    : (isStep1Valid && isStep2Valid)
                     ? 'bg-white border-2 border-slate-300 text-slate-900 group-hover:border-slate-400'
                     : 'bg-slate-100 text-slate-400'
                 }`}>
@@ -844,121 +871,13 @@ export function CreateTestModal({
 
               {/* STEP 5: Riepilogo */}
               {activeStep === 5 && (
-                <div className="space-y-8 flex flex-col h-full overflow-y-auto pr-2 pb-4">
-                  
-                  {/* Informazioni Generali */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="flex flex-col gap-1.5">
-                      <span className="text-sm font-semibold text-slate-500">Situazione di Valutazione</span>
-                      <span className="text-base font-medium text-slate-900">{assessmentSituation || '-'}</span>
-                    </div>
-                    <div className="flex flex-col gap-1.5">
-                      <span className="text-sm font-semibold text-slate-500">Competenza Selezionata</span>
-                      <span className="text-base font-medium text-slate-900">{competencies.find(c => c.id === selectedCompetencyId)?.title || '-'}</span>
-                    </div>
-                  </div>
-
-                  <div className="w-full h-px bg-slate-100" />
-
-                  {/* Sottocompetenze Selezionate */}
-                  <div className="flex flex-col gap-3">
-                    <div className="flex flex-col gap-0.5">
-                      <h4 className="text-lg font-semibold text-slate-800">
-                        Prove
-                      </h4>
-                      <p className="text-sm text-slate-500">
-                        {selectedSubcompetencyIds.length} {selectedSubcompetencyIds.length === 1 ? 'elemento' : 'elementi'}
-                      </p>
-                    </div>
-                    <div className="border rounded-md overflow-hidden bg-white shadow-sm">
-                      <Table>
-                        <TableHeader>
-                          <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-                            <TableHead className="w-[80px]">ID</TableHead>
-                            <TableHead>Titolo Prova</TableHead>
-                            <TableHead className="text-right">Soglia %</TableHead>
-                            <TableHead className="text-right">Peso</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {subCompetencies.filter(s => selectedSubcompetencyIds.includes(s.id)).map(sub => (
-                            <TableRow key={sub.id}>
-                              <TableCell className="font-medium text-slate-500">{sub.id}</TableCell>
-                              <TableCell className="font-medium">{sub.title}</TableCell>
-                              <TableCell className="text-right">{sub.threshold}%</TableCell>
-                              <TableCell className="text-right">{sub.weight}</TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-                  </div>
-
-                  <div className="w-full h-px bg-slate-100" />
-
-                  {/* Utenti Selezionati */}
-                  <div className="flex flex-col gap-3">
-                    <div className="flex flex-col gap-0.5">
-                      <h4 className="text-lg font-semibold text-slate-800">
-                        Studenti
-                      </h4>
-                      <p className="text-sm text-slate-500">
-                        {selectedUserIds.length} {selectedUserIds.length === 1 ? 'elemento' : 'elementi'}
-                      </p>
-                    </div>
-                    <div className="border rounded-md overflow-hidden bg-white shadow-sm">
-                      <Table>
-                        <TableHeader>
-                          <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-                            <TableHead>Nome</TableHead>
-                            <TableHead>Email</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {users.filter(u => selectedUserIds.includes(u.id)).map(user => (
-                            <TableRow key={user.id}>
-                              <TableCell className="font-medium">{user.name}</TableCell>
-                              <TableCell className="text-slate-500">{user.email}</TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-                  </div>
-
-                  <div className="w-full h-px bg-slate-100" />
-
-                  {/* Valutatori Selezionati */}
-                  <div className="flex flex-col gap-3">
-                    <div className="flex flex-col gap-0.5">
-                      <h4 className="text-lg font-semibold text-slate-800">
-                        Valutatori
-                      </h4>
-                      <p className="text-sm text-slate-500">
-                        {selectedEvaluatorIds.length} {selectedEvaluatorIds.length === 1 ? 'elemento' : 'elementi'}
-                      </p>
-                    </div>
-                    <div className="border rounded-md overflow-hidden bg-white shadow-sm">
-                      <Table>
-                        <TableHeader>
-                          <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-                            <TableHead>Nome</TableHead>
-                            <TableHead>Email</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {evaluators.filter(e => selectedEvaluatorIds.includes(e.id)).map(evaluator => (
-                            <TableRow key={evaluator.id}>
-                              <TableCell className="font-medium">{evaluator.name}</TableCell>
-                              <TableCell className="text-slate-500">{evaluator.email}</TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-                  </div>
-
-                </div>
+                <TestSummaryView
+                  assessmentSituation={assessmentSituation}
+                  competencyTitle={competencies.find(c => String(c.id) === String(selectedCompetencyId))?.title || '-'}
+                  subcompetencies={subCompetencies.filter(s => selectedSubcompetencyIds.includes(s.id))}
+                  students={users.filter(u => selectedUserIds.includes(u.id))}
+                  evaluators={evaluators.filter(e => selectedEvaluatorIds.includes(e.id))}
+                />
               )}
 
             </div>
@@ -969,7 +888,7 @@ export function CreateTestModal({
             <Button
               type="button"
               variant="outline"
-              onClick={onClose}
+              onClick={handleClose}
               disabled={isSubmitting}
               className="px-4 md:px-6 border-slate-300 text-slate-700"
             >
@@ -993,9 +912,7 @@ export function CreateTestModal({
                   onClick={() => setActiveStep(activeStep + 1)}
                   disabled={
                     (activeStep === 1 && !isStep1Valid) ||
-                    (activeStep === 2 && !isStep2Valid) ||
-                    (activeStep === 3 && !isStep3Valid) ||
-                    (activeStep === 4 && !isStep4Valid)
+                    (activeStep === 2 && !isStep2Valid)
                   }
                   className="px-6 md:px-8"
                 >

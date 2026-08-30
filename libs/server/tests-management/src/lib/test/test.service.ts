@@ -82,12 +82,7 @@ export class TestService {
           test_evaluator_id: evaluatorId,
         }));
 
-        await manager
-          .createQueryBuilder()
-          .insert()
-          .into('test_evaluation')
-          .values(evaluatorRows)
-          .execute();
+        await manager.insert('test_evaluation', evaluatorRows);
       }
 
       // 3. Creazione record test_execution per ciascun evaluated_user assegnato
@@ -99,12 +94,7 @@ export class TestService {
           max_score: null,
         }));
 
-        await manager
-          .createQueryBuilder()
-          .insert()
-          .into('test_execution')
-          .values(executionRows)
-          .execute();
+        await manager.insert('test_execution', executionRows);
       }
 
       await queryRunner.commitTransaction();

@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { PageContainer } from '@/components/page-container';
-import { fetchTests, ApiTest, ApiCompetency, ApiSubCompetency, ApiUser, fetchCompetencies, fetchSubCompetencies, fetchUsers, fetchTestDesigners, createTest, fetchEvaluatedUsers, fetchTestEvaluators } from './tests.api';
+import { fetchTests, deleteTest, ApiTest, ApiCompetency, ApiSubCompetency, ApiUser, fetchCompetencies, fetchSubCompetencies, fetchTestDesigners, createTest, fetchEvaluatedUsers, fetchTestEvaluators } from './tests.api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -19,8 +19,19 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '@/components/ui/empty';
-import { Plus, Loader2, FolderCode, Edit, Trash2, RefreshCw, Search, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Loader2, FolderCode, Edit, Trash2, RefreshCw, Search, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, TriangleAlert } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { CreateTestModal } from './create-test-modal';
+import { ViewTestModal } from './view-test-modal';
 
 const ITEMS_PER_PAGE = 5;
 
@@ -35,6 +46,8 @@ export function TestsManagementPage() {
   const [evaluators, setEvaluators] = useState<ApiUser[]>([]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [viewingTestId, setViewingTestId] = useState<number | null>(null);
+  const [deleteTargetTest, setDeleteTargetTest] = useState<ApiTest | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeletingId, setIsDeletingId] = useState<number | null>(null);
 
@@ -52,8 +65,38 @@ export function TestsManagementPage() {
   async function loadTests() {
     setIsLoading(true);
     try {
-      const data = await fetchTests();
-      setTests(data);
+      const [testsRes, evaluatedUsersRes, testEvaluatorsRes] = await Promise.all([
+        fetchTests(),
+        fetchEvaluatedUsers(),
+        fetchTestEvaluators(),
+      ]);
+
+      // Conta gli studenti distinti per test (quanti EvaluatedUser hanno almeno un'esecuzione per quel test)
+      const evaluatedUsersCountByTest = new Map<number, number>();
+      for (const eu of evaluatedUsersRes) {
+        const testIds = new Set((eu.test_executions || []).map((e) => e.test_id));
+        for (const testId of testIds) {
+          evaluatedUsersCountByTest.set(testId, (evaluatedUsersCountByTest.get(testId) || 0) + 1);
+        }
+      }
+
+      // Conta i valutatori per test
+      const evaluatorsCountByTest = new Map<number, number>();
+      for (const te of testEvaluatorsRes) {
+        for (const t of te.tests || []) {
+          evaluatorsCountByTest.set(t.id, (evaluatorsCountByTest.get(t.id) || 0) + 1);
+        }
+      }
+
+      setTests(testsRes.map((test) => ({
+        ...test,
+        evaluated_users_count: evaluatedUsersCountByTest.get(test.id) || 0,
+        evaluators_count: evaluatorsCountByTest.get(test.id) || 0,
+      })));
+
+      // Aggiorna anche i dati dei dropdown nella modale
+      setUsers(evaluatedUsersRes.filter((eu) => eu.user).map((eu) => ({ ...eu.user!, id: eu.id })));
+      setEvaluators(testEvaluatorsRes.filter((te) => te.user).map((te) => ({ ...te.user!, id: te.id })));
     } catch (err) {
       console.error('Failed to fetch tests', err);
     } finally {
@@ -61,57 +104,32 @@ export function TestsManagementPage() {
     }
   }
 
+  async function loadModalData() {
+    try {
+      const [compRes, subRes] = await Promise.all([
+        fetchCompetencies(),
+        fetchSubCompetencies(),
+      ]);
+      setCompetencies(compRes);
+      setSubCompetencies(subRes);
+    } catch (err) {
+      console.error('Failed to fetch modal data', err);
+      setCompetencies([]);
+      setSubCompetencies([]);
+    }
+  }
+
   const handleDeleteTest = async (id: number) => {
-    if (!window.confirm('Sei sicuro di voler eliminare questo test? Questa operazione è irreversibile.')) return;
     try {
       setIsDeletingId(id);
       await deleteTest(id);
       await loadTests();
     } catch (err) {
       console.error('Failed to delete test', err);
-      window.alert('Errore durante l\'eliminazione del test.');
     } finally {
       setIsDeletingId(null);
     }
   };
-
-  async function loadModalData() {
-    try {
-      const [compRes, subRes, evaluatedUsersRes, testEvaluatorsRes] = await Promise.all([
-        fetchCompetencies(),
-        fetchSubCompetencies(),
-        fetchEvaluatedUsers(),
-        fetchTestEvaluators(),
-      ]);
-
-      setCompetencies(compRes);
-      setSubCompetencies(subRes);
-
-      const students = evaluatedUsersRes
-        .filter((eu: any) => eu.user)
-        .map((eu: any) => ({
-          ...eu.user,
-          id: eu.id, // the ID passed to the backend must be the EvaluatedUser ID
-        }));
-
-      const evaluators = testEvaluatorsRes
-        .filter((te: any) => te.user)
-        .map((te: any) => ({
-          ...te.user,
-          id: te.id, // the ID passed to the backend must be the TestEvaluator ID
-        }));
-
-      setUsers(students);
-      setEvaluators(evaluators);
-    } catch (err) {
-      console.error('Failed to fetch modal data', err);
-      // Fallback empty if needed so UI doesn't crash completely, but now we know it failed
-      setCompetencies([]);
-      setSubCompetencies([]);
-      setUsers([]);
-      setEvaluators([]);
-    }
-  }
 
   const handleCreateTest = async (testData: {
     assessmentSituation: string;
@@ -174,6 +192,12 @@ export function TestsManagementPage() {
       if (sortColumn === 'subcompetencies') {
         valA = a.subcompetencies?.length || 0;
         valB = b.subcompetencies?.length || 0;
+      } else if (sortColumn === 'evaluated_users_count') {
+        valA = a.evaluated_users_count || 0;
+        valB = b.evaluated_users_count || 0;
+      } else if (sortColumn === 'evaluators_count') {
+        valA = a.evaluators_count || 0;
+        valB = b.evaluators_count || 0;
       }
 
       if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
@@ -264,8 +288,11 @@ export function TestsManagementPage() {
                     <TableHead className="cursor-pointer select-none" onClick={() => handleSort('test_designer_id')}>
                       <div className="flex items-center gap-1">Test Designer {getSortIcon('test_designer_id')}</div>
                     </TableHead>
-                    <TableHead className="cursor-pointer select-none text-center" onClick={() => handleSort('executions_count')}>
-                      <div className="flex items-center justify-center gap-1">Esecuzioni {getSortIcon('executions_count')}</div>
+                    <TableHead className="cursor-pointer select-none text-center" onClick={() => handleSort('evaluated_users_count')}>
+                      <div className="flex items-center justify-center gap-1">Studenti {getSortIcon('evaluated_users_count')}</div>
+                    </TableHead>
+                    <TableHead className="cursor-pointer select-none text-center" onClick={() => handleSort('evaluators_count')}>
+                      <div className="flex items-center justify-center gap-1">Valutatori {getSortIcon('evaluators_count')}</div>
                     </TableHead>
                     <TableHead className="cursor-pointer select-none" onClick={() => handleSort('subcompetencies')}>
                       <div className="flex items-center gap-1">Sottocompetenze {getSortIcon('subcompetencies')}</div>
@@ -276,7 +303,7 @@ export function TestsManagementPage() {
                 <TableBody>
                   {paginatedTests.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                      <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
                         Nessun test trovato corrispondente alla ricerca.
                       </TableCell>
                     </TableRow>
@@ -285,8 +312,8 @@ export function TestsManagementPage() {
                       <TableRow key={test.id} className="group">
                         <TableCell className="font-medium text-slate-500">{test.id}</TableCell>
                         <TableCell 
-                          className="font-medium text-slate-900 cursor-pointer"
-                          onClick={() => console.log('Apri dettaglio test', test.id)}
+                          className="font-medium text-slate-900 cursor-pointer hover:text-primary hover:underline"
+                          onClick={() => setViewingTestId(test.id)}
                         >
                           {test.assessment_situation}
                         </TableCell>
@@ -294,7 +321,14 @@ export function TestsManagementPage() {
                           {test.test_designer?.user?.name || `ID: ${test.test_designer_id}`}
                         </TableCell>
                         <TableCell className="text-slate-600 text-center">
-                          {test.executions_count || 0}
+                          <span className="inline-flex items-center justify-center bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-xs font-medium">
+                            {test.evaluated_users_count || 0}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-slate-600 text-center">
+                          <span className="inline-flex items-center justify-center bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-xs font-medium">
+                            {test.evaluators_count || 0}
+                          </span>
                         </TableCell>
                         <TableCell className="text-slate-600">
                           <span className="inline-flex items-center justify-center bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-xs font-medium">
@@ -311,7 +345,7 @@ export function TestsManagementPage() {
                               size="icon" 
                               className="h-8 w-8 text-slate-500 hover:text-red-600 cursor-pointer" 
                               title="Elimina"
-                              onClick={() => handleDeleteTest(test.id)}
+                              onClick={() => setDeleteTargetTest(test)}
                               disabled={isDeletingId === test.id}
                             >
                               {isDeletingId === test.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
@@ -370,6 +404,52 @@ export function TestsManagementPage() {
         isSubmitting={isSubmitting}
         onConfirm={handleCreateTest}
       />
+
+      <ViewTestModal
+        isOpen={viewingTestId !== null}
+        testId={viewingTestId}
+        onClose={() => setViewingTestId(null)}
+      />
+
+      {/* MODALE CONFERMA ELIMINAZIONE */}
+      <AlertDialog
+        open={deleteTargetTest !== null}
+        onOpenChange={(open) => !open && setDeleteTargetTest(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+              <TriangleAlert className="h-5 w-5 text-destructive" />
+              Conferma Eliminazione
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-600">
+              Sei sicuro di voler eliminare il test <span className="font-semibold text-slate-900">"{deleteTargetTest?.assessment_situation}"</span> (ID: #{deleteTargetTest?.id})?
+              <br className="my-1" />
+              Questa operazione è irreversibile e cancellerà definitivamente tutti i dati e le assegnazioni associate.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeletingId !== null}>
+              Annulla
+            </AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              disabled={isDeletingId !== null}
+              onClick={async (e) => {
+                e.preventDefault();
+                if (deleteTargetTest) {
+                  await handleDeleteTest(deleteTargetTest.id);
+                  setDeleteTargetTest(null);
+                }
+              }}
+              className="flex items-center gap-2"
+            >
+              {isDeletingId !== null && <Loader2 className="h-4 w-4 animate-spin" />}
+              Elimina Test
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </PageContainer>
   );
 }

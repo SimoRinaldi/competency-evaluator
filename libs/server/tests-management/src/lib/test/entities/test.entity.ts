@@ -39,7 +39,5 @@ export class TestEntity {
     },
   })
   subcompetencies?: Relation<SubCompetencyEntity>[];
-
-  executions_count?: number;
 }
 
