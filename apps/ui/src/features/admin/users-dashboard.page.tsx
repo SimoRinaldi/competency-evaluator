@@ -94,7 +94,7 @@ export function UsersDashboardPage() {
           {/* Pulsante per tornare alle Competenze */}
           <Link to="/">
             <Button variant="outline">
-              Competenze
+              Gestione Competenze
             </Button>
           </Link>
           <Link to="/admin/users/new">
