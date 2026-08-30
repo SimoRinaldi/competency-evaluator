@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getCompetencyById, updateCompetency } from './competencies.api';
-import styles from '../css/shared.module.css';
+
 import { Step1Competency } from './components/step1-competency';
 import { SubCompetencyPanel } from './components/sub-competency-panel';
 import { Step3Summary } from './components/step3-summary';
@@ -132,13 +132,13 @@ export function EditCompetencyPage() {
   const isStep3Enabled = subCompetencies.length > 0;
 
   return (
-    <div className="min-h-screen bg-slate-50 flex justify-center items-start py-10 px-4">
+    <div className="min-h-screen bg-muted/30 flex justify-center items-start py-10 px-4">
       {/* Contenitore Principale */}
-      <div className="flex w-full max-w-6xl bg-white rounded-xl shadow-xl overflow-hidden border border-slate-200">
+      <div className="flex w-full max-w-6xl bg-card rounded-xl shadow-xl overflow-hidden border border-border">
         {/* COLONNA SINISTRA: SIDEBAR */}
-        <div className="w-72 shrink-0 p-8 border-r border-slate-200 bg-slate-50/30">
+        <div className="w-72 shrink-0 p-8 border-r border-border bg-muted/30">
           
-          <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-8">
+          <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-8">
             Modifica Guidata
           </h2>
 
@@ -155,18 +155,18 @@ export function EditCompetencyPage() {
               >
                 <div className={`flex shrink-0 items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-all ${
                   activeMenu === 1
-                    ? 'bg-slate-900 text-white shadow-md scale-110'
+                    ? 'bg-primary text-primary-foreground shadow-md scale-110'
                     : isStep1Valid
-                    ? 'bg-white border-2 border-slate-300 text-slate-900 group-hover:border-slate-400'
-                    : 'bg-slate-100 text-slate-400'
+                    ? 'bg-card border-2 border-border text-primary group-hover:border-slate-400'
+                    : 'bg-muted text-muted-foreground'
                 }`}>
                   1
                 </div>
                 <div className="pt-1.5">
-                  <div className={`font-semibold transition-colors ${activeMenu === 1 ? 'text-slate-900' : 'text-slate-500 group-hover:text-slate-900'}`}>
+                  <div className={`font-semibold transition-colors ${activeMenu === 1 ? 'text-primary' : 'text-muted-foreground group-hover:text-primary'}`}>
                     Competenza
                   </div>
-                  <div className="text-xs text-slate-400 mt-0.5">Dati generali</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">Dati generali</div>
                 </div>
               </button>
             </li>
@@ -180,18 +180,18 @@ export function EditCompetencyPage() {
               >
                 <div className={`flex shrink-0 items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-all ${
                   activeMenu === 2
-                    ? 'bg-slate-900 text-white shadow-md scale-110'
+                    ? 'bg-primary text-primary-foreground shadow-md scale-110'
                     : subCompetencies.length > 0
-                    ? 'bg-white border-2 border-slate-300 text-slate-900 group-hover:border-slate-400'
-                    : 'bg-slate-100 text-slate-400'
+                    ? 'bg-card border-2 border-border text-primary group-hover:border-slate-400'
+                    : 'bg-muted text-muted-foreground'
                 }`}>
                   2
                 </div>
                 <div className="pt-1.5">
-                  <div className={`font-semibold transition-colors ${activeMenu === 2 ? 'text-slate-900' : 'text-slate-500 group-hover:text-slate-900'}`}>
+                  <div className={`font-semibold transition-colors ${activeMenu === 2 ? 'text-primary' : 'text-muted-foreground group-hover:text-primary'}`}>
                     Sottocompetenze
                   </div>
-                  <div className="text-xs text-slate-400 mt-0.5">
+                  <div className="text-xs text-muted-foreground mt-0.5">
                     {subCompetencies.length > 0 
                       ? `${subCompetencies.length} inserit${subCompetencies.length === 1 ? 'a' : 'e'}`
                       : 'Definizione struttura'
@@ -213,8 +213,8 @@ export function EditCompetencyPage() {
                         disabled={!isStep1Valid}
                         className={`text-left text-sm w-full py-1.5 px-3 rounded-md transition-colors border-l-2 ${
                           activeSubIndex === idx && activeMenu === 2
-                            ? 'border-slate-900 bg-slate-100 text-slate-900 font-bold'
-                            : 'border-transparent font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-100/50 hover:border-slate-300'
+                            ? 'border-slate-900 bg-muted text-primary font-bold'
+                            : 'border-transparent font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 hover:border-border'
                         }`}
                       >
                         <span className="truncate block w-full">{sub.title || `Sottocompetenza ${idx + 1}`}</span>
@@ -229,8 +229,8 @@ export function EditCompetencyPage() {
                       disabled={!isStep1Valid}
                       className={`text-left text-sm transition-colors flex items-center gap-2 py-1.5 px-3 rounded-md border-l-2 ${
                         activeSubIndex === -1 && activeMenu === 2
-                          ? 'border-slate-900 bg-slate-100 text-slate-900 font-bold'
-                          : 'border-transparent font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-100/50 hover:border-slate-300'
+                          ? 'border-slate-900 bg-muted text-primary font-bold'
+                          : 'border-transparent font-medium text-muted-foreground hover:text-primary hover:bg-muted/50 hover:border-border'
                       }`}
                     >
                       <span>+ Aggiungi un'altra</span>
@@ -249,16 +249,16 @@ export function EditCompetencyPage() {
               >
                 <div className={`flex shrink-0 items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-all ${
                   activeMenu === 3
-                    ? 'bg-slate-900 text-white shadow-md scale-110'
-                    : 'bg-slate-100 text-slate-400'
+                    ? 'bg-primary text-primary-foreground shadow-md scale-110'
+                    : 'bg-muted text-muted-foreground'
                 }`}>
                   3
                 </div>
                 <div className="pt-1.5">
-                  <div className={`font-semibold transition-colors ${activeMenu === 3 ? 'text-slate-900' : 'text-slate-500 group-hover:text-slate-900'}`}>
+                  <div className={`font-semibold transition-colors ${activeMenu === 3 ? 'text-primary' : 'text-muted-foreground group-hover:text-primary'}`}>
                     Riepilogo
                   </div>
-                  <div className="text-xs text-slate-400 mt-0.5">Verifica e salva</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">Verifica e salva</div>
                 </div>
               </button>
             </li>
@@ -266,7 +266,7 @@ export function EditCompetencyPage() {
         </div>
 
         {/* COLONNA DESTRA: AREA PRINCIPALE */}
-        <div className="flex-1 p-10 bg-white">
+        <div className="flex-1 p-10 bg-card">
           {activeMenu === 1 && (
             <Step1Competency
               data={competencyData}

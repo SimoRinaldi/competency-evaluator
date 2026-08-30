@@ -7,11 +7,10 @@ export function Step1Competency({ data, onChange, onNext }: any) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight text-slate-900">
-          Dati della Competenza
-        </h2>
-        <p className="text-slate-500 text-sm mt-1">
-          Definisci il titolo della competenza, il suo peso (intero da 1 a 5) e la soglia minima di acquisizione della competenza.
+        <h2 className="text-2xl font-bold tracking-tight text-foreground">Dati della Competenza</h2>
+        <p className="text-muted-foreground text-sm mt-1">
+          Definisci il titolo della competenza, il suo peso (intero da 1 a 5) e la soglia minima di
+          acquisizione della competenza.
         </p>
       </div>
 
@@ -65,7 +64,10 @@ export function Step1Competency({ data, onChange, onNext }: any) {
         </div>
 
         <div className="flex justify-end border-t border-slate-200 pt-6">
-          <button type="submit" className="inline-flex h-10 items-center justify-center rounded-md bg-slate-900 px-8 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50">
+          <button
+            type="submit"
+            className="inline-flex h-10 items-center justify-center rounded-md bg-slate-900 px-8 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+          >
             Avanti
           </button>
         </div>
