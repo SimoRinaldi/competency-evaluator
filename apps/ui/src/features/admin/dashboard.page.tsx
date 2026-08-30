@@ -53,11 +53,13 @@ const columns: ColumnDef<Competency>[] = [
   },
   {
     accessorKey: "weight",
-    header: "Peso",
+    header: () => <div className="text-center">Peso</div>,
+    cell: ({ row }) => <div className="text-center">{row.getValue("weight")}</div>,
   },
   {
     accessorKey: "threshold",
-    header: "Soglia",
+    header: () => <div className="text-center">Soglia</div>,
+    cell: ({ row }) => <div className="text-center">{row.getValue("threshold")}</div>,
   },
   {
     id: "actions",
