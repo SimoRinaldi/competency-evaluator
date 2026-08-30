@@ -147,7 +147,38 @@ export async function createTest(payload: CreateTestPayload) {
   return await response.json();
 }
 
+export async function deleteTest(id: number): Promise<void> {
+  const response = await fetch(`${API_URL}/tests/${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) {
+    const errorBody = await response.json().catch(() => ({ message: 'Errore API sconosciuto' }));
+    throw new Error(errorBody.message || `Errore API DELETE /tests: ${response.statusText}`);
+  }
+}
 
+
+
+export async function fetchTestExecutionsByTestId(testId: number): Promise<any[]> {
+  const response = await fetch(`${API_URL}/test_executions/by-test/${testId}`, {
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) {
+    throw new Error(`Errore API /test_executions/by-test: ${response.statusText}`);
+  }
+  return await response.json();
+}
+
+export async function fetchTestEvaluatorsByTestId(testId: number): Promise<ApiTestEvaluator[]> {
+  const response = await fetch(`${API_URL}/test_evaluators/by-test/${testId}`, {
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) {
+    throw new Error(`Errore API /test_evaluators/by-test: ${response.statusText}`);
+  }
+  return await response.json();
+}
 
 export async function fetchTests(): Promise<ApiTest[]> {
   const response = await fetch(`${API_URL}/tests`, {

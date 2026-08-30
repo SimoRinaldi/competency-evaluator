@@ -23,6 +23,13 @@ export class TestEvaluatorRepository {
     });
   }
 
+  async findByTestId(testId: number): Promise<TestEvaluatorEntity[]> {
+    return this.repository.find({
+      where: { tests: { id: testId } },
+      relations: ['user'],
+    });
+  }
+
   async findById(id: number): Promise<TestEvaluatorEntity | null> {
     return this.repository.findOne({
       where: { id },

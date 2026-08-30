@@ -398,7 +398,7 @@ export function CreateTestModal({
 
         {/* COLONNA DESTRA: AREA PRINCIPALE */}
         <div className="flex-1 flex flex-col bg-white h-full overflow-hidden">
-          <DialogHeader className="p-4 md:p-8 md:pb-4 border-b border-slate-100 md:border-b-0">
+          <DialogHeader className="p-4 md:px-8 md:pt-8 md:pb-2">
             <DialogTitle className="text-xl md:text-2xl font-bold text-slate-800">
               {activeStep === 1 && "Dati di base"}
               {activeStep === 2 && "Selezione Sottocompetenze"}
@@ -406,6 +406,7 @@ export function CreateTestModal({
               {activeStep === 4 && "Assegnazione Valutatori"}
               {activeStep === 5 && "Riepilogo"}
             </DialogTitle>
+            <div className="w-auto mx-2 mt-4 mb-3 h-px bg-slate-200" />
           </DialogHeader>
 
           {isLoading ? (
@@ -843,77 +844,120 @@ export function CreateTestModal({
 
               {/* STEP 5: Riepilogo */}
               {activeStep === 5 && (
-                <div className="space-y-6 flex flex-col h-full overflow-y-auto pr-2 pb-4">
-                  <div className="bg-slate-50 p-6 rounded-lg border shrink-0">
-                    <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Informazioni Generali</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label className="text-xs text-slate-400">Situazione di Valutazione</Label>
-                        <p className="text-base font-medium text-slate-900 mt-1">{assessmentSituation || '-'}</p>
-                      </div>
-                      <div>
-                        <Label className="text-xs text-slate-400">Competenza Selezionata</Label>
-                        <p className="text-base font-medium text-slate-900 mt-1">
-                          {competencies.find(c => c.id === selectedCompetencyId)?.title || '-'}
-                        </p>
-                      </div>
+                <div className="space-y-8 flex flex-col h-full overflow-y-auto pr-2 pb-4">
+                  
+                  {/* Informazioni Generali */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1.5">
+                      <span className="text-sm font-semibold text-slate-500">Situazione di Valutazione</span>
+                      <span className="text-base font-medium text-slate-900">{assessmentSituation || '-'}</span>
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <span className="text-sm font-semibold text-slate-500">Competenza Selezionata</span>
+                      <span className="text-base font-medium text-slate-900">{competencies.find(c => c.id === selectedCompetencyId)?.title || '-'}</span>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 shrink-0">
-                    {/* Prove Selezionate */}
-                    <div className="bg-slate-50 p-5 rounded-lg border flex flex-col h-[250px]">
-                      <div className="flex items-center justify-between mb-3">
-                        <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Prove</h4>
-                        <span className="bg-sky-100 text-sky-700 text-xs font-bold px-2 py-1 rounded-full">
-                          {selectedSubcompetencyIds.length}
-                        </span>
-                      </div>
-                      <div className="flex-1 overflow-y-auto pr-2 space-y-2">
-                        {subCompetencies.filter(s => selectedSubcompetencyIds.includes(s.id)).map(sub => (
-                          <div key={sub.id} className="bg-white p-3 rounded border shadow-sm text-sm font-medium text-slate-700">
-                            {sub.title}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+                  <div className="w-full h-px bg-slate-100" />
 
-                    {/* Utenti Selezionati */}
-                    <div className="bg-slate-50 p-5 rounded-lg border flex flex-col h-[250px]">
-                      <div className="flex items-center justify-between mb-3">
-                        <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Studenti</h4>
-                        <span className="bg-emerald-100 text-emerald-700 text-xs font-bold px-2 py-1 rounded-full">
-                          {selectedUserIds.length}
-                        </span>
-                      </div>
-                      <div className="flex-1 overflow-y-auto pr-2 space-y-2">
-                        {users.filter(u => selectedUserIds.includes(u.id)).map(user => (
-                          <div key={user.id} className="bg-white p-2.5 rounded border shadow-sm flex items-center justify-between">
-                            <span className="text-sm font-medium text-slate-700">{user.name}</span>
-                            <span className="text-xs text-slate-500 truncate ml-2">{user.email}</span>
-                          </div>
-                        ))}
-                      </div>
+                  {/* Sottocompetenze Selezionate */}
+                  <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-0.5">
+                      <h4 className="text-lg font-semibold text-slate-800">
+                        Prove
+                      </h4>
+                      <p className="text-sm text-slate-500">
+                        {selectedSubcompetencyIds.length} {selectedSubcompetencyIds.length === 1 ? 'elemento' : 'elementi'}
+                      </p>
                     </div>
-
-                    {/* Valutatori Selezionati */}
-                    <div className="bg-slate-50 p-5 rounded-lg border flex flex-col h-[250px] md:col-span-2">
-                      <div className="flex items-center justify-between mb-3">
-                        <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Valutatori</h4>
-                        <span className="bg-purple-100 text-purple-700 text-xs font-bold px-2 py-1 rounded-full">
-                          {selectedEvaluatorIds.length}
-                        </span>
-                      </div>
-                      <div className="flex-1 overflow-y-auto pr-2 grid grid-cols-1 md:grid-cols-2 gap-2 content-start">
-                        {evaluators.filter(e => selectedEvaluatorIds.includes(e.id)).map(evaluator => (
-                          <div key={evaluator.id} className="bg-white p-2.5 rounded border shadow-sm flex items-center justify-between">
-                            <span className="text-sm font-medium text-slate-700">{evaluator.name}</span>
-                            <span className="text-xs text-slate-500 truncate ml-2">{evaluator.email}</span>
-                          </div>
-                        ))}
-                      </div>
+                    <div className="border rounded-md overflow-hidden bg-white shadow-sm">
+                      <Table>
+                        <TableHeader>
+                          <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
+                            <TableHead className="w-[80px]">ID</TableHead>
+                            <TableHead>Titolo Prova</TableHead>
+                            <TableHead className="text-right">Soglia %</TableHead>
+                            <TableHead className="text-right">Peso</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {subCompetencies.filter(s => selectedSubcompetencyIds.includes(s.id)).map(sub => (
+                            <TableRow key={sub.id}>
+                              <TableCell className="font-medium text-slate-500">{sub.id}</TableCell>
+                              <TableCell className="font-medium">{sub.title}</TableCell>
+                              <TableCell className="text-right">{sub.threshold}%</TableCell>
+                              <TableCell className="text-right">{sub.weight}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
                     </div>
                   </div>
+
+                  <div className="w-full h-px bg-slate-100" />
+
+                  {/* Utenti Selezionati */}
+                  <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-0.5">
+                      <h4 className="text-lg font-semibold text-slate-800">
+                        Studenti
+                      </h4>
+                      <p className="text-sm text-slate-500">
+                        {selectedUserIds.length} {selectedUserIds.length === 1 ? 'elemento' : 'elementi'}
+                      </p>
+                    </div>
+                    <div className="border rounded-md overflow-hidden bg-white shadow-sm">
+                      <Table>
+                        <TableHeader>
+                          <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
+                            <TableHead>Nome</TableHead>
+                            <TableHead>Email</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {users.filter(u => selectedUserIds.includes(u.id)).map(user => (
+                            <TableRow key={user.id}>
+                              <TableCell className="font-medium">{user.name}</TableCell>
+                              <TableCell className="text-slate-500">{user.email}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </div>
+
+                  <div className="w-full h-px bg-slate-100" />
+
+                  {/* Valutatori Selezionati */}
+                  <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-0.5">
+                      <h4 className="text-lg font-semibold text-slate-800">
+                        Valutatori
+                      </h4>
+                      <p className="text-sm text-slate-500">
+                        {selectedEvaluatorIds.length} {selectedEvaluatorIds.length === 1 ? 'elemento' : 'elementi'}
+                      </p>
+                    </div>
+                    <div className="border rounded-md overflow-hidden bg-white shadow-sm">
+                      <Table>
+                        <TableHeader>
+                          <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
+                            <TableHead>Nome</TableHead>
+                            <TableHead>Email</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {evaluators.filter(e => selectedEvaluatorIds.includes(e.id)).map(evaluator => (
+                            <TableRow key={evaluator.id}>
+                              <TableCell className="font-medium">{evaluator.name}</TableCell>
+                              <TableCell className="text-slate-500">{evaluator.email}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </div>
+
                 </div>
               )}
 

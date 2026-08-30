@@ -41,6 +41,10 @@ export class TestEvaluatorService {
     return this.repository.findAll();
   }
 
+  async findByTestId(testId: number): Promise<TestEvaluatorEntity[]> {
+    return this.repository.findByTestId(testId);
+  }
+
   async findOne(id: number): Promise<TestEvaluatorEntity> {
     const evaluator = await this.repository.findById(id);
     if (!evaluator) {
