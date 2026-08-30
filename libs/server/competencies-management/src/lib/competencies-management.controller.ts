@@ -29,9 +29,9 @@ export class CompetenciesManagementController {
   ) {}
 
   @Post('chain')
-//  @UseGuards(JwtAuthGuard, RolesGuard)
-//  @Roles(UserRole.ADMIN)
-//  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
   @ApiBody({ type: CreateCompetencyChainDto })
   @ApiOperation({
     summary:

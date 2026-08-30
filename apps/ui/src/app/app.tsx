@@ -1,38 +1,47 @@
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, Navigate } from 'react-router-dom';
+import { AuthProvider } from '../features/auth/auth-context';
+import { ProtectedRoute } from '../features/auth/protected-route';
+import { PublicRoute } from '../features/auth/public-route';
 import { LoginPage } from '../features/auth/login.page';
-import { AppLayout } from '../features/layouts/app-layout';
 import { RegisterPage } from '../features/auth/register.page';
+import { AppLayout } from '../features/layouts/app-layout';
 import { CreateCompetencyPage } from '../features/competencies/create-competency.page';
 
 export function App() {
   return (
-    <Routes>
-      {/* Rotte pubbliche */}
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
+    <AuthProvider>
+      <Routes>
+        {/* Rotte pubbliche per ospiti (Login e Registrazione) */}
+        <Route element={<PublicRoute />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+        </Route>
 
-      {/* Tutte le altre rotte saranno racchiuse nel Layout (che ha la navbar) */}
-      <Route element={<AppLayout />}>
-        {/* Questa è la rotta radice ("/") */}
-        <Route
-          path="/"
-          element={
-            <div className="bg-white p-6 rounded shadow">
-              <h1 className="text-2xl font-bold mb-4">
-                Benvenuto nella Dashboard
-              </h1>
-              <p className="text-gray-600">
-                Qui inseriremo le funzionalità principali.
-              </p>
-            </div>
-          }
-        />
+        {/* Rotte protette (richiedono autenticazione / token salvato) */}
+        <Route element={<ProtectedRoute />}>
+          <Route element={<AppLayout />}>
+            <Route
+              path="/"
+              element={
+                <div className="bg-white p-6 rounded shadow">
+                  <h1 className="text-2xl font-bold mb-4">
+                    Benvenuto nella Dashboard
+                  </h1>
+                  <p className="text-gray-600">
+                    Qui inseriremo le funzionalità principali.
+                  </p>
+                </div>
+              }
+            />
+            <Route path="/competencies/new" element={<CreateCompetencyPage />} />
+            {/* Altre rotte protette future */}
+          </Route>
+        </Route>
 
-        <Route path="/competencies/new" element={<CreateCompetencyPage />} />
-
-        {/* Qui sotto in futuro aggiungeremo altre rotte, es. /utenti, /competenze ecc. */}
-      </Route>
-    </Routes>
+        {/* Rotta di fallback: reindirizza alla home (o al login se non autenticati) */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </AuthProvider>
   );
 }
 
