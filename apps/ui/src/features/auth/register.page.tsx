@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { UserRole } from './auth.api';
 import { useAuth } from './auth-context';
+import { useFeedback } from '../../providers/feedback-provider';
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -18,30 +19,32 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Eye, EyeOff } from 'lucide-react';
 
 export function RegisterPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState<UserRole>('USER');
-  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { register } = useAuth();
+  const { showError, showSuccess } = useFeedback();
   const navigate = useNavigate();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError('');
     setIsLoading(true);
 
     try {
       await register(name, email, password, role);
+      showSuccess("Registrazione completata", "Ora puoi effettuare l'accesso.");
       navigate('/login');
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setError(err.message);
+        showError(err.message, "Errore di Registrazione");
       } else {
-        setError('Errore durante la registrazione');
+        showError('Errore durante la registrazione', "Errore di Registrazione");
       }
     } finally {
       setIsLoading(false);
@@ -61,11 +64,6 @@ export function RegisterPage() {
           <CardContent>
             <form onSubmit={handleSubmit}>
               <FieldGroup>
-                {error && (
-                  <div className="text-sm font-medium text-destructive">
-                    {error}
-                  </div>
-                )}
                 
                 <Field>
                   <FieldLabel htmlFor="name">Nome</FieldLabel>
@@ -95,14 +93,32 @@ export function RegisterPage() {
                 
                 <Field>
                   <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <Input
-                    id="password"
-                    type="password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={isLoading}
-                  />
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      disabled={isLoading}
+                      className="pr-10"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-muted-foreground hover:text-foreground"
+                      onClick={() => setShowPassword(!showPassword)}
+                      tabIndex={-1}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                      <span className="sr-only">Mostra password</span>
+                    </Button>
+                  </div>
                 </Field>
 
                 <Field>

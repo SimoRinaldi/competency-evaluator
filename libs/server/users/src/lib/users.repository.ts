@@ -55,4 +55,8 @@ export class UsersRepository {
         const result = await this.repository.delete(id);
         return (result.affected ?? 0) > 0;
     }
+
+    async updatePasswordHash(id: number, passwordHash: string): Promise<void> {
+        await this.repository.update(id, { passwordHash });
+    }
 }

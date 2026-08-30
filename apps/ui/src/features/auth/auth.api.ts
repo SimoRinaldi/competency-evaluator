@@ -36,6 +36,14 @@ export function getAuthHeaders(): HeadersInit {
 
 const API_URL = 'http://localhost:3333/api';
 
+function translateErrorMessage(msg: string): string {
+  if (msg.includes('Credentials not valid')) return 'Credenziali non valide';
+  if (msg.includes('Email already in use')) return 'Questa email è già in uso';
+  if (msg.includes('password is not strong enough')) return 'La password non è abbastanza sicura';
+  if (msg.includes('email must be an email')) return 'Inserisci un indirizzo email valido';
+  return msg;
+}
+
 export async function login(email: string, password: string): Promise<AuthResponse> {
   const response = await fetch(`${API_URL}/auth/login`, {
     method: 'POST',
@@ -50,9 +58,10 @@ export async function login(email: string, password: string): Promise<AuthRespon
     try {
       const errorData = await response.json();
       if (errorData?.message) {
-        errorMessage = Array.isArray(errorData.message)
+        const rawMsg = Array.isArray(errorData.message)
           ? errorData.message.join(', ')
           : errorData.message;
+        errorMessage = translateErrorMessage(rawMsg);
       }
     } catch {
       // fallback to default error message
@@ -87,9 +96,10 @@ export async function register(
     try {
       const errorData = await response.json();
       if (errorData?.message) {
-        errorMessage = Array.isArray(errorData.message)
+        const rawMsg = Array.isArray(errorData.message)
           ? errorData.message.join(', ')
           : errorData.message;
+        errorMessage = translateErrorMessage(rawMsg);
       }
     } catch {
       // fallback to default error message
@@ -111,6 +121,32 @@ export async function fetchCurrentUser(): Promise<User> {
 
   if (!response.ok) {
     throw new Error(`Errore HTTP ${response.status}`);
+  }
+
+  return response.json();
+}
+
+export async function updateProfile(name: string, email: string, oldPassword?: string, newPassword?: string): Promise<User> {
+  const token = getToken();
+  
+  const payload: any = { name, email };
+  if (oldPassword && newPassword) {
+    payload.oldPassword = oldPassword;
+    payload.newPassword = newPassword;
+  }
+
+  const response = await fetch(`${API_URL}/users/me`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || 'Errore durante l\'aggiornamento del profilo');
   }
 
   return response.json();
