@@ -7,6 +7,7 @@ import { RegisterPage } from '../features/auth/register.page';
 import { AppLayout } from '../features/layouts/app-layout';
 import { CreateCompetencyPage } from '../features/competencies/create-competency.page';
 import { CreateTestPage } from '../features/tests/create-test.page';
+import { TestsManagementPage } from '../features/tests/tests-management.page';
 import { FeedbackProvider } from '../providers/feedback-provider';
 import { PageContainer } from '../components/page-container';
 
@@ -58,7 +59,7 @@ export function App() {
 
             {/* Rotte esclusive per TEST_DESIGNER */}
             <Route element={<ProtectedRoute allowedRoles={['TEST_DESIGNER']} />}>
-              <Route path="/tests-management" element={<Placeholder title="Gestione Test" />} />
+              <Route path="/tests-management" element={<TestsManagementPage />} />
               <Route path="/tests/new" element={<CreateTestPage />} />
               <Route path="/indicators-management" element={<Placeholder title="Gestione Oggetto di Osservazione e Indicatori" />} />
             </Route>

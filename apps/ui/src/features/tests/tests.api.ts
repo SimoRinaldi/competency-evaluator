@@ -45,6 +45,17 @@ export interface ApiTestDesigner {
   user?: ApiUser;
 }
 
+export interface ApiTest {
+  id: number;
+  assessment_situation: string;
+  test_designer_id: number;
+  test_designer?: ApiTestDesigner;
+  subcompetencies?: ApiSubCompetency[];
+  evaluators?: ApiTestEvaluator[];
+  evaluated_users?: ApiUser[];
+  executions_count?: number;
+}
+
 export interface CreateTestPayload {
   assessment_situation: string;
   test_designer_id: number;
@@ -305,4 +316,40 @@ export async function createTest(payload: CreateTestPayload) {
     test_designer_id: payload.test_designer_id,
     subcompetencies: payload.subcompetency_ids.map((id) => ({ id })),
   };
+}
+
+export const MOCK_TESTS: ApiTest[] = [
+  {
+    id: 1,
+    assessment_situation: 'Valutazione Sviluppo Web e Architetture Software',
+    test_designer_id: 21,
+    test_designer: { id: 21, user_id: 21, user: MOCK_USERS.find(u => u.id === 21) },
+    executions_count: 5,
+    subcompetencies: [MOCK_SUBCOMPETENCIES[0], MOCK_SUBCOMPETENCIES[1]],
+  },
+  {
+    id: 2,
+    assessment_situation: 'Test sulle Competenze Database',
+    test_designer_id: 21,
+    test_designer: { id: 21, user_id: 21, user: MOCK_USERS.find(u => u.id === 21) },
+    executions_count: 0,
+    subcompetencies: [MOCK_SUBCOMPETENCIES[4], MOCK_SUBCOMPETENCIES[5]],
+  }
+];
+
+export async function fetchTests(): Promise<ApiTest[]> {
+  try {
+    const response = await fetch(`${API_URL}/tests`, {
+      headers: getAuthHeaders(),
+    });
+    if (response.ok) {
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        return data;
+      }
+    }
+  } catch (err) {
+    console.warn('API /tests non raggiungibile o non autorizzata. Utilizzo mockup.', err);
+  }
+  return MOCK_TESTS;
 }
