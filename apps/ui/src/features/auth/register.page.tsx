@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { register, UserRole } from './auth.api';
+import { UserRole } from './auth.api';
+import { useAuth } from './auth-context';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +15,7 @@ export function RegisterPage() {
   const [role, setRole] = useState<UserRole>('USER');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const { register } = useAuth();
   const navigate = useNavigate();
 
   async function handleSubmit(e: React.FormEvent) {
@@ -24,8 +26,12 @@ export function RegisterPage() {
     try {
       await register(name, email, password, role);
       navigate('/login');
-    } catch (err: any) {
-      setError(err.message || 'Errore durante la registrazione');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Errore durante la registrazione');
+      }
     } finally {
       setIsLoading(false);
     }

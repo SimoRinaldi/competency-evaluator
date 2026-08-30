@@ -1,13 +1,6 @@
-const API_URL = 'http://localhost:3333/api';
+import { getAuthHeaders } from '../auth/auth.api';
 
-// funzione per ottenere il token salvato dal login
-function getAuthHeaders() {
-  const token = localStorage.getItem('access_token');
-  return {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${token}`,
-  };
-}
+const API_URL = 'http://localhost:3333/api';
 
 export async function createCompetency(
   title: string,

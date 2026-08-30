@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { login } from './auth.api';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useAuth } from './auth-context';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,7 +11,11 @@ export function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const from = (location.state as { from?: { pathname?: string } })?.from?.pathname || '/';
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -20,10 +24,14 @@ export function LoginPage() {
 
     try {
       await login(email, password);
-      // Se il login va a buon fine, passa alla dashboard
-      navigate('/');
-    } catch (err: any) {
-      setError(err.message || 'Errore durante il login');
+      // Se il login va a buon fine, naviga alla rotta precedente o alla dashboard
+      navigate(from, { replace: true });
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Errore durante il login');
+      }
     } finally {
       setIsLoading(false);
     }
