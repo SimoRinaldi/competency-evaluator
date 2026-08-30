@@ -45,13 +45,18 @@ function translateErrorMessage(msg: string): string {
 }
 
 export async function login(email: string, password: string): Promise<AuthResponse> {
-  const response = await fetch(`${API_URL}/auth/login`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email, password }),
-  });
+  let response;
+  try {
+    response = await fetch(`${API_URL}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+  } catch (error) {
+    throw new Error('Impossibile connettersi al server. Verifica la tua connessione o riprova più tardi.');
+  }
 
   if (!response.ok) {
     let errorMessage = 'Credenziali non valide';
@@ -83,13 +88,18 @@ export async function register(
   password: string,
   role: UserRole,
 ): Promise<AuthResponse> {
-  const response = await fetch(`${API_URL}/auth/register`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ name, email, password, role }),
-  });
+  let response;
+  try {
+    response = await fetch(`${API_URL}/auth/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name, email, password, role }),
+    });
+  } catch (error) {
+    throw new Error('Impossibile connettersi al server. Verifica la tua connessione o riprova più tardi.');
+  }
 
   if (!response.ok) {
     let errorMessage = 'Errore durante la registrazione. Controlla i dati.';

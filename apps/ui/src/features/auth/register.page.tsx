@@ -70,7 +70,7 @@ export function RegisterPage() {
                   <Input
                     id="name"
                     type="text"
-                    placeholder="Mario Rossi"
+                    placeholder="Inserisci il tuo nome"
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
@@ -83,7 +83,7 @@ export function RegisterPage() {
                   <Input
                     id="email"
                     type="email"
-                    placeholder="mario@esempio.it"
+                    placeholder="Inserisci la tua email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -97,6 +97,7 @@ export function RegisterPage() {
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
+                      placeholder="Scegli una password"
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}

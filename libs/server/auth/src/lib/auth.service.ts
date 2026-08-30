@@ -13,17 +13,19 @@ export class ServerAuthService {
         private readonly jwtService: JwtService) {}
 
     async validateUser(email: string, password: string): Promise<AuthenticatedUser> {
-        const user = await this.usersService.findByEmail(email);
+        try {
+            const user = await this.usersService.findByEmail(email);
+            
+            const passwordMatches = await bcrypt.compare(password,user.passwordHash);
+            if(!passwordMatches) {
+                throw new UnauthorizedException("Credentials not valid!");
+            }
 
-        if(!user) throw new NotFoundException("Credentials not valid");
-
-        const passwordMatches = await bcrypt.compare(password,user.passwordHash);
-        if(!passwordMatches) {
+            const { passwordHash, ...result } = user;
+            return result;
+        } catch (error) {
             throw new UnauthorizedException("Credentials not valid!");
         }
-
-        const { passwordHash, ...result } = user;
-        return result;
     }
 
     async login(user: AuthenticatedUser): Promise<AuthResponse> {
