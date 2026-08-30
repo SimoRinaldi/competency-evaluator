@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import {
   Field,
+  FieldDescription,
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
@@ -127,9 +128,9 @@ export function RegisterPage() {
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? 'Registrazione in corso...' : 'Registrati'}
                   </Button>
-                  <Button variant="outline" type="button" asChild className="w-full" disabled={isLoading}>
-                    <Link to="/login">Accedi qui</Link>
-                  </Button>
+                  <FieldDescription className="text-center">
+                    Hai già un account? <Link to="/login" className="underline underline-offset-4 hover:text-primary">Accedi qui</Link>
+                  </FieldDescription>
                 </Field>
               </FieldGroup>
             </form>

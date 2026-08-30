@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card";
 import {
   Field,
+  FieldDescription,
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
@@ -92,11 +93,11 @@ export function LoginPage() {
                 </Field>
                 <Field className="flex flex-col gap-2 mt-2">
                   <Button type="submit" disabled={isLoading} className="w-full">
-                    {isLoading ? 'Accesso in corso...' : 'Entra'}
+                    {isLoading ? 'Accesso in corso...' : 'Accedi'}
                   </Button>
-                  <Button variant="outline" type="button" asChild className="w-full" disabled={isLoading}>
-                    <Link to="/register">Registrati</Link>
-                  </Button>
+                  <FieldDescription className="text-center">
+                    Non hai un account? <Link to="/register" className="underline underline-offset-4 hover:text-primary">Registrati</Link>
+                  </FieldDescription>
                 </Field>
               </FieldGroup>
             </form>
