@@ -10,8 +10,6 @@ import { FeedbackProvider } from '../providers/feedback-provider';
 import { PageContainer } from '../components/page-container';
 import { UserTestsPage } from '../features/evaluated-user/user-tests.page';
 
-
-
 import { TestsManagementPage } from '../features/tests/tests-management.page';
 import { CreateTestPage } from '../features/tests/create-test.page';
 
@@ -93,23 +91,17 @@ export function App() {
 
               {/* Rotte esclusive per USER */}
               <Route element={<ProtectedRoute allowedRoles={['USER']} />}>
-                <Route
-                  path="/my-tests/todo"
-                  element={<UserTestsPage filter="todo" />}
-                />
-                
-                <Route
-                  path="/my-tests/completed"
-                  element={<UserTestsPage filter="completed" />}
-                />
-                
+                <Route path="/my-tests/todo" element={<UserTestsPage filter="todo" />} />
+
+                <Route path="/my-tests/completed" element={<UserTestsPage filter="completed" />} />
+
                 <Route
                   path="/my-tests/history"
                   element={<Placeholder title="Storico punteggi" />}
                 />
               </Route>
             </Route>
-            
+
             {/* Rotta di fallback: reindirizza alla home (o al login se non autenticati) */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
@@ -120,4 +112,3 @@ export function App() {
 }
 
 export default App;
-
