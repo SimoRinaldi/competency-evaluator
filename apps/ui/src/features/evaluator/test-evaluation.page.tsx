@@ -53,7 +53,8 @@ export function TestEvaluationPage() {
       }
 
       const execs = await getTestExecutions(id as string);
-      setExecutions(execs);
+      const deliveredExecs = execs.filter(e => e.test_outputs && e.test_outputs.length > 0);
+      setExecutions(deliveredExecs);
     } catch (err: any) {
       setError(err.message || "Errore nel caricamento dei dati.");
     } finally {
