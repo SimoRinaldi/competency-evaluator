@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getTestExecutions, TestExecution, Test } from "./evaluator.api";
+import { getTestExecutions, TestExecution } from "./evaluator.api";
 import {
   ColumnDef,
   flexRender,
@@ -28,22 +28,11 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "@/components/ui/empty";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-
 import { UserEvaluationModal } from "./user-evaluation-modal";
 
 export function TestEvaluationPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [test, setTest] = useState<Test | null>(null);
   const [executions, setExecutions] = useState<TestExecution[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -60,7 +49,6 @@ export function TestEvaluationPage() {
       if (!currentTest) {
         throw new Error("Test non trovato o non assegnato a te.");
       }
-      setTest(currentTest);
 
       const execs = await getTestExecutions(id as string);
       setExecutions(execs);
