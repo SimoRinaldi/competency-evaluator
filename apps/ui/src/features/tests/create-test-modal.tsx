@@ -368,6 +368,31 @@ export function CreateTestModal({
                 </div>
               </button>
             </li>
+
+            {/* STEP 5: Riepilogo */}
+            <li className="relative shrink-0">
+              <button
+                onClick={() => setActiveStep(5)}
+                disabled={!isStep1Valid || !isStep2Valid || !isStep3Valid || !isStep4Valid}
+                className={`flex items-center md:items-start gap-2 md:gap-4 text-left group ${(!isStep1Valid || !isStep2Valid || !isStep3Valid || !isStep4Valid) ? 'cursor-not-allowed opacity-60' : ''}`}
+              >
+                <div className={`flex shrink-0 items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-all ${
+                  activeStep === 5
+                    ? 'bg-primary text-primary-foreground shadow-md scale-110'
+                    : (isStep1Valid && isStep2Valid && isStep3Valid && isStep4Valid)
+                    ? 'bg-white border-2 border-slate-300 text-slate-900 group-hover:border-slate-400'
+                    : 'bg-slate-100 text-slate-400'
+                }`}>
+                  5
+                </div>
+                <div className="pt-1.5 hidden md:block">
+                  <div className={`font-semibold transition-colors ${activeStep === 5 ? 'text-slate-900' : 'text-slate-500 group-hover:text-slate-900'}`}>
+                    Riepilogo
+                  </div>
+                  <div className="text-xs text-slate-400 mt-0.5">Conferma finale</div>
+                </div>
+              </button>
+            </li>
           </ul>
         </div>
 
@@ -379,6 +404,7 @@ export function CreateTestModal({
               {activeStep === 2 && "Selezione Sottocompetenze"}
               {activeStep === 3 && "Assegnazione Studenti"}
               {activeStep === 4 && "Assegnazione Valutatori"}
+              {activeStep === 5 && "Riepilogo"}
             </DialogTitle>
           </DialogHeader>
 
@@ -815,6 +841,82 @@ export function CreateTestModal({
                 </div>
               )}
 
+              {/* STEP 5: Riepilogo */}
+              {activeStep === 5 && (
+                <div className="space-y-6 flex flex-col h-full overflow-y-auto pr-2 pb-4">
+                  <div className="bg-slate-50 p-6 rounded-lg border shrink-0">
+                    <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Informazioni Generali</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-xs text-slate-400">Situazione di Valutazione</Label>
+                        <p className="text-base font-medium text-slate-900 mt-1">{assessmentSituation || '-'}</p>
+                      </div>
+                      <div>
+                        <Label className="text-xs text-slate-400">Competenza Selezionata</Label>
+                        <p className="text-base font-medium text-slate-900 mt-1">
+                          {competencies.find(c => c.id === selectedCompetencyId)?.title || '-'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 shrink-0">
+                    {/* Prove Selezionate */}
+                    <div className="bg-slate-50 p-5 rounded-lg border flex flex-col h-[250px]">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Prove</h4>
+                        <span className="bg-sky-100 text-sky-700 text-xs font-bold px-2 py-1 rounded-full">
+                          {selectedSubcompetencyIds.length}
+                        </span>
+                      </div>
+                      <div className="flex-1 overflow-y-auto pr-2 space-y-2">
+                        {subCompetencies.filter(s => selectedSubcompetencyIds.includes(s.id)).map(sub => (
+                          <div key={sub.id} className="bg-white p-3 rounded border shadow-sm text-sm font-medium text-slate-700">
+                            {sub.title}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Utenti Selezionati */}
+                    <div className="bg-slate-50 p-5 rounded-lg border flex flex-col h-[250px]">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Studenti</h4>
+                        <span className="bg-emerald-100 text-emerald-700 text-xs font-bold px-2 py-1 rounded-full">
+                          {selectedUserIds.length}
+                        </span>
+                      </div>
+                      <div className="flex-1 overflow-y-auto pr-2 space-y-2">
+                        {users.filter(u => selectedUserIds.includes(u.id)).map(user => (
+                          <div key={user.id} className="bg-white p-2.5 rounded border shadow-sm flex items-center justify-between">
+                            <span className="text-sm font-medium text-slate-700">{user.name}</span>
+                            <span className="text-xs text-slate-500 truncate ml-2">{user.email}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Valutatori Selezionati */}
+                    <div className="bg-slate-50 p-5 rounded-lg border flex flex-col h-[250px] md:col-span-2">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Valutatori</h4>
+                        <span className="bg-purple-100 text-purple-700 text-xs font-bold px-2 py-1 rounded-full">
+                          {selectedEvaluatorIds.length}
+                        </span>
+                      </div>
+                      <div className="flex-1 overflow-y-auto pr-2 grid grid-cols-1 md:grid-cols-2 gap-2 content-start">
+                        {evaluators.filter(e => selectedEvaluatorIds.includes(e.id)).map(evaluator => (
+                          <div key={evaluator.id} className="bg-white p-2.5 rounded border shadow-sm flex items-center justify-between">
+                            <span className="text-sm font-medium text-slate-700">{evaluator.name}</span>
+                            <span className="text-xs text-slate-500 truncate ml-2">{evaluator.email}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
             </div>
           )}
 
@@ -841,14 +943,15 @@ export function CreateTestModal({
                   Indietro
                 </Button>
               )}
-              {activeStep < 4 ? (
+              {activeStep < 5 ? (
                 <Button
                   type="button"
                   onClick={() => setActiveStep(activeStep + 1)}
                   disabled={
                     (activeStep === 1 && !isStep1Valid) ||
                     (activeStep === 2 && !isStep2Valid) ||
-                    (activeStep === 3 && !isStep3Valid)
+                    (activeStep === 3 && !isStep3Valid) ||
+                    (activeStep === 4 && !isStep4Valid)
                   }
                   className="px-6 md:px-8"
                 >

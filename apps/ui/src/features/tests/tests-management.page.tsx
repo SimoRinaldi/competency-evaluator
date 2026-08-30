@@ -36,6 +36,7 @@ export function TestsManagementPage() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeletingId, setIsDeletingId] = useState<number | null>(null);
 
   // Stati tabella
   const [searchQuery, setSearchQuery] = useState('');
@@ -59,6 +60,20 @@ export function TestsManagementPage() {
       setIsLoading(false);
     }
   }
+
+  const handleDeleteTest = async (id: number) => {
+    if (!window.confirm('Sei sicuro di voler eliminare questo test? Questa operazione è irreversibile.')) return;
+    try {
+      setIsDeletingId(id);
+      await deleteTest(id);
+      await loadTests();
+    } catch (err) {
+      console.error('Failed to delete test', err);
+      window.alert('Errore durante l\'eliminazione del test.');
+    } finally {
+      setIsDeletingId(null);
+    }
+  };
 
   async function loadModalData() {
     try {
@@ -291,8 +306,15 @@ export function TestsManagementPage() {
                             <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-sky-600 cursor-pointer" title="Modifica">
                               <Edit className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-red-600 cursor-pointer" title="Elimina">
-                              <Trash2 className="h-4 w-4" />
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-8 w-8 text-slate-500 hover:text-red-600 cursor-pointer" 
+                              title="Elimina"
+                              onClick={() => handleDeleteTest(test.id)}
+                              disabled={isDeletingId === test.id}
+                            >
+                              {isDeletingId === test.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
                             </Button>
                           </div>
                         </TableCell>
