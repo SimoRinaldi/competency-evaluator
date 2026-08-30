@@ -175,9 +175,6 @@ export function EvaluatorTestsPage({ filter }: { filter: 'pending' | 'completed'
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50 hover:bg-slate-50">
-                <TableHead className="w-20 cursor-pointer select-none font-semibold text-slate-700" onClick={() => handleSort('id')}>
-                  <div className="flex items-center gap-1">ID {getSortIcon('id')}</div>
-                </TableHead>
                 <TableHead className="cursor-pointer select-none font-semibold text-slate-700" onClick={() => handleSort('assessment_situation')}>
                   <div className="flex items-center gap-1">Descrizione test {getSortIcon('assessment_situation')}</div>
                 </TableHead>
@@ -190,13 +187,13 @@ export function EvaluatorTestsPage({ filter }: { filter: 'pending' | 'completed'
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="h-24 text-center text-slate-500">
+                  <TableCell colSpan={3} className="h-24 text-center text-slate-500">
                     Caricamento in corso...
                   </TableCell>
                 </TableRow>
               ) : paginatedTests.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="h-48 text-center p-0">
+                  <TableCell colSpan={3} className="h-48 text-center p-0">
                     <Empty className="border-0">
                       <EmptyHeader>
                         <EmptyMedia variant="icon" className="text-slate-400">
@@ -215,7 +212,6 @@ export function EvaluatorTestsPage({ filter }: { filter: 'pending' | 'completed'
               ) : (
                 paginatedTests.map((test) => (
                   <TableRow key={test.id} className="group">
-                    <TableCell className="font-medium text-slate-600">#{test.id}</TableCell>
                     <TableCell className="max-w-[420px]">
                       <HoverCard>
                         <HoverCardTrigger asChild>
