@@ -6,16 +6,18 @@ import { LoginPage } from '../features/auth/login.page';
 import { RegisterPage } from '../features/auth/register.page';
 import { AppLayout } from '../features/layouts/app-layout';
 import { CreateCompetencyPage } from '../features/competencies/create-competency.page';
-import { CreateTestPage } from '../features/tests/create-test.page';
-import { TestsManagementPage } from '../features/tests/tests-management.page';
 import { FeedbackProvider } from '../providers/feedback-provider';
 import { PageContainer } from '../components/page-container';
 import { UserTestsPage } from '../features/evaluated-user/user-tests.page';
-import { EvaluatedUserTestPage } from '../features/evaluated-user/evaluated-user-test.page';
+
+
+
+import { TestsManagementPage } from '../features/tests/tests-management.page';
+import { CreateTestPage } from '../features/tests/create-test.page';
 
 const Placeholder = ({ title }: { title: string }) => (
-  <PageContainer title={title} description="Questa pagina è in costruzione.">
-    <div className="flex h-40 items-center justify-center rounded-lg border border-dashed text-muted-foreground">
+  <PageContainer title={title} description="Questa pagina � in costruzione.">
+    <div className="flex items-center justify-center h-64 bg-slate-50 border border-dashed rounded-lg text-slate-500">
       Contenuto in arrivo...
     </div>
   </PageContainer>
@@ -45,7 +47,7 @@ export function App() {
                   >
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                       <div className="rounded-xl border bg-card text-card-foreground shadow p-6">
-                        <h3 className="font-semibold leading-none tracking-tight">Novità</h3>
+                        <h3 className="font-semibold leading-none tracking-tight">Novit�</h3>
                         <p className="text-sm text-muted-foreground mt-2">
                           Nessun nuovo aggiornamento.
                         </p>
@@ -93,95 +95,21 @@ export function App() {
               <Route element={<ProtectedRoute allowedRoles={['USER']} />}>
                 <Route
                   path="/my-tests/todo"
-                  element={<Placeholder title="Test che devi ancora fare" />}
+                  element={<UserTestsPage filter="todo" />}
                 />
+                
                 <Route
-                  path="/my-tests/pending"
-                  element={<Placeholder title="Test in attesa di valutazione" />}
+                  path="/my-tests/completed"
+                  element={<UserTestsPage filter="completed" />}
                 />
-                <Route path="/my-tests/completed" element={<Placeholder title="Test valutati" />} />
+                
                 <Route
                   path="/my-tests/history"
-                  element={<Placeholder title="Risultati storici" />}
+                  element={<Placeholder title="Storico punteggi" />}
                 />
               </Route>
             </Route>
-
-            {/* Rotte protette (richiedono autenticazione / token salvato) */}
-            <Route element={<ProtectedRoute />}>
-              <Route element={<AppLayout />}>
-                {/* Rotta accessibile a tutti gli utenti loggati */}
-                <Route
-                  path="/"
-                  element={
-                    <PageContainer
-                      title="Pannello di controllo"
-                      description="Benvenuto nella tua dashboard."
-                    >
-                      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                        <div className="rounded-xl border bg-card text-card-foreground shadow p-6">
-                          <h3 className="font-semibold leading-none tracking-tight">Novità</h3>
-                          <p className="text-sm text-muted-foreground mt-2">
-                            Nessun nuovo aggiornamento.
-                          </p>
-                        </div>
-                      </div>
-                    </PageContainer>
-                  }
-                />
-
-                {/* Rotte esclusive per ADMIN */}
-                <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
-                  <Route
-                    path="/competencies"
-                    element={<Placeholder title="Gestione Competenze" />}
-                  />
-                  <Route path="/competencies/new" element={<CreateCompetencyPage />} />
-                  <Route path="/rubrics" element={<Placeholder title="Gestione Rubriche" />} />
-                  <Route path="/users" element={<Placeholder title="Gestione Utenti" />} />
-                  <Route
-                    path="/tests-overview"
-                    element={<Placeholder title="Visualizzazione Test (Admin)" />}
-                  />
-                </Route>
-
-                {/* Rotte esclusive per TEST_DESIGNER */}
-                <Route element={<ProtectedRoute allowedRoles={['TEST_DESIGNER']} />}>
-                  <Route path="/tests-management" element={<Placeholder title="Gestione Test" />} />
-                  <Route
-                    path="/indicators-management"
-                    element={<Placeholder title="Gestione Oggetto di Osservazione e Indicatori" />}
-                  />
-                </Route>
-
-                {/* Rotte esclusive per EVALUATOR */}
-                <Route element={<ProtectedRoute allowedRoles={['EVALUATOR']} />}>
-                  <Route
-                    path="/evaluations/pending"
-                    element={<Placeholder title="Test da Valutare" />}
-                  />
-                  <Route
-                    path="/evaluations/completed"
-                    element={<Placeholder title="Test Valutati" />}
-                  />
-                </Route>
-
-                {/* Rotte esclusive per USER */}
-                <Route element={<ProtectedRoute allowedRoles={['USER']} />}>
-                  <Route path="/my-tests/todo" element={<UserTestsPage filter="todo" />} />
-                  <Route
-                    path="/my-tests/completed"
-                    element={<UserTestsPage filter="completed" />}
-                  />
-                  <Route
-                    path="/my-tests/history"
-                    element={<Placeholder title="Storico punteggi" />}
-                  />
-                  <Route path="/evaluated-user/tests/:id" element={<EvaluatedUserTestPage />} />
-                </Route>
-              </Route>
-            </Route>
-
+            
             {/* Rotta di fallback: reindirizza alla home (o al login se non autenticati) */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
@@ -192,3 +120,4 @@ export function App() {
 }
 
 export default App;
+

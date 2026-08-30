@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+﻿import { useEffect, useState, useMemo } from 'react';
 import { PageContainer } from '@/components/page-container';
 import { fetchTests, deleteTest, ApiTest, ApiCompetency, ApiSubCompetency, ApiUser, fetchCompetencies, fetchSubCompetencies, fetchTestDesigners, createTest, fetchEvaluatedUsers, fetchTestEvaluators } from './tests.api';
 import { Button } from '@/components/ui/button';
@@ -32,6 +32,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { CreateTestModal } from './create-test-modal';
 import { ViewTestModal } from './view-test-modal';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 
 const ITEMS_PER_PAGE = 5;
 
@@ -233,7 +234,7 @@ export function TestsManagementPage() {
                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   type="text"
-                  placeholder="Cerca test per situazione o ID..."
+                  placeholder="Cerca test per descrizione o ID..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9 h-9 w-full bg-transparent"
@@ -279,11 +280,8 @@ export function TestsManagementPage() {
               <Table>
                 <TableHeader>
                   <TableRow className="hover:bg-transparent">
-                    <TableHead className="w-[96px] cursor-pointer select-none" onClick={() => handleSort('id')}>
-                      <div className="flex items-center gap-1">ID {getSortIcon('id')}</div>
-                    </TableHead>
                     <TableHead className="cursor-pointer select-none" onClick={() => handleSort('assessment_situation')}>
-                      <div className="flex items-center gap-1">Situazione di Valutazione {getSortIcon('assessment_situation')}</div>
+                      <div className="flex items-center gap-1">Descrizione test {getSortIcon('assessment_situation')}</div>
                     </TableHead>
                     <TableHead className="cursor-pointer select-none" onClick={() => handleSort('test_designer_id')}>
                       <div className="flex items-center gap-1">Test Designer {getSortIcon('test_designer_id')}</div>
@@ -303,19 +301,28 @@ export function TestsManagementPage() {
                 <TableBody>
                   {paginatedTests.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
+                      <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
                         Nessun test trovato corrispondente alla ricerca.
                       </TableCell>
                     </TableRow>
                   ) : (
                     paginatedTests.map((test) => (
                       <TableRow key={test.id} className="group">
-                        <TableCell className="font-medium text-slate-500">{test.id}</TableCell>
-                        <TableCell 
-                          className="font-medium text-slate-900 cursor-pointer hover:text-primary hover:underline"
-                          onClick={() => setViewingTestId(test.id)}
-                        >
-                          {test.assessment_situation}
+                        <TableCell className="max-w-[420px]">
+                          <HoverCard>
+                            <HoverCardTrigger asChild>
+                              <span
+                                className="block truncate font-medium text-slate-900 cursor-pointer hover:text-primary hover:underline"
+                                onClick={() => setViewingTestId(test.id)}
+                              >
+                                {test.assessment_situation}
+                              </span>
+                            </HoverCardTrigger>
+                            <HoverCardContent className="w-96 bg-white text-sm text-slate-700 shadow-lg border border-slate-200">
+                              <p className="font-semibold text-slate-900 mb-1">Descrizione test</p>
+                              <p className="leading-relaxed">{test.assessment_situation}</p>
+                            </HoverCardContent>
+                          </HoverCard>
                         </TableCell>
                         <TableCell className="text-slate-600">
                           {test.test_designer?.user?.name || `ID: ${test.test_designer_id}`}

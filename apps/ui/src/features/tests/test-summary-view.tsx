@@ -1,4 +1,4 @@
-import {
+﻿import {
   Table,
   TableBody,
   TableCell,
@@ -41,7 +41,7 @@ export function TestSummaryView({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50/60 p-4 rounded-xl border border-slate-100">
         <div className="flex flex-col gap-1.5">
           <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-            Situazione di Valutazione
+            Descrizione test
           </span>
           <span className="text-base font-medium text-slate-900 leading-relaxed">
             {assessmentSituation || '-'}

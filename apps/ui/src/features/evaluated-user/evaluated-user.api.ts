@@ -14,15 +14,26 @@ export async function getTestDetails(testId: string | number) {
   return response.json();
 }
 
-export async function submitTestExecution(testId: number, userId: number, outputs: { name: string, description: string, url: string, version: string }[]) {
-  // 1. Crea la test execution
-  const executionRes = await fetch(`${API_URL}/test_executions`, {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify({ test_id: testId, user_id: userId })
-  });
-  if (!executionRes.ok) throw new Error("Errore durante la creazione dell'esecuzione del test");
-  const execution = await executionRes.json();
+export async function getTestEvaluators(testId: string | number) {
+  const response = await fetch(`${API_URL}/test_evaluators/by-test/${testId}`, { headers: getAuthHeaders() });
+  if (!response.ok) return []; // Graceful fallback
+  return response.json();
+}
+
+export async function submitTestExecution(testId: number, userId: number, outputs: { name: string, description: string, url: string, version: string }[], existingExecutionId?: number) {
+  let executionId = existingExecutionId;
+  
+  if (!executionId) {
+    // 1. Crea la test execution se non esiste
+    const executionRes = await fetch(`${API_URL}/test_executions`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ test_id: testId, user_id: userId })
+    });
+    if (!executionRes.ok) throw new Error("Errore durante la creazione dell'esecuzione del test");
+    const execution = await executionRes.json();
+    executionId = execution.id;
+  }
 
   // 2. Crea i test outputs associati
   for (const output of outputs) {
@@ -31,17 +42,17 @@ export async function submitTestExecution(testId: number, userId: number, output
       headers: getAuthHeaders(),
       body: JSON.stringify({
         ...output,
-        test_execution_id: execution.id
+        test_execution_id: executionId
       })
     });
     if (!outRes.ok) throw new Error('Errore durante il salvataggio dei file output');
   }
 
-  return execution;
+  return { id: executionId };
 }
 
 export async function getUserExecutions(userId: number) {
   const response = await fetch(`${API_URL}/test_executions/by-user/${userId}`, { headers: getAuthHeaders() });
-  if (!response.ok) throw new Error('Errore caricamento tue esecuzioni');
+  if (!response.ok) return []; // Nessuna esecuzione trovata, restituisce array vuoto
   return response.json();
 }

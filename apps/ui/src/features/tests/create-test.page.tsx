@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+﻿import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -489,14 +489,14 @@ export function CreateTestPage() {
                   Dati del Test e Competenza
                 </h2>
                 <p className="text-slate-500 text-sm mt-1">
-                  Seleziona la competenza di riferimento per cui strutturare il test e descrivi la situazione di valutazione.
+                  Seleziona la competenza di riferimento per cui strutturare il test e descrivi la Descrizione test.
                 </p>
               </div>
 
               <div className="space-y-4 pt-2">
                 <div className="space-y-2">
                   <Label>
-                    Situazione di Valutazione <span className="text-red-500">*</span>
+                    Descrizione test <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     type="text"

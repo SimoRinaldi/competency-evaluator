@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+﻿import { useState, useMemo, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -449,7 +449,7 @@ export function CreateTestModal({
                 <div className="space-y-6 flex flex-col h-full">
                   <div className="space-y-2 max-w-2xl">
                     <Label className="text-sm font-semibold text-slate-800">
-                      Situazione di Valutazione (Nome del test)
+                      Descrizione test (Nome del test)
                     </Label>
                     <Input
                       placeholder="es. Valutazione Sviluppo Web"
