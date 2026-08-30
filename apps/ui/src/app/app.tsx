@@ -21,8 +21,10 @@ import { UsersDashboardPage } from '../features/admin/users-dashboard.page';
 import { UserFormPage } from '../features/admin/user-form.page';
 import { RubricsDashboardPage } from '../features/admin/rubrics-dashboard.page';
 
+import { TestsOverviewPage } from '../features/admin/tests-overview.page';
+
 const Placeholder = ({ title }: { title: string }) => (
-  <PageContainer title={title} description="Questa pagina � in costruzione.">
+  <PageContainer title={title} description="Questa pagina è in costruzione.">
     <div className="flex items-center justify-center h-64 bg-slate-50 border border-dashed rounded-lg text-slate-500">
       Contenuto in arrivo...
     </div>
@@ -74,7 +76,7 @@ export function App() {
                 <Route path="/users/edit/:id" element={<UserFormPage />} />
                 <Route
                   path="/tests-overview"
-                  element={<Placeholder title="Visualizzazione Test (Admin)" />}
+                  element={<TestsOverviewPage />}
                 />
               </Route>
 
