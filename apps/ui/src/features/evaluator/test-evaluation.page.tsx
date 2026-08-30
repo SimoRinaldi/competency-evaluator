@@ -194,22 +194,6 @@ export function TestEvaluationPage() {
               <div className="text-sm font-medium text-muted-foreground hidden sm:block">
                 Totale Utenti: {executions.length}
               </div>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline">
-                    Descrizione Test
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md w-full">
-                  <DialogHeader>
-                    <DialogTitle>Descrizione Test</DialogTitle>
-                    <DialogDescription>Dettagli del test da valutare</DialogDescription>
-                  </DialogHeader>
-                  <div className="mt-4 prose prose-sm text-slate-700 whitespace-pre-wrap max-h-[60vh] overflow-y-auto">
-                    {test?.assessment_situation}
-                  </div>
-                </DialogContent>
-              </Dialog>
             </div>
           </div>
 
