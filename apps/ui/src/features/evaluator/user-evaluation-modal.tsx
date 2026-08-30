@@ -16,6 +16,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldLabel,
+  FieldTitle,
+} from "@/components/ui/field"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Button } from '@/components/ui/button';
 import { Loader2, AlertCircle, Check, Send, FileText, Download } from 'lucide-react';
 import { fetchCurrentUser } from '../auth/auth.api';
@@ -238,13 +246,19 @@ export function UserEvaluationModal({
                                   {indicator.description}
                                 </p>
                                 
-                                <div className="flex flex-col gap-3">
+                                <RadioGroup 
+                                  value={String(evaluations[indicator.id] || "")} 
+                                  onValueChange={(val) => handleSelectLevel(indicator.id, Number(val))}
+                                  disabled={isEvaluated}
+                                  className="flex flex-col gap-2 mt-2"
+                                >
                                   {indicator.rubric_set?.levels?.map((level) => {
                                     const isSelected = evaluations[indicator.id] === level.rank;
                                     return (
-                                      <label
+                                      <FieldLabel 
                                         key={level.id}
-                                        className={`flex items-start gap-4 p-4 rounded-lg border transition-all cursor-pointer ${
+                                        htmlFor={`indicator-${indicator.id}-level-${level.rank}`}
+                                        className={`p-3 rounded-lg border transition-all cursor-pointer ${
                                           isSelected
                                             ? "border-sky-500 bg-sky-50 ring-1 ring-sky-500"
                                             : isEvaluated 
@@ -252,33 +266,28 @@ export function UserEvaluationModal({
                                               : "border-slate-200 hover:border-sky-300 hover:bg-slate-50"
                                         }`}
                                       >
-                                        <div className="pt-0.5">
-                                          <div className={`h-5 w-5 rounded-full border flex items-center justify-center ${isSelected ? 'border-sky-600' : 'border-slate-300 bg-white'}`}>
-                                            {isSelected && <div className="h-2.5 w-2.5 rounded-full bg-sky-600" />}
+                                        <Field orientation="horizontal" className="flex items-start justify-between w-full">
+                                          <FieldContent className="flex-1 pr-3">
+                                            <FieldTitle className={`text-sm ${isSelected ? "text-sky-800" : "text-slate-700"}`}>
+                                              {level.title || `Livello ${level.rank}`}
+                                            </FieldTitle>
+                                            <FieldDescription className={`text-xs mt-0.5 leading-snug ${isSelected ? "text-slate-800" : "text-slate-600"}`}>
+                                              <span className="font-medium">Livello {level.rank}</span>
+                                              {level.description ? ` - ${level.description}` : ""}
+                                            </FieldDescription>
+                                          </FieldContent>
+                                          <div className="pt-0.5">
+                                            <RadioGroupItem 
+                                              value={String(level.rank)} 
+                                              id={`indicator-${indicator.id}-level-${level.rank}`} 
+                                              className={isSelected ? "border-sky-600 text-sky-600" : ""}
+                                            />
                                           </div>
-                                        </div>
-                                        <div className="flex-1 flex flex-col">
-                                          <span className={`font-bold text-sm ${isSelected ? "text-sky-800" : "text-slate-700"}`}>
-                                            Livello {level.rank}
-                                          </span>
-                                          <span className={`text-sm mt-1 leading-relaxed ${isSelected ? "text-slate-800" : "text-slate-600"}`}>
-                                            {level.description}
-                                          </span>
-                                        </div>
-                                        {/* Input radio nascosto per accessibilità */}
-                                        <input 
-                                          type="radio" 
-                                          name={`indicator-${indicator.id}`} 
-                                          value={level.rank}
-                                          checked={isSelected}
-                                          disabled={isEvaluated}
-                                          onChange={() => handleSelectLevel(indicator.id, level.rank)}
-                                          className="sr-only"
-                                        />
-                                      </label>
+                                        </Field>
+                                      </FieldLabel>
                                     );
                                   })}
-                                </div>
+                                </RadioGroup>
                               </div>
                             ))}
                           </div>
