@@ -12,6 +12,7 @@ import { CreateTestDto } from './dto/create-test.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
 import { TestRepository } from './test.repository';
 import { SubCompetencyEntity } from '@server/competencies-management';
+import { TestEvaluatorEntity } from '@server/tests-evaluation';
 
 @Injectable()
 export class TestService {
@@ -85,12 +86,17 @@ export class TestService {
 
       // 2. Collegamento valutatori nella tabella N:N test_evaluation
       if (dto.evaluator_ids && dto.evaluator_ids.length > 0) {
-        const evaluatorRows = dto.evaluator_ids.map((evaluatorId) => ({
+        const evaluators = await manager.find(TestEvaluatorEntity, {
+          where: { user_id: In(dto.evaluator_ids) }
+        });
+        const evaluatorRows = evaluators.map((ev) => ({
           test_id: savedTest.id,
-          test_evaluator_id: evaluatorId,
+          test_evaluator_id: ev.id,
         }));
 
-        await manager.insert('test_evaluation', evaluatorRows);
+        if (evaluatorRows.length > 0) {
+          await manager.insert('test_evaluation', evaluatorRows);
+        }
       }
 
       // 3. Creazione record test_execution per ciascun evaluated_user assegnato
@@ -191,11 +197,16 @@ export class TestService {
       if (dto.evaluator_ids !== undefined) {
         await manager.delete('test_evaluation', { test_id: id });
         if (dto.evaluator_ids.length > 0) {
-          const evaluatorRows = dto.evaluator_ids.map((evaluatorId) => ({
+          const evaluators = await manager.find(TestEvaluatorEntity, {
+            where: { user_id: In(dto.evaluator_ids) }
+          });
+          const evaluatorRows = evaluators.map((ev) => ({
             test_id: id,
-            test_evaluator_id: evaluatorId,
+            test_evaluator_id: ev.id,
           }));
-          await manager.insert('test_evaluation', evaluatorRows);
+          if (evaluatorRows.length > 0) {
+            await manager.insert('test_evaluation', evaluatorRows);
+          }
         }
       }
 
