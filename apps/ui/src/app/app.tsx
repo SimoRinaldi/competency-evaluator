@@ -11,8 +11,6 @@ import { PageContainer } from '../components/page-container';
 import { UserTestsPage } from '../features/evaluated-user/user-tests.page';
 import { EvaluatorTestsPage } from '../features/evaluator/evaluator-tests.page';
 import { TestEvaluationPage } from '../features/evaluator/test-evaluation.page';
-import { UserEvaluationPage } from '../features/evaluator/user-evaluation.page';
-import { HistoricalScoresPage } from '../features/evaluated-user/historical-scores.page';
 
 import { TestsManagementPage } from '../features/tests/tests-management.page';
 import { CreateTestPage } from '../features/tests/create-test.page';
@@ -22,12 +20,8 @@ import { UsersDashboardPage } from '../features/admin/users-dashboard.page';
 import { UserFormPage } from '../features/admin/user-form.page';
 import { RubricsDashboardPage } from '../features/admin/rubrics-dashboard.page';
 
-import { TestsOverviewPage } from '../features/admin/tests-overview.page';
-
-import { IndicatorsManagementPage } from '../features/tests/indicators-management.page';
-
 const Placeholder = ({ title }: { title: string }) => (
-  <PageContainer title={title} description="Questa pagina è in costruzione.">
+  <PageContainer title={title} description="Questa pagina � in costruzione.">
     <div className="flex items-center justify-center h-64 bg-slate-50 border border-dashed rounded-lg text-slate-500">
       Contenuto in arrivo...
     </div>
@@ -79,7 +73,7 @@ export function App() {
                 <Route path="/users/edit/:id" element={<UserFormPage />} />
                 <Route
                   path="/tests-overview"
-                  element={<TestsOverviewPage />}
+                  element={<TestsManagementPage readOnly={true} />}
                 />
               </Route>
 
@@ -89,7 +83,7 @@ export function App() {
                 <Route path="/tests/new" element={<CreateTestPage />} />
                 <Route
                   path="/indicators-management"
-                  element={<IndicatorsManagementPage />}
+                  element={<Placeholder title="Gestione Oggetto di Osservazione e Indicatori" />}
                 />
               </Route>
 
@@ -104,10 +98,6 @@ export function App() {
                   element={<EvaluatorTestsPage filter="completed" />}
                 />
                 <Route path="/evaluator/tests/:id" element={<TestEvaluationPage />} />
-                <Route
-                  path="/evaluator/tests/:id/execution/:executionId"
-                  element={<UserEvaluationPage />}
-                />
               </Route>
 
               {/* Rotte esclusive per USER */}
@@ -118,7 +108,7 @@ export function App() {
 
                 <Route
                   path="/my-tests/history"
-                  element={<HistoricalScoresPage />}
+                  element={<Placeholder title="Storico punteggi" />}
                 />
               </Route>
             </Route>

@@ -37,7 +37,7 @@ import {
 } from "@/components/ui/dialog";
 import { CreateCompetencyPage } from "../competencies/create-competency.page";
 import { EditCompetencyPage } from "../competencies/edit-competency.page";
-import { Pencil, Plus, Search, BookX, ArrowUpRight } from "lucide-react";
+import { Pencil, Plus, Search, RefreshCw, BookX, ArrowUpRight } from "lucide-react";
 
 type Competency = {
   id: number;
@@ -89,8 +89,8 @@ export function AdminDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [globalFilter, setGlobalFilter] = useState("");
 
-  useEffect(() => {
-    async function loadData() {
+  async function loadData() {
+      setLoading(true);
       try {
         const result = await getCompetencies();
         setData(result);
@@ -100,6 +100,8 @@ export function AdminDashboardPage() {
         setLoading(false);
       }
     }
+
+  useEffect(() => {
     loadData();
   }, []);
 
@@ -160,19 +162,22 @@ export function AdminDashboardPage() {
       description="Gestisci le competenze del sistema."
     >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4">
-        <div className="relative w-full sm:max-w-sm">
+        <div className="flex items-center gap-3 w-full max-w-md">
+        <div className="relative w-full">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Cerca per titolo..."
             value={globalFilter ?? ""}
             onChange={(event) => setGlobalFilter(String(event.target.value))}
-            className="!pl-10"
+            className="!pl-10 bg-white"
           />
         </div>
+        <Button variant="outline" size="icon" onClick={loadData} disabled={loading} className="shrink-0 bg-white" title="Aggiorna tabella">
+          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+        </Button>
+      </div>
         <div className="flex items-center gap-4">
-          <div className="text-sm font-medium text-muted-foreground hidden sm:block">
-            Totale: {data.length}
-          </div>
+          
           <Dialog>
             <DialogTrigger asChild>
               <Button>
@@ -244,6 +249,11 @@ export function AdminDashboardPage() {
             )}
           </TableBody>
         </Table>
+      </div>
+      <div className="flex items-center justify-between py-4 px-1">
+        <div className="text-sm font-medium text-slate-500">
+          {data.length} elementi
+        </div>
       </div>
     </PageContainer>
   );

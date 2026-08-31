@@ -4,6 +4,15 @@ import { fetchTests, deleteTest, ApiTest, ApiCompetency, ApiSubCompetency, ApiUs
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import {
   Table,
   TableBody,
   TableCell,
@@ -13,13 +22,12 @@ import {
 } from '@/components/ui/table';
 import {
   Empty,
-  EmptyContent,
   EmptyDescription,
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
 } from '@/components/ui/empty';
-import { Plus, Loader2, FolderCode, Edit, Trash2, RefreshCw, Search, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, TriangleAlert } from 'lucide-react';
+import { Plus, Loader2, FolderCode, Edit, Trash2, RefreshCw, Search, TriangleAlert, ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,11 +40,13 @@ import {
 } from '@/components/ui/alert-dialog';
 import { CreateTestModal } from './create-test-modal';
 import { ViewTestModal } from './view-test-modal';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
+import { useNavigate } from 'react-router-dom';
 
-const ITEMS_PER_PAGE = 5;
+interface TestsManagementPageProps {
+  readOnly?: boolean;
+}
 
-export function TestsManagementPage() {
+export function TestsManagementPage({ readOnly = false }: TestsManagementPageProps) {
   const [tests, setTests] = useState<ApiTest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
@@ -51,17 +61,15 @@ export function TestsManagementPage() {
   const [deleteTargetTest, setDeleteTargetTest] = useState<ApiTest | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeletingId, setIsDeletingId] = useState<number | null>(null);
+  const [globalFilter, setGlobalFilter] = useState('');
 
-  // Stati tabella
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortColumn, setSortColumn] = useState<keyof ApiTest>('id');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
-  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     loadTests();
-    loadModalData();
-  }, []);
+    if (!readOnly) {
+      loadModalData();
+    }
+  }, [readOnly]);
 
   async function loadTests() {
     setIsLoading(true);
@@ -72,7 +80,6 @@ export function TestsManagementPage() {
         fetchTestEvaluators(),
       ]);
 
-      // Conta gli studenti distinti per test (quanti EvaluatedUser hanno almeno un'esecuzione per quel test)
       const evaluatedUsersCountByTest = new Map<number, number>();
       for (const eu of evaluatedUsersRes) {
         const testIds = new Set((eu.test_executions || []).map((e) => e.test_id));
@@ -81,7 +88,6 @@ export function TestsManagementPage() {
         }
       }
 
-      // Conta i valutatori per test
       const evaluatorsCountByTest = new Map<number, number>();
       for (const te of testEvaluatorsRes) {
         for (const t of te.tests || []) {
@@ -95,9 +101,10 @@ export function TestsManagementPage() {
         evaluators_count: evaluatorsCountByTest.get(test.id) || 0,
       })));
 
-      // Aggiorna anche i dati dei dropdown nella modale
-      setUsers(evaluatedUsersRes.filter((eu) => eu.user).map((eu) => ({ ...eu.user!, id: eu.id })));
-      setEvaluators(testEvaluatorsRes.filter((te) => te.user).map((te) => ({ ...te.user!, id: te.id })));
+      if (!readOnly) {
+        setUsers(evaluatedUsersRes.filter((eu) => eu.user).map((eu) => ({ ...eu.user!, id: eu.id })));
+        setEvaluators(testEvaluatorsRes.filter((te) => te.user).map((te) => ({ ...te.user!, id: te.id })));
+      }
     } catch (err) {
       console.error('Failed to fetch tests', err);
     } finally {
@@ -121,6 +128,7 @@ export function TestsManagementPage() {
   }
 
   const handleDeleteTest = async (id: number) => {
+    if (readOnly) return;
     try {
       setIsDeletingId(id);
       await deleteTest(id);
@@ -139,6 +147,7 @@ export function TestsManagementPage() {
     userIds: number[];
     evaluatorIds: number[];
   }) => {
+    if (readOnly) return;
     setIsSubmitting(true);
     try {
       let designerId = 1;
@@ -164,299 +173,294 @@ export function TestsManagementPage() {
     }
   };
 
-  const handleSort = (column: keyof ApiTest) => {
-    if (sortColumn === column) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortColumn(column);
-      setSortDirection('asc');
-    }
-  };
-
-  const getSortIcon = (column: keyof ApiTest) => {
-    if (sortColumn !== column) return <span className="w-4" />;
-    return sortDirection === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />;
-  };
-
-  const filteredTests = useMemo(() => {
-    return tests.filter(t => 
-      t.assessment_situation?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      String(t.id).includes(searchQuery)
-    );
-  }, [tests, searchQuery]);
-
-  const sortedTests = useMemo(() => {
-    return [...filteredTests].sort((a, b) => {
-      let valA: any = a[sortColumn];
-      let valB: any = b[sortColumn];
-      
-      if (sortColumn === 'subcompetencies') {
-        valA = a.subcompetencies?.length || 0;
-        valB = b.subcompetencies?.length || 0;
-      } else if (sortColumn === 'evaluated_users_count') {
-        valA = a.evaluated_users_count || 0;
-        valB = b.evaluated_users_count || 0;
-      } else if (sortColumn === 'evaluators_count') {
-        valA = a.evaluators_count || 0;
-        valB = b.evaluators_count || 0;
+  const columns = useMemo<ColumnDef<ApiTest>[]>(() => {
+    const baseCols: ColumnDef<ApiTest>[] = [
+      {
+        accessorKey: "assessment_situation",
+        header: "Descrizione test",
+        cell: ({ row }) => (
+          <span 
+            className="block truncate font-medium text-slate-900 cursor-pointer hover:text-primary hover:underline"
+            onClick={() => setViewingTestId(row.original.id)}
+          >
+            {row.original.assessment_situation}
+          </span>
+        )
+      },
+      {
+        accessorKey: "test_designer_id",
+        header: "Test Designer",
+        cell: ({ row }) => (
+          <span className="text-slate-600">
+            {row.original.test_designer?.user?.name || `ID: ${row.original.test_designer_id}`}
+          </span>
+        )
+      },
+      {
+        accessorKey: "evaluated_users_count",
+        header: () => <div className="text-center">Studenti</div>,
+        cell: ({ row }) => (
+          <div className="flex justify-center">
+            <span className="inline-flex items-center justify-center bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full text-xs font-semibold border border-slate-200">
+              {row.original.evaluated_users_count || 0}
+            </span>
+          </div>
+        )
+      },
+      {
+        accessorKey: "evaluators_count",
+        header: () => <div className="text-center">Valutatori</div>,
+        cell: ({ row }) => (
+          <div className="flex justify-center">
+            <span className="inline-flex items-center justify-center bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full text-xs font-semibold border border-slate-200">
+              {row.original.evaluators_count || 0}
+            </span>
+          </div>
+        )
+      },
+      {
+        accessorKey: "subcompetencies",
+        header: "Sottocompetenze",
+        cell: ({ row }) => (
+          <span className="inline-flex items-center justify-center bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-xs font-medium border border-slate-200">
+            {row.original.subcompetencies?.length || 0} prove
+          </span>
+        )
       }
+    ];
 
-      if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
-      if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
-      return 0;
-    });
-  }, [filteredTests, sortColumn, sortDirection]);
+    if (!readOnly) {
+      baseCols.push({
+        id: "actions",
+        header: () => <div className="text-right">Azioni</div>,
+        cell: ({ row }) => (
+          <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-sky-600 cursor-pointer" title="Modifica">
+              <Edit className="h-4 w-4" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-8 w-8 text-slate-500 hover:text-red-600 cursor-pointer" 
+              title="Elimina"
+              onClick={() => setDeleteTargetTest(row.original)}
+              disabled={isDeletingId === row.original.id}
+            >
+              {isDeletingId === row.original.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+            </Button>
+          </div>
+        )
+      });
+    }
 
-  const totalPages = Math.ceil(sortedTests.length / ITEMS_PER_PAGE) || 1;
-  const paginatedTests = useMemo(() => {
-    const start = (currentPage - 1) * ITEMS_PER_PAGE;
-    return sortedTests.slice(start, start + ITEMS_PER_PAGE);
-  }, [sortedTests, currentPage]);
+    return baseCols;
+  }, [readOnly, isDeletingId]);
 
-  useEffect(() => {
-    if (currentPage > totalPages) setCurrentPage(totalPages);
-  }, [totalPages, currentPage]);
+  const table = useReactTable({
+    data: tests,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    state: {
+      globalFilter,
+    },
+    onGlobalFilterChange: setGlobalFilter,
+    initialState: {
+      pagination: {
+        pageSize: 10,
+      }
+    }
+  });
 
   return (
     <PageContainer 
-      title="Gestione Test" 
-      description="Visualizza e gestisci tutti i test configurati nel sistema."
+      title={readOnly ? "Consultazione Test" : "Gestione Test"} 
+      description={readOnly ? "Visualizza tutti i test configurati nel sistema." : "Visualizza e gestisci tutti i test configurati nel sistema."}
     >
-      <div className="h-full flex flex-col gap-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4">
+        <div className="flex items-center gap-3 w-full max-w-md">
+          <div className="relative w-full">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Cerca test per descrizione o ID..."
+              value={globalFilter}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              className="pl-9 h-9 w-full bg-white"
+            />
+          </div>
+          <Button variant="outline" size="icon" onClick={loadTests} disabled={isLoading} className="h-9 w-9 shrink-0 bg-white" title="Aggiorna tabella">
+            <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+          </Button>
+        </div>
         
-        {/* Intestazione Tabella & Controlli */}
-        <div className="flex flex-col gap-3">
-          <h2 className="text-xl font-semibold tracking-tight text-slate-900">Test disponibili</h2>
-          
-          <div className="flex items-center justify-between w-full">
-            <div className="flex items-center gap-3 w-full max-w-md">
-              <div className="relative w-full">
-                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="text"
-                  placeholder="Cerca test per descrizione o ID..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 h-9 w-full bg-transparent"
-                />
-              </div>
-              <Button variant="ghost" size="icon" onClick={loadTests} disabled={isLoading} className="h-9 w-9 shrink-0" title="Aggiorna tabella">
-                <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-              </Button>
-            </div>
-            
-            <Button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 h-9 ml-auto">
+        <div className="flex items-center gap-4">
+          {!readOnly && (
+            <Button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 h-9">
               <Plus className="h-4 w-4" />
               Nuovo
             </Button>
-          </div>
+          )}
         </div>
+      </div>
 
-        {/* Contenuto Tabella o Stato Vuoto */}
-        {isLoading && tests.length === 0 ? (
-          <div className="flex-1 flex justify-center items-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          </div>
-        ) : tests.length === 0 ? (
-          <div className="flex-1 flex justify-center items-center py-12 border border-dashed rounded-lg">
-            <Empty>
-              <EmptyHeader>
-                <EmptyMedia variant="icon">
-                  <FolderCode />
-                </EmptyMedia>
-                <EmptyTitle>Nessun Test Creato</EmptyTitle>
-                <EmptyDescription>
-                  Non hai ancora creato nessun test. Inizia creando il tuo primo test per valutare le competenze.
-                </EmptyDescription>
-              </EmptyHeader>
-              <EmptyContent className="flex-row justify-center gap-2">
-                <Button onClick={() => setIsModalOpen(true)}>Crea Nuovo Test</Button>
-              </EmptyContent>
-            </Empty>
-          </div>
-        ) : (
-          <div className="flex flex-col flex-1 overflow-hidden">
-            <div className="overflow-x-auto border rounded-md">
-              <Table>
-                <TableHeader>
-                  <TableRow className="hover:bg-transparent">
-                    <TableHead className="cursor-pointer select-none" onClick={() => handleSort('assessment_situation')}>
-                      <div className="flex items-center gap-1">Descrizione test {getSortIcon('assessment_situation')}</div>
+      <div className="rounded-md border bg-card text-card-foreground shadow-sm overflow-hidden flex flex-col">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader className="bg-slate-50/50">
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id} className="px-4 whitespace-nowrap">
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                     </TableHead>
-                    <TableHead className="cursor-pointer select-none" onClick={() => handleSort('test_designer_id')}>
-                      <div className="flex items-center gap-1">Test Designer {getSortIcon('test_designer_id')}</div>
-                    </TableHead>
-                    <TableHead className="cursor-pointer select-none text-center" onClick={() => handleSort('evaluated_users_count')}>
-                      <div className="flex items-center justify-center gap-1">Studenti {getSortIcon('evaluated_users_count')}</div>
-                    </TableHead>
-                    <TableHead className="cursor-pointer select-none text-center" onClick={() => handleSort('evaluators_count')}>
-                      <div className="flex items-center justify-center gap-1">Valutatori {getSortIcon('evaluators_count')}</div>
-                    </TableHead>
-                    <TableHead className="cursor-pointer select-none" onClick={() => handleSort('subcompetencies')}>
-                      <div className="flex items-center gap-1">Sottocompetenze {getSortIcon('subcompetencies')}</div>
-                    </TableHead>
-                    <TableHead className="text-right">Azioni</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {paginatedTests.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
-                        Nessun test trovato corrispondente alla ricerca.
+                  ))}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="h-24 text-center">
+                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground mx-auto" />
+                  </TableCell>
+                </TableRow>
+              ) : table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                    className="hover:bg-slate-50/50 group"
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id} className="px-4 py-3 align-middle">
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
                       </TableCell>
-                    </TableRow>
-                  ) : (
-                    paginatedTests.map((test) => (
-                      <TableRow key={test.id} className="group">
-                        <TableCell className="max-w-[420px]">
-                          <HoverCard>
-                            <HoverCardTrigger asChild>
-                              <span
-                                className="block truncate font-medium text-slate-900 cursor-pointer hover:text-primary hover:underline"
-                                onClick={() => setViewingTestId(test.id)}
-                              >
-                                {test.assessment_situation}
-                              </span>
-                            </HoverCardTrigger>
-                            <HoverCardContent className="w-96 bg-white text-sm text-slate-700 shadow-lg border border-slate-200">
-                              <p className="font-semibold text-slate-900 mb-1">Descrizione test</p>
-                              <p className="leading-relaxed">{test.assessment_situation}</p>
-                            </HoverCardContent>
-                          </HoverCard>
-                        </TableCell>
-                        <TableCell className="text-slate-600">
-                          {test.test_designer?.user?.name || `ID: ${test.test_designer_id}`}
-                        </TableCell>
-                        <TableCell className="text-slate-600 text-center">
-                          <span className="inline-flex items-center justify-center bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-xs font-medium">
-                            {test.evaluated_users_count || 0}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-slate-600 text-center">
-                          <span className="inline-flex items-center justify-center bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-xs font-medium">
-                            {test.evaluators_count || 0}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-slate-600">
-                          <span className="inline-flex items-center justify-center bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-xs font-medium">
-                            {test.subcompetencies?.length || 0} prove
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-sky-600 cursor-pointer" title="Modifica">
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
-                              className="h-8 w-8 text-slate-500 hover:text-red-600 cursor-pointer" 
-                              title="Elimina"
-                              onClick={() => setDeleteTargetTest(test)}
-                              disabled={isDeletingId === test.id}
-                            >
-                              {isDeletingId === test.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="h-32 text-center">
+                    <Empty className="pt-4">
+                      <EmptyHeader>
+                        <EmptyMedia variant="icon">
+                          <FolderCode />
+                        </EmptyMedia>
+                        <EmptyTitle>Nessun Test</EmptyTitle>
+                        <EmptyDescription>
+                          {readOnly 
+                            ? "Nessun test presente nel sistema." 
+                            : "Non hai ancora creato nessun test. Inizia creando il tuo primo test per valutare le competenze."}
+                        </EmptyDescription>
+                      </EmptyHeader>
+                    </Empty>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between py-4 px-1">
+        <div className="text-sm font-medium text-slate-500">
+          {tests.length} elementi
+        </div>
+        {table.getPageCount() > 1 && (
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              <ChevronLeft className="h-4 w-4 mr-1" /> Precedente
+            </Button>
+            <div className="text-sm font-medium text-slate-600 px-2">
+              Pagina {table.getState().pagination.pageIndex + 1} di {table.getPageCount()}
             </div>
-            
-            {/* Paginazione Footer */}
-            {sortedTests.length > 0 && (
-              <div className="flex items-center justify-between py-4 text-sm text-slate-500">
-                <div>
-                  Mostrando da {((currentPage - 1) * ITEMS_PER_PAGE) + 1} a {Math.min(currentPage * ITEMS_PER_PAGE, sortedTests.length)} di {sortedTests.length} test
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="h-8 w-8 bg-transparent"
-                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                    disabled={currentPage === 1}
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                  <span className="px-2 font-medium">
-                    {currentPage} / {totalPages}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="h-8 w-8 bg-transparent"
-                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                    disabled={currentPage === totalPages}
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              Successiva <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
           </div>
         )}
       </div>
 
-      <CreateTestModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        competencies={competencies}
-        subCompetencies={subCompetencies}
-        users={users}
-        evaluators={evaluators}
-        isSubmitting={isSubmitting}
-        onConfirm={handleCreateTest}
-      />
+      {/* MODALS */}
+      {!readOnly && (
+        <>
+          <CreateTestModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            competencies={competencies}
+            subCompetencies={subCompetencies}
+            users={users}
+            evaluators={evaluators}
+            isSubmitting={isSubmitting}
+            onConfirm={handleCreateTest}
+          />
+          <AlertDialog
+            open={deleteTargetTest !== null}
+            onOpenChange={(open) => !open && setDeleteTargetTest(null)}
+          >
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+                  <TriangleAlert className="h-5 w-5 text-destructive" />
+                  Conferma Eliminazione
+                </AlertDialogTitle>
+                <AlertDialogDescription className="text-slate-600">
+                  Sei sicuro di voler eliminare il test <span className="font-semibold text-slate-900">"{deleteTargetTest?.assessment_situation}"</span> (ID: #{deleteTargetTest?.id})?
+                  <br className="my-1" />
+                  Questa operazione è irreversibile e cancellerà definitivamente tutti i dati e le assegnazioni associate.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={isDeletingId !== null}>
+                  Annulla
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  variant="destructive"
+                  disabled={isDeletingId !== null}
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    if (deleteTargetTest) {
+                      await handleDeleteTest(deleteTargetTest.id);
+                      setDeleteTargetTest(null);
+                    }
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  {isDeletingId !== null && <Loader2 className="h-4 w-4 animate-spin" />}
+                  Elimina Test
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </>
+      )}
 
       <ViewTestModal
         isOpen={viewingTestId !== null}
         testId={viewingTestId}
         onClose={() => setViewingTestId(null)}
       />
-
-      {/* MODALE CONFERMA ELIMINAZIONE */}
-      <AlertDialog
-        open={deleteTargetTest !== null}
-        onOpenChange={(open) => !open && setDeleteTargetTest(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2 text-destructive">
-              <TriangleAlert className="h-5 w-5 text-destructive" />
-              Conferma Eliminazione
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-slate-600">
-              Sei sicuro di voler eliminare il test <span className="font-semibold text-slate-900">"{deleteTargetTest?.assessment_situation}"</span> (ID: #{deleteTargetTest?.id})?
-              <br className="my-1" />
-              Questa operazione è irreversibile e cancellerà definitivamente tutti i dati e le assegnazioni associate.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeletingId !== null}>
-              Annulla
-            </AlertDialogCancel>
-            <AlertDialogAction
-              variant="destructive"
-              disabled={isDeletingId !== null}
-              onClick={async (e) => {
-                e.preventDefault();
-                if (deleteTargetTest) {
-                  await handleDeleteTest(deleteTargetTest.id);
-                  setDeleteTargetTest(null);
-                }
-              }}
-              className="flex items-center gap-2"
-            >
-              {isDeletingId !== null && <Loader2 className="h-4 w-4 animate-spin" />}
-              Elimina Test
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </PageContainer>
   );
 }

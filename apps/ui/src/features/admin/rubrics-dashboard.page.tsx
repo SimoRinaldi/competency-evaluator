@@ -36,7 +36,7 @@ import {
 } from "@/components/ui/hover-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Pencil, Plus, Search, TableProperties, ArrowUpRight, Trash } from "lucide-react";
+import { Pencil, Plus, Search, RefreshCw, TableProperties, ArrowUpRight, Trash } from "lucide-react";
 import { RubricFormPage } from "./rubric-form.page";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CreateRubricForm } from "../competencies/components/create-rubric-modal";
@@ -185,8 +185,8 @@ export function RubricsDashboardPage() {
     }
   };
 
-  useEffect(() => {
-    async function loadData() {
+  async function loadData() {
+      setLoading(true);
       try {
         const result = await fetchRubrics();
         setData(result);
@@ -196,6 +196,8 @@ export function RubricsDashboardPage() {
         setLoading(false);
       }
     }
+
+  useEffect(() => {
     loadData();
   }, []);
 
@@ -263,19 +265,22 @@ export function RubricsDashboardPage() {
       description="Visualizza, crea e modifica le rubriche per le valutazioni."
     >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4">
-        <div className="relative w-full sm:max-w-sm">
+        <div className="flex items-center gap-3 w-full max-w-md">
+        <div className="relative w-full">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Cerca rubrica..."
             value={globalFilter ?? ""}
             onChange={(event) => setGlobalFilter(String(event.target.value))}
-            className="!pl-10"
+            className="!pl-10 bg-white"
           />
         </div>
+        <Button variant="outline" size="icon" onClick={loadData} disabled={loading} className="shrink-0 bg-white" title="Aggiorna tabella">
+          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+        </Button>
+      </div>
         <div className="flex items-center gap-4">
-          <div className="text-sm font-medium text-muted-foreground hidden sm:block">
-            Totale: {data.length}
-          </div>
+          
           <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
             <PopoverTrigger asChild>
               <Button>
@@ -355,6 +360,11 @@ export function RubricsDashboardPage() {
             )}
           </TableBody>
         </Table>
+      </div>
+      <div className="flex items-center justify-between py-4 px-1">
+        <div className="text-sm font-medium text-slate-500">
+          {data.length} elementi
+        </div>
       </div>
     </PageContainer>
   );
