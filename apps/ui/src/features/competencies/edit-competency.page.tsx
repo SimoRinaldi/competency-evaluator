@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getCompetencyById, updateCompetency } from './competencies.api';
+import { getCompetencyById, updateCompetencyChain } from './competencies.api';
+import { useFeedback } from '../../providers/feedback-provider';
 
 import { Step1Competency } from './components/step1-competency';
 import { SubCompetencyPanel } from './components/sub-competency-panel';
@@ -9,6 +10,7 @@ import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 export function EditCompetencyPage({ competencyId: propId }: { competencyId?: string }) {
   const navigate = useNavigate();
+  const { showSuccess } = useFeedback();
   const { id: paramId } = useParams();
   const id = propId || paramId;
 
@@ -38,7 +40,19 @@ export function EditCompetencyPage({ competencyId: propId }: { competencyId?: st
           threshold: data.threshold?.toString() || '',
         });
         if (data.subcompetencies) {
-          setSubCompetencies(data.subcompetencies);
+          const mappedSubs = data.subcompetencies.map((sub: any) => ({
+            ...sub,
+            obsDescription: sub.observation_object?.description || '',
+            indicators: (sub.observation_object?.indicators || []).map((ind: any) => ({
+              description: ind.description,
+              weight: ind.weight?.toString(),
+              rubricId: `db_${ind.rubric_set_id}`,
+            })),
+            tools: (sub.tools || []).map((t: any) => t.id),
+            methods: (sub.methods || []).map((m: any) => m.id),
+            skills: (sub.skills || []).map((s: any) => s.id),
+          }));
+          setSubCompetencies(mappedSubs);
         }
         // Siccome stiamo modificando, sblocchiamo subito gli step successivi
         setHasPassedStep1(true);
@@ -80,9 +94,6 @@ export function EditCompetencyPage({ competencyId: propId }: { competencyId?: st
     setActiveSubIndex(-1); // torna alla visualizzazione vuota
 
     // --- GARBAGE COLLECTION ---
-    // Eliminiamo dalla memoria globale i tools/methods/skills temporanei
-    // che l'utente aveva creato col bottone "+ Crea" ma che alla fine 
-    // NON sono stati associati a NESSUNA sottocompetenza salvata.
     const referencedTools = new Set<string>();
     const referencedMethods = new Set<string>();
     const referencedSkills = new Set<string>();
@@ -112,16 +123,74 @@ export function EditCompetencyPage({ competencyId: propId }: { competencyId?: st
   const handleFinalSave = async () => {
     setIsSubmitting(true);
     setSubmitError('');
+
     try {
       if (id) {
-        await updateCompetency(
-          id,
-          competencyData.title,
-          parseInt(competencyData.weight),
-          parseInt(competencyData.threshold)
-          // Se l'API richiede anche le subCompetencies ecc., andranno aggiunte qui.
-        );
-        navigate('/admin/competencies'); // Modifica con la rotta desiderata per l'admin
+        const payload = {
+          title: competencyData.title,
+          weight: parseInt(competencyData.weight),
+          threshold: parseInt(competencyData.threshold),
+          subcompetencies: subCompetencies.map(sub => {
+            const tool_ids = sub.tools.filter((t: any) => typeof t === 'number' || (typeof t === 'string' && t.startsWith('db_'))).map((t: any) => typeof t === 'string' ? parseInt(t.replace('db_', '')) : t);
+            const tools = sub.tools.filter((t: any) => typeof t === 'string' && t.startsWith('temp_')).map((t: any) => ({ name: newTools.find(nt => nt.tempId === t)?.name }));
+
+            const method_ids = sub.methods.filter((m: any) => typeof m === 'number' || (typeof m === 'string' && m.startsWith('db_'))).map((m: any) => typeof m === 'string' ? parseInt(m.replace('db_', '')) : m);
+            const methods = sub.methods.filter((m: any) => typeof m === 'string' && m.startsWith('temp_')).map((m: any) => ({ name: newMethods.find(nm => nm.tempId === m)?.name }));
+
+            const skill_ids = sub.skills.filter((s: any) => typeof s === 'number' || (typeof s === 'string' && s.startsWith('db_'))).map((s: any) => typeof s === 'string' ? parseInt(s.replace('db_', '')) : s);
+            const skills = sub.skills.filter((s: any) => typeof s === 'string' && s.startsWith('temp_')).map((s: any) => ({ name: newSkills.find(ns => ns.tempId === s)?.name }));
+
+            return {
+              title: sub.title,
+              weight: parseInt(sub.weight),
+              threshold: parseInt(sub.threshold),
+              input: sub.input || undefined,
+              action: sub.action || undefined,
+              output: sub.output || undefined,
+              tool_ids,
+              tools: tools.filter((t: any) => t.name),
+              method_ids,
+              methods: methods.filter((m: any) => m.name),
+              skill_ids,
+              skills: skills.filter((s: any) => s.name),
+              observationObject: {
+                description: sub.obsDescription,
+                indicators: sub.indicators.map((ind: any) => {
+                  const isTempRubric = typeof ind.rubricId === 'string' && ind.rubricId.startsWith('temp_');
+                  const isDbRubric = typeof ind.rubricId === 'string' && ind.rubricId.startsWith('db_');
+                  let rubric_set_id = undefined;
+                  let rubricSet = undefined;
+
+                  if (isDbRubric) {
+                    rubric_set_id = parseInt(ind.rubricId.replace('db_', ''));
+                  } else if (typeof ind.rubricId === 'number') {
+                    rubric_set_id = ind.rubricId;
+                  } else if (isTempRubric) {
+                    const idx = parseInt(ind.rubricId.replace('temp_', ''));
+                    const rData = newRubrics[idx];
+                    rubricSet = {
+                      yes_no: rData.yesNo,
+                      levels: rData.levels.map((l: any) => ({
+                        description: l.description,
+                        rank: l.rank
+                      }))
+                    };
+                  }
+
+                  return {
+                    description: ind.description,
+                    weight: parseInt(ind.weight),
+                    ...(rubric_set_id ? { rubric_set_id } : { rubricSet })
+                  };
+                })
+              }
+            };
+          })
+        };
+
+        await updateCompetencyChain(id, payload);
+        showSuccess('Competenza modificata con successo!');
+        navigate('/competencies'); 
       }
     } catch (error: any) {
       setSubmitError(error.message || "Errore durante il salvataggio");

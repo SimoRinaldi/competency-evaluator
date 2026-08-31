@@ -114,3 +114,33 @@ export async function getCompetencies() {
   if (!response.ok) throw new Error('Errore nel caricamento delle competenze');
   return response.json();
 }
+
+export async function createCompetencyChain(payload: any) {
+  const response = await fetch(`${API_URL}/competencies_management/chain`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.message || 'Errore durante la creazione della competenza');
+  }
+
+  return response.json();
+}
+
+export async function updateCompetencyChain(id: string | number, payload: any) {
+  const response = await fetch(`${API_URL}/competencies_management/chain/${id}`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.message || 'Errore durante l\'aggiornamento della competenza');
+  }
+
+  return response.json();
+}
