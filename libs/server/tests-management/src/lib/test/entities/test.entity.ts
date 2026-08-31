@@ -26,7 +26,7 @@ export class TestEntity {
   @JoinColumn({ name: 'test_designer_id' })
   test_designer?: Relation<TestDesignerEntity>;
 
-  @ManyToMany(() => SubCompetencyEntity)
+  @ManyToMany(() => SubCompetencyEntity, { cascade: true })
   @JoinTable({
     name: 'test_subcompetency',
     joinColumn: {

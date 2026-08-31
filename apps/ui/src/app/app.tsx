@@ -14,6 +14,7 @@ import { TestEvaluationPage } from '../features/evaluator/test-evaluation.page';
 import { HistoricalScoresPage } from '../features/evaluated-user/historical-scores.page';
 import { TestsManagementPage } from '../features/tests/tests-management.page';
 import { CreateTestPage } from '../features/tests/create-test.page';
+import { IndicatorsManagementPage } from '../features/tests/indicators-management.page';
 import { EditCompetencyPage } from '../features/competencies/edit-competency.page';
 import { AdminDashboardPage } from '../features/admin/dashboard.page';
 import { UsersDashboardPage } from '../features/admin/users-dashboard.page';
@@ -102,7 +103,7 @@ export function App() {
                 <Route path="/tests/new" element={<CreateTestPage />} />
                 <Route
                   path="/indicators-management"
-                  element={<Placeholder title="Gestione Oggetto di Osservazione e Indicatori" />}
+                  element={<IndicatorsManagementPage />}
                 />
               </Route>
 

@@ -150,6 +150,20 @@ export async function createTest(payload: CreateTestPayload) {
   return await response.json();
 }
 
+export async function updateTest(id: number, payload: CreateTestPayload) {
+  const response = await fetch(`${API_URL}/tests/${id}`, {
+    method: 'PATCH',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.json().catch(() => ({ message: 'Errore API sconosciuto' }));
+    throw new Error(errorBody.message || `Errore API PATCH /tests: ${response.statusText}`);
+  }
+  return await response.json();
+}
+
 export async function deleteTest(id: number): Promise<void> {
   const response = await fetch(`${API_URL}/tests/${id}`, {
     method: 'DELETE',

@@ -147,3 +147,25 @@ export async function updateCompetencyChain(id: string | number, payload: any) {
 
   return response.json();
 }
+
+export async function getSubCompetencyById(id: string | number) {
+  const response = await fetch(`${API_URL}/subcompetencies/${id}`, {
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) throw new Error('Sottocompetenza non trovata');
+  return response.json();
+}
+
+export async function updateSubCompetency(id: string | number, payload: any, obsId?: number | null) {
+  const response = await fetch(`${API_URL}/subcompetencies/${id}`, {
+    method: 'PATCH',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.message || 'Errore durante l\'aggiornamento della sottocompetenza');
+  }
+  return response.json();
+}
+

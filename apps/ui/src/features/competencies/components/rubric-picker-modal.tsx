@@ -48,6 +48,7 @@ export function RubricPickerModal({
   newRubrics,
   onSelect,
   onCreateNew,
+  allowCreate = true,
 }: any) {
   const [globalFilter, setGlobalFilter] = useState("");
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
@@ -218,24 +219,26 @@ export function RubricPickerModal({
                   Totale: {allRubrics.length}
                 </div>
                 
-                <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-                  <PopoverTrigger asChild>
-                    <Button>
-                      <Plus className="mr-2 h-4 w-4" /> Nuovo
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[600px] p-8 max-h-[85vh] overflow-y-auto" align="end">
-                    <h3 className="font-semibold text-lg mb-4">Nuova Rubrica</h3>
-                    <CreateRubricForm 
-                      onSave={handleSaveNewRubric} 
-                      onCancel={() => setIsPopoverOpen(false)} 
-                      isBinary={draftIsBinary}
-                      setIsBinary={setDraftIsBinary}
-                      levels={draftLevels}
-                      setLevels={setDraftLevels}
-                    />
-                  </PopoverContent>
-                </Popover>
+                {allowCreate && (
+                  <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+                    <PopoverTrigger asChild>
+                      <Button>
+                        <Plus className="mr-2 h-4 w-4" /> Nuovo
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[600px] p-8 max-h-[85vh] overflow-y-auto" align="end">
+                      <h3 className="font-semibold text-lg mb-4">Nuova Rubrica</h3>
+                      <CreateRubricForm 
+                        onSave={handleSaveNewRubric} 
+                        onCancel={() => setIsPopoverOpen(false)} 
+                        isBinary={draftIsBinary}
+                        setIsBinary={setDraftIsBinary}
+                        levels={draftLevels}
+                        setLevels={setDraftLevels}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                )}
 
               </div>
             </div>
