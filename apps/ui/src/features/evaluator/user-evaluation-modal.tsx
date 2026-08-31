@@ -126,47 +126,21 @@ export function UserEvaluationModal({
     setError(null);
 
     try {
-      // 1. Invia tutte le valutazioni
-      const promises = Object.entries(evaluations).map(async ([indicatorId, rank]) => {
-        try {
-          await submitEvaluation({
-            rubric_rank: rank,
-            indicator_id: Number(indicatorId),
-            test_execution_id: Number(executionId),
-            evaluator_id: evaluatorId
-          });
-        } catch (e: any) {
-          // Ignora se è già stato assegnato in un tentativo precedente
-          if (e.message && e.message.includes("già assegnato")) {
-            console.log(`Valutazione per indicatore ${indicatorId} già salvata.`);
-          } else {
-            throw e;
-          }
-        }
-      });
-      await Promise.all(promises);
+      const evaluationsArray = Object.entries(evaluations).map(([indicatorId, rank]) => ({
+        indicator_id: Number(indicatorId),
+        rubric_rank: rank,
+      }));
 
-      // 2. Calcola il punteggio totale e max
-      let totalScore = 0;
-      let maxScore = 0;
+      await submitEvaluation({
+        test_execution_id: Number(executionId),
+        evaluator_id: evaluatorId,
+        evaluations: evaluationsArray,
+      });
+
+      // Il ricalcolo dei punteggi (test_score e max_score) avviene automaticamente sul backend
+      // quando TUTTI i valutatori assegnati al test hanno inviato le loro valutazioni.
+      // Non è necessario inviare un aggiornamento manuale da qui.
       
-      test.subcompetencies?.forEach(sc => {
-        const scWeight = Number(sc.weight) || 1;
-        sc.observation_object?.indicators?.forEach(ind => {
-          const indWeight = Number(ind.weight) || 1;
-          const maxRank = 5;
-          const rank = evaluations[ind.id] || 0;
-          totalScore += rank * indWeight * scWeight;
-          maxScore += maxRank * indWeight * scWeight;
-        });
-      });
-
-      // 3. Aggiorna la Test Execution con il punteggio per segnarla come "Valutato"
-      await updateTestExecution(executionId, {
-        test_score: totalScore.toFixed(2),
-        max_score: maxScore.toFixed(2)
-      });
-
       onSubmitted?.();
       onClose();
     } catch (err: any) {
