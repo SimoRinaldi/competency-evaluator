@@ -11,9 +11,7 @@ import { PageContainer } from '../components/page-container';
 import { UserTestsPage } from '../features/evaluated-user/user-tests.page';
 import { EvaluatorTestsPage } from '../features/evaluator/evaluator-tests.page';
 import { TestEvaluationPage } from '../features/evaluator/test-evaluation.page';
-import { UserEvaluationPage } from '../features/evaluator/user-evaluation.page';
 import { HistoricalScoresPage } from '../features/evaluated-user/historical-scores.page';
-
 import { TestsManagementPage } from '../features/tests/tests-management.page';
 import { CreateTestPage } from '../features/tests/create-test.page';
 import { EditCompetencyPage } from '../features/competencies/edit-competency.page';
@@ -21,6 +19,7 @@ import { AdminDashboardPage } from '../features/admin/dashboard.page';
 import { UsersDashboardPage } from '../features/admin/users-dashboard.page';
 import { UserFormPage } from '../features/admin/user-form.page';
 import { RubricsDashboardPage } from '../features/admin/rubrics-dashboard.page';
+import { useAuth } from '../features/auth/auth-context';
 
 const Placeholder = ({ title }: { title: string }) => (
   <PageContainer title={title} description="Questa pagina � in costruzione.">
@@ -29,6 +28,25 @@ const Placeholder = ({ title }: { title: string }) => (
     </div>
   </PageContainer>
 );
+
+const RoleRedirect = () => {
+  const { user } = useAuth();
+
+  if (!user) return <Placeholder title="Caricamento..." />;
+
+  switch (user.role) {
+    case 'ADMIN':
+      return <Navigate to="/competencies" replace />;
+    case 'TEST_DESIGNER':
+      return <Navigate to="/tests-management" replace />;
+    case 'EVALUATOR':
+      return <Navigate to="/evaluations/pending" replace />;
+    case 'USER':
+      return <Navigate to="/my-tests/todo" replace />;
+    default:
+      return <Navigate to="/login" replace />;
+  }
+};
 
 export function App() {
   return (
@@ -44,7 +62,7 @@ export function App() {
           {/* Rotte protette (richiedono autenticazione / token salvato) */}
           <Route element={<ProtectedRoute />}>
             <Route element={<AppLayout />}>
-              {/* Rotta accessibile a tutti gli utenti loggati */}
+              {/* Rotta accessibile a tutti gli utenti loggati
               <Route
                 path="/"
                 element={
@@ -63,6 +81,8 @@ export function App() {
                   </PageContainer>
                 }
               />
+              */}
+              <Route path="/" element={<RoleRedirect />} />
 
               {/* Rotte esclusive per ADMIN */}
               <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
@@ -73,10 +93,7 @@ export function App() {
                 <Route path="/users" element={<UsersDashboardPage />} />
                 <Route path="/users/new" element={<UserFormPage />} />
                 <Route path="/users/edit/:id" element={<UserFormPage />} />
-                <Route
-                  path="/tests-overview"
-                  element={<TestsManagementPage readOnly={true} />}
-                />
+                <Route path="/tests-overview" element={<TestsManagementPage readOnly={true} />} />
               </Route>
 
               {/* Rotte esclusive per TEST_DESIGNER */}
@@ -105,13 +122,8 @@ export function App() {
               {/* Rotte esclusive per USER */}
               <Route element={<ProtectedRoute allowedRoles={['USER']} />}>
                 <Route path="/my-tests/todo" element={<UserTestsPage filter="todo" />} />
-
                 <Route path="/my-tests/completed" element={<UserTestsPage filter="completed" />} />
-
-                <Route
-                  path="/my-tests/history"
-                  element={<HistoricalScoresPage />}
-                />
+                <Route path="/my-tests/history" element={<HistoricalScoresPage />} />
               </Route>
             </Route>
 
