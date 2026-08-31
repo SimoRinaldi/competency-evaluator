@@ -65,7 +65,7 @@ export class CompetenciesManagementController {
 
   @Put('chain/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
   @ApiBearerAuth()
   @ApiBody({ type: CreateCompetencyChainDto }) // Reuse Create DTO per semplificare la chain intera
   @ApiOperation({
