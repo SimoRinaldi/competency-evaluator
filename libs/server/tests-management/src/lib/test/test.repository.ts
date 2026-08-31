@@ -33,6 +33,10 @@ export class TestRepository {
         'test_designer.user',
         'subcompetencies',
         'subcompetencies.competency',
+        'subcompetencies.observation_object',
+        'subcompetencies.observation_object.indicators',
+        'subcompetencies.observation_object.indicators.rubric_set',
+        'subcompetencies.observation_object.indicators.rubric_set.levels',
       ],
     });
   }
@@ -45,6 +49,10 @@ export class TestRepository {
         'test_designer.user',
         'subcompetencies',
         'subcompetencies.competency',
+        'subcompetencies.observation_object',
+        'subcompetencies.observation_object.indicators',
+        'subcompetencies.observation_object.indicators.rubric_set',
+        'subcompetencies.observation_object.indicators.rubric_set.levels',
       ],
     });
   }
@@ -58,6 +66,10 @@ export class TestRepository {
         'test_designer.user',
         'subcompetencies',
         'subcompetencies.competency',
+        'subcompetencies.observation_object',
+        'subcompetencies.observation_object.indicators',
+        'subcompetencies.observation_object.indicators.rubric_set',
+        'subcompetencies.observation_object.indicators.rubric_set.levels',
       ],
     });
   }

@@ -3,6 +3,7 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
+  OneToOne,
   JoinColumn,
   JoinTable,
   ManyToMany,
@@ -12,6 +13,7 @@ import { CompetencyEntity } from '../../competency/entities/competency.entity';
 import { ToolEntity } from '../../tool/entities/tool.entity';
 import { MethodEntity } from '../../method/entities/method.entity';
 import { SkillEntity } from '../../skill/entities/skill.entity';
+import { ObservationObjectEntity } from '../../observation-object/entities/observation-object.entity';
 
 @Entity('subcompetency')
 export class SubCompetencyEntity {
@@ -61,6 +63,9 @@ export class SubCompetencyEntity {
   )
   @JoinColumn({ name: 'competency_id' })
   competency?: Relation<CompetencyEntity>;
+
+  @OneToOne(() => ObservationObjectEntity, (obs) => obs.subcompetency)
+  observation_object?: Relation<ObservationObjectEntity>;
 
   // Molti a molti con tool
   @ManyToMany(() => ToolEntity)

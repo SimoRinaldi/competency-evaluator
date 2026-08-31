@@ -64,8 +64,10 @@ export function EvaluatorTestsPage({ filter }: { filter: 'pending' | 'completed'
         evaluatorTests.map(async (test: Test) => {
           try {
             const execs = await getTestExecutions(test.id);
-            const totalCount = execs.length;
-            const completedCount = execs.filter((e: TestExecution) => e.test_score !== null && e.test_score !== undefined).length;
+            // Consideriamo solo le esecuzioni con materiale consegnato
+            const deliveredExecs = execs.filter((e: TestExecution) => e.test_outputs && e.test_outputs.length > 0);
+            const totalCount = deliveredExecs.length;
+            const completedCount = deliveredExecs.filter((e: TestExecution) => e.test_score !== null && e.test_score !== undefined).length;
             const pendingCount = totalCount - completedCount;
             return { ...test, totalCount, completedCount, pendingCount };
           } catch (e) {
@@ -76,8 +78,8 @@ export function EvaluatorTestsPage({ filter }: { filter: 'pending' | 'completed'
       
       const filtered = testsWithStats.filter((t) => {
         if (filter === 'pending') {
-          // Mostriamo nei pending i test che hanno esecuzioni da valutare, o che non ne hanno ancora nessuna (in attesa)
-          return t.pendingCount > 0 || t.totalCount === 0;
+          // Mostriamo nei pending SOLO i test che hanno esecuzioni da valutare
+          return t.pendingCount > 0;
         } else {
           // Mostriamo nei completati solo i test che hanno ALMENO un'esecuzione, e TUTTE le esecuzioni sono valutate
           return t.totalCount > 0 && t.pendingCount === 0;
@@ -184,7 +186,7 @@ export function EvaluatorTestsPage({ filter }: { filter: 'pending' | 'completed'
                   <div className="flex items-center gap-1">Descrizione test {getSortIcon('assessment_situation')}</div>
                 </TableHead>
                 <TableHead className="w-48 cursor-pointer select-none font-semibold text-slate-700" onClick={() => handleSort('pendingCount')}>
-                  <div className="flex items-center gap-1">Stato Esecuzioni {getSortIcon('pendingCount')}</div>
+                  <div className="flex items-center gap-1">Stato {getSortIcon('pendingCount')}</div>
                 </TableHead>
                 <TableHead className="w-24 text-right font-semibold text-slate-700 whitespace-nowrap">Azioni</TableHead>
               </TableRow>
@@ -244,14 +246,14 @@ export function EvaluatorTestsPage({ filter }: { filter: 'pending' | 'completed'
                         </span>
                       ) : (
                         <span className="inline-flex items-center text-xs font-semibold text-green-600 bg-green-100 px-2.5 py-1 rounded-full">
-                          Tutte valutate ({test.completedCount})
+                          Tutti valutati ({test.completedCount})
                         </span>
                       )}
                     </TableCell>
                     <TableCell className="text-right">
                       {test.pendingCount > 0 ? (
                         <Button size="sm" className="h-7 px-2.5 text-xs gap-1.5" onClick={() => navigate(`/evaluator/tests/${test.id}`)}>
-                          <Eye className="h-3.5 w-3.5" /> Valuta
+                          <Eye className="h-3.5 w-3.5" /> Seleziona
                         </Button>
                       ) : (
                         <Button size="sm" variant="secondary" className="h-7 px-2.5 text-xs gap-1.5" onClick={() => navigate(`/evaluator/tests/${test.id}`)}>
