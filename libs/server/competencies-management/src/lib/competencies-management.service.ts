@@ -96,6 +96,11 @@ export class CompetenciesManagementService {
         );
       }
 
+      // Calcola la soglia della competenza come somma delle soglie delle sotto-competenze
+      const compThreshold = dto.subcompetencies.reduce((sum, sub) => sum + sub.threshold, 0);
+      saved_competency.threshold = compThreshold;
+      await manager.save(saved_competency);
+
       await queryRunner.commitTransaction();
       return saved_competency;
     } catch (error) {
@@ -104,14 +109,19 @@ export class CompetenciesManagementService {
         throw error;
       }
       throw new InternalServerErrorException(
-        `Errore durante il salvataggio della catena di competenze: ${(error as Error).message || 'Operazione annullata.'}`,
+        `Errore durante il salvataggio della catena di competenze: ${
+          (error as Error).message || 'Operazione annullata.'
+        }`,
       );
     } finally {
       await queryRunner.release();
     }
   }
 
-  async handleUpdateCompetencyChain(id: number, dto: CreateCompetencyChainDto): Promise<CompetencyEntity> {
+  async handleUpdateCompetencyChain(
+    id: number,
+    dto: CreateCompetencyChainDto,
+  ): Promise<CompetencyEntity> {
     // Implementazione base: Elimina e ricrea per semplicità, oppure implementa logica fine
     // NOTA: in un ambiente produttivo l'eliminazione potrebbe violare foreign keys (es. test esistenti).
     const queryRunner = this.dataSource.createQueryRunner();
@@ -120,21 +130,23 @@ export class CompetenciesManagementService {
 
     try {
       const manager = queryRunner.manager;
-      const existingCompetency = await manager.findOne(CompetencyEntity, { where: { id }, relations: ['subcompetencies'] });
-      
+      const existingCompetency = await manager.findOne(CompetencyEntity, {
+        where: { id },
+        relations: ['subcompetencies'],
+      });
+
       if (!existingCompetency) {
         throw new NotFoundException(`Competenza con id ${id} non trovata`);
       }
 
       // Elimina le subcompetencies esistenti per ricrearle
-      if (existingCompetency.subcompetencies?.length > 0) {
+      if ((existingCompetency.subcompetencies?.length ?? 0) > 0) {
         await manager.remove(existingCompetency.subcompetencies);
       }
 
       // Aggiorna dati base della competenza
       existingCompetency.title = dto.title;
       existingCompetency.weight = dto.weight;
-      existingCompetency.threshold = dto.threshold;
       const saved_competency = await manager.save(existingCompetency);
 
       const toolsCache = new Map<string, ToolEntity>();
@@ -171,6 +183,11 @@ export class CompetenciesManagementService {
         );
       }
 
+      // Ricalcola threshold come somma dei threshold delle subcompetency
+      const totalThreshold = dto.subcompetencies.reduce((sum, sub) => sum + sub.threshold, 0);
+      existingCompetency.threshold = totalThreshold;
+      await manager.save(existingCompetency);
+
       await queryRunner.commitTransaction();
       return saved_competency;
     } catch (error) {
@@ -179,7 +196,9 @@ export class CompetenciesManagementService {
         throw error;
       }
       throw new InternalServerErrorException(
-        `Errore durante l'aggiornamento della catena di competenze: ${(error as Error).message || 'Operazione annullata.'}`,
+        `Errore durante l'aggiornamento della catena di competenze: ${
+          (error as Error).message || 'Operazione annullata.'
+        }`,
       );
     } finally {
       await queryRunner.release();
@@ -201,7 +220,7 @@ export class CompetenciesManagementService {
     const competency = manager.create(CompetencyEntity, {
       title: dto.title,
       weight: dto.weight,
-      threshold: dto.threshold,
+      threshold: 0,
     });
 
     return await manager.save(competency);
@@ -384,10 +403,7 @@ export class CompetenciesManagementService {
     saved_observation_object: ObservationObjectEntity,
     rubricSetsCache: RubricSetEntity[],
   ): Promise<IndicatorEntity[]> {
-    if (
-      !observation_object_dto.indicators ||
-      observation_object_dto.indicators.length === 0
-    ) {
+    if (!observation_object_dto.indicators || observation_object_dto.indicators.length === 0) {
       throw new BadRequestException(
         "L'oggetto di osservazione deve contenere almeno un indicatore",
       );
@@ -470,7 +486,9 @@ export class CompetenciesManagementService {
 
       return savedRubricSet;
     } else {
-      throw new BadRequestException("È necessario fornire 'rubric_set_id' oppure 'rubricSet' per ciascun indicatore");
+      throw new BadRequestException(
+        "È necessario fornire 'rubric_set_id' oppure 'rubricSet' per ciascun indicatore",
+      );
     }
   }
 

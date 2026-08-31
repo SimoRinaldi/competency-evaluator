@@ -1,11 +1,4 @@
-import {
-  IsNotEmpty,
-  IsInt,
-  IsPositive,
-  IsString,
-  Max,
-  Min,
-} from 'class-validator';
+import { IsNotEmpty, IsOptional, IsInt, IsPositive, IsString, Max, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateCompetencyDto {
@@ -36,6 +29,6 @@ export class CreateCompetencyDto {
   })
   @IsInt()
   @IsPositive()
-  @IsNotEmpty()
-  threshold!: number;
+  @IsOptional()
+  threshold?: number;
 }

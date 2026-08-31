@@ -2,15 +2,11 @@ import { getAuthHeaders } from '../auth/auth.api';
 
 const API_URL = 'http://localhost:3333/api';
 
-export async function createCompetency(
-  title: string,
-  weight: number,
-  threshold: number
-) {
+export async function createCompetency(title: string, weight: number) {
   const response = await fetch(`${API_URL}/competencies`, {
     method: 'POST',
     headers: getAuthHeaders(), // gli header con il token
-    body: JSON.stringify({ title, weight, threshold }),
+    body: JSON.stringify({ title, weight }),
   });
 
   if (!response.ok) throw new Error('Dati non validi');
@@ -18,7 +14,10 @@ export async function createCompetency(
   return response.json();
 }
 
-export async function createRubric(yes_no: boolean, levels: { description: string; rank: number }[]) {
+export async function createRubric(
+  yes_no: boolean,
+  levels: { description: string; rank: number }[],
+) {
   const response = await fetch(`${API_URL}/rubrics`, {
     method: 'POST',
     headers: getAuthHeaders(),
@@ -28,7 +27,11 @@ export async function createRubric(yes_no: boolean, levels: { description: strin
   return response.json();
 }
 
-export async function updateRubric(id: string | number, yes_no: boolean, levels: { id?: number; description: string; rank: number }[]) {
+export async function updateRubric(
+  id: string | number,
+  yes_no: boolean,
+  levels: { id?: number; description: string; rank: number }[],
+) {
   const response = await fetch(`${API_URL}/rubrics/${id}`, {
     method: 'PATCH',
     headers: getAuthHeaders(),
@@ -47,7 +50,7 @@ export async function deleteRubric(id: string | number) {
     method: 'DELETE',
     headers: getAuthHeaders(),
   });
-  if (!response.ok) throw new Error('Errore durante l\'eliminazione della rubrica');
+  if (!response.ok) throw new Error("Errore durante l'eliminazione della rubrica");
   return response.json();
 }
 
@@ -97,14 +100,14 @@ export async function updateCompetency(
   id: string | number,
   title: string,
   weight: number,
-  threshold: number
+  threshold: number,
 ) {
   const response = await fetch(`${API_URL}/competencies/${id}`, {
     method: 'PATCH',
     headers: getAuthHeaders(),
     body: JSON.stringify({ title, weight, threshold }),
   });
-  if (!response.ok) throw new Error('Errore durante l\'aggiornamento della competenza');
+  if (!response.ok) throw new Error("Errore durante l'aggiornamento della competenza");
   return response.json();
 }
 export async function getCompetencies() {
@@ -139,7 +142,7 @@ export async function updateCompetencyChain(id: string | number, payload: any) {
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => null);
-    throw new Error(errorData?.message || 'Errore durante l\'aggiornamento della competenza');
+    throw new Error(errorData?.message || "Errore durante l'aggiornamento della competenza");
   }
 
   return response.json();
