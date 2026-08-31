@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { PageContainer } from '@/components/page-container';
-import { fetchTests, deleteTest, ApiTest, ApiCompetency, ApiSubCompetency, ApiUser, fetchCompetencies, fetchSubCompetencies, fetchTestDesigners, createTest, fetchEvaluatedUsers, fetchTestEvaluators } from './tests.api';
+import { fetchTests, deleteTest, ApiTest, ApiCompetency, ApiSubCompetency, ApiUser, fetchCompetencies, fetchSubCompetencies, fetchTestDesigners, createTest, updateTest, fetchTestDetails, fetchEvaluatedUsers, fetchTestEvaluators } from './tests.api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -41,6 +41,7 @@ import {
 import { CreateTestModal } from './create-test-modal';
 import { ViewTestModal } from './view-test-modal';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 interface TestsManagementPageProps {
   readOnly?: boolean;
@@ -62,6 +63,7 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeletingId, setIsDeletingId] = useState<number | null>(null);
   const [globalFilter, setGlobalFilter] = useState('');
+  const [editingTestData, setEditingTestData] = useState<any>(null);
 
 
   useEffect(() => {
@@ -114,39 +116,65 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
 
   async function loadModalData() {
     try {
-      const [compRes, subRes] = await Promise.all([
+      const [compRes, subCompRes, evalRes, usersRes] = await Promise.all([
         fetchCompetencies(),
         fetchSubCompetencies(),
+        fetchTestEvaluators(),
+        fetchEvaluatedUsers(),
       ]);
       setCompetencies(compRes);
-      setSubCompetencies(subRes);
-    } catch (err) {
-      console.error('Failed to fetch modal data', err);
-      setCompetencies([]);
-      setSubCompetencies([]);
+      setSubCompetencies(subCompRes);
+      
+      const uniqueEvaluators = Array.from(new Map(evalRes.map(item => [item.user_id, item.user])).values()).filter(Boolean) as ApiUser[];
+      setEvaluators(uniqueEvaluators);
+      
+      const uniqueUsers = Array.from(new Map(usersRes.map(item => [item.user_id, item.user])).values()).filter(Boolean) as ApiUser[];
+      setUsers(uniqueUsers);
+      
+    } catch (error) {
+      console.error('Errore nel caricamento dei dati per la modale:', error);
     }
   }
 
-  const handleDeleteTest = async (id: number) => {
-    if (readOnly) return;
+  const handleDeleteTest = async () => {
+    if (!deleteTargetTest) return;
+    setIsDeletingId(deleteTargetTest.id);
     try {
-      setIsDeletingId(id);
-      await deleteTest(id);
+      await deleteTest(deleteTargetTest.id);
       await loadTests();
-    } catch (err) {
-      console.error('Failed to delete test', err);
+    } catch (error) {
+      console.error('Errore durante l\'eliminazione del test:', error);
     } finally {
       setIsDeletingId(null);
+      setDeleteTargetTest(null);
     }
   };
 
-  const handleCreateTest = async (testData: {
-    assessmentSituation: string;
-    competencyId: number;
-    subcompetencyIds: number[];
-    userIds: number[];
-    evaluatorIds: number[];
-  }) => {
+  const handleEditClick = async (testId: number) => {
+    try {
+      const details = await fetchTestDetails(testId);
+      
+      let competencyId = null;
+      if (details.subcompetencies.length > 0) {
+        const firstSub = details.subcompetencies[0] as any;
+        competencyId = firstSub.competency_id || firstSub.competency?.id;
+      }
+      
+      setEditingTestData({
+        id: testId,
+        assessmentSituation: details.test.assessment_situation,
+        competencyId,
+        subcompetencyIds: details.subcompetencies.map(s => s.id),
+        userIds: details.students.map(s => s.id),
+        evaluatorIds: details.evaluators.map(e => e.id)
+      });
+      setIsModalOpen(true);
+    } catch (err) {
+      toast.error('Errore nel caricamento del test');
+    }
+  };
+
+  const handleSaveTest = async (testData: any) => {
     if (readOnly) return;
     setIsSubmitting(true);
     try {
@@ -156,18 +184,28 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
         designerId = designers[0].id;
       }
 
-      await createTest({
+      const payload = {
         assessment_situation: testData.assessmentSituation,
         test_designer_id: designerId,
         subcompetency_ids: testData.subcompetencyIds,
         evaluated_user_ids: testData.userIds,
         evaluator_ids: testData.evaluatorIds,
-      });
+      };
+
+      if (editingTestData) {
+        await updateTest(editingTestData.id, payload);
+        toast.success('Test aggiornato con successo');
+      } else {
+        await createTest(payload);
+        toast.success('Test creato con successo');
+      }
 
       await loadTests();
       setIsModalOpen(false);
+      setEditingTestData(null);
     } catch (error) {
-      console.error('Errore durante la creazione del test:', error);
+      console.error('Errore durante il salvataggio del test:', error);
+      toast.error('Errore durante il salvataggio');
     } finally {
       setIsSubmitting(false);
     }
@@ -235,7 +273,13 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
         header: () => <div className="text-right">Azioni</div>,
         cell: ({ row }) => (
           <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-sky-600 cursor-pointer" title="Modifica">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-8 w-8 text-slate-500 hover:text-sky-600 cursor-pointer" 
+              title="Modifica"
+              onClick={() => handleEditClick(row.original.id)}
+            >
               <Edit className="h-4 w-4" />
             </Button>
             <Button 
@@ -298,7 +342,7 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
         
         <div className="flex items-center gap-4">
           {!readOnly && (
-            <Button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 h-9">
+            <Button onClick={() => { setEditingTestData(null); setIsModalOpen(true); }} className="flex items-center gap-2 h-9">
               <Plus className="h-4 w-4" />
               Nuovo
             </Button>
@@ -407,13 +451,17 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
         <>
           <CreateTestModal
             isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
+            onClose={() => {
+              setIsModalOpen(false);
+              setEditingTestData(null);
+            }}
             competencies={competencies}
             subCompetencies={subCompetencies}
             users={users}
             evaluators={evaluators}
             isSubmitting={isSubmitting}
-            onConfirm={handleCreateTest}
+            initialData={editingTestData}
+            onConfirm={handleSaveTest}
           />
           <AlertDialog
             open={deleteTargetTest !== null}
