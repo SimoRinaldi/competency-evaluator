@@ -138,7 +138,8 @@ export class TestsEvaluationService {
 
     // ricalcolo i punteggi solo se tutti i valutatori hanno espresso le loro valutazioni
     if (allEvaluated) {
-      await this.calculateTestScores(dto.test_execution_id, testExecution.user_id);
+      const realUserId = testExecution.evaluated_user?.user_id ?? testExecution.user_id;
+      await this.calculateTestScores(dto.test_execution_id, realUserId);
     }
 
     return {
