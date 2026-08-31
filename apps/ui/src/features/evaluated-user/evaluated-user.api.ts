@@ -57,13 +57,15 @@ export async function getUserExecutions(userId: number) {
   return response.json();
 }
 
-export async function getCompetencyHistoricalScores(userId: number) {
-  const response = await fetch(`${API_URL}/competency_historical_scores/by-user/${userId}`, { headers: getAuthHeaders() });
-  if (!response.ok) return [];
+export async function getCompetencyHistoricalScores(userId: string | number): Promise<any[]> {
+  const response = await fetch(`${API_URL}/competency_historical_scores/by-user/${userId}`, {
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) throw new Error('Errore nel caricamento dei punteggi delle competenze');
   return response.json();
 }
 
-export async function getSubCompetencyHistoricalScores(userId: number) {
+export async function getSubCompetencyHistoricalScores(userId: string | number): Promise<any[]> {
   const response = await fetch(`${API_URL}/subcompetency_historical_scores/by-user/${userId}`, { headers: getAuthHeaders() });
   if (!response.ok) return [];
   return response.json();
