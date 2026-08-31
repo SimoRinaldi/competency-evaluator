@@ -202,7 +202,7 @@ export function UserTestsPage({ filter }: { filter: 'todo' | 'completed' }) {
                 </TableHead>
                 <TableHead className="w-44 pl-8 cursor-pointer select-none font-semibold text-slate-700 whitespace-nowrap" onClick={() => handleSort(filter === 'completed' ? 'score' : 'status')}>
                   <div className="flex items-center gap-1">
-                    {filter === 'completed' ? 'Punteggio / Stato' : 'Stato'} {getSortIcon(filter === 'completed' ? 'score' : 'status')}
+                    {filter === 'completed' ? 'Punteggio ottenuto / Punteggio massimo' : 'Stato'} {getSortIcon(filter === 'completed' ? 'score' : 'status')}
                   </div>
                 </TableHead>
                 <TableHead className="w-20 text-right font-semibold text-slate-700 whitespace-nowrap">Azioni</TableHead>

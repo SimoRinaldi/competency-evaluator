@@ -11,6 +11,8 @@ import { PageContainer } from '../components/page-container';
 import { UserTestsPage } from '../features/evaluated-user/user-tests.page';
 import { EvaluatorTestsPage } from '../features/evaluator/evaluator-tests.page';
 import { TestEvaluationPage } from '../features/evaluator/test-evaluation.page';
+import { UserEvaluationPage } from '../features/evaluator/user-evaluation.page';
+import { HistoricalScoresPage } from '../features/evaluated-user/historical-scores.page';
 
 import { TestsManagementPage } from '../features/tests/tests-management.page';
 import { CreateTestPage } from '../features/tests/create-test.page';
@@ -108,7 +110,7 @@ export function App() {
 
                 <Route
                   path="/my-tests/history"
-                  element={<Placeholder title="Storico punteggi" />}
+                  element={<HistoricalScoresPage />}
                 />
               </Route>
             </Route>

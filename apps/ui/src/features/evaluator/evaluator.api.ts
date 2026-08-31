@@ -70,8 +70,12 @@ export async function getTestExecutionById(executionId: string | number): Promis
   return response.json();
 }
 
-export async function submitEvaluation(data: { rubric_rank: number; indicator_id: number; test_execution_id: number; evaluator_id: number }) {
-  const response = await fetch(`${API_URL}/rubric_level_assignments`, {
+export async function submitEvaluation(data: { 
+  test_execution_id: number; 
+  evaluator_id?: number; 
+  evaluations: Array<{ indicator_id: number; rubric_rank: number }> 
+}) {
+  const response = await fetch(`${API_URL}/tests_evaluation/evaluate`, {
     method: 'POST',
     headers: getAuthHeaders(),
     body: JSON.stringify(data),

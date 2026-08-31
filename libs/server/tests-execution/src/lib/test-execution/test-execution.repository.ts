@@ -33,7 +33,7 @@ export class TestExecutionRepository {
   async findById(id: number): Promise<TestExecutionEntity | null> {
     return this.repository.findOne({
       where: { id },
-      relations: ['test', 'evaluated_user', 'evaluated_user.user', 'test_outputs'],
+      relations: ['test', 'test.subcompetencies', 'evaluated_user', 'evaluated_user.user', 'test_outputs'],
     });
   }
 
