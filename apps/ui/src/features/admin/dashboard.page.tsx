@@ -135,7 +135,7 @@ export function AdminDashboardPage() {
             <Dialog>
               <DialogTrigger asChild>
                 <Button>
-                  <Plus className="mr-2 h-4 w-4" /> Crea Competenza
+                  <Plus className="mr-2 h-4 w-4" /> Nuovo
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-[95vw] xl:max-w-[1400px] w-full h-[90vh] p-0 flex flex-col md:flex-row overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
@@ -176,7 +176,7 @@ export function AdminDashboardPage() {
           <Dialog>
             <DialogTrigger asChild>
               <Button>
-                <Plus className="mr-2 h-4 w-4" /> Crea Competenza
+                <Plus className="mr-2 h-4 w-4" /> Nuovo
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-[95vw] xl:max-w-[1400px] w-full h-[90vh] p-0 flex flex-col md:flex-row overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">

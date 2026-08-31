@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchRubrics, deleteRubric } from "../competencies/competencies.api";
+import { fetchRubrics, deleteRubric, createRubric } from "../competencies/competencies.api";
 import { PageContainer } from "../../components/page-container";
 import {
   ColumnDef,
@@ -38,6 +38,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Pencil, Plus, Search, TableProperties, ArrowUpRight, Trash } from "lucide-react";
 import { RubricFormPage } from "./rubric-form.page";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CreateRubricForm } from "../competencies/components/create-rubric-modal";
 
 export type Rubric = {
   id: number;
@@ -153,6 +155,35 @@ export function RubricsDashboardPage() {
   const [data, setData] = useState<Rubric[]>([]);
   const [loading, setLoading] = useState(true);
   const [globalFilter, setGlobalFilter] = useState("");
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [draftIsBinary, setDraftIsBinary] = useState('false');
+  const [draftLevels, setDraftLevels] = useState([
+    { description: '', rank: 1 },
+    { description: '', rank: 2 },
+    { description: '', rank: 3 },
+    { description: '', rank: 4 },
+    { description: '', rank: 5 },
+  ]);
+
+  const handleSaveNewRubric = async (rubricData: any) => {
+    try {
+      await createRubric(rubricData.yesNo, rubricData.levels);
+      const result = await fetchRubrics();
+      setData(result);
+      setDraftIsBinary('false');
+      setDraftLevels([
+        { description: '', rank: 1 },
+        { description: '', rank: 2 },
+        { description: '', rank: 3 },
+        { description: '', rank: 4 },
+        { description: '', rank: 5 },
+      ]);
+      setIsPopoverOpen(false);
+    } catch (e) {
+      console.error(e);
+      alert("Errore durante la creazione della rubrica");
+    }
+  };
 
   useEffect(() => {
     async function loadData() {
@@ -197,16 +228,24 @@ export function RubricsDashboardPage() {
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent className="flex-row justify-center gap-2">
-            <Dialog>
-              <DialogTrigger asChild>
+            <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+              <PopoverTrigger asChild>
                 <Button>
-                  <Plus className="mr-2 h-4 w-4" /> Crea Rubrica
+                  <Plus className="mr-2 h-4 w-4" /> Nuovo
                 </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-[95vw] xl:max-w-[1400px] w-full h-[90vh] p-0 flex flex-col md:flex-row overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
-                <RubricFormPage />
-              </DialogContent>
-            </Dialog>
+              </PopoverTrigger>
+              <PopoverContent className="w-[600px] p-8 max-h-[85vh] overflow-y-auto" align="center">
+                <h3 className="font-semibold text-lg mb-4">Nuova Rubrica</h3>
+                <CreateRubricForm 
+                  onSave={handleSaveNewRubric} 
+                  onCancel={() => setIsPopoverOpen(false)} 
+                  isBinary={draftIsBinary}
+                  setIsBinary={setDraftIsBinary}
+                  levels={draftLevels}
+                  setLevels={setDraftLevels}
+                />
+              </PopoverContent>
+            </Popover>
           </EmptyContent>
           <Button variant="link" className="text-muted-foreground" size="sm" asChild>
             <a href="#">
@@ -237,16 +276,24 @@ export function RubricsDashboardPage() {
           <div className="text-sm font-medium text-muted-foreground hidden sm:block">
             Totale: {data.length}
           </div>
-          <Dialog>
-            <DialogTrigger asChild>
+          <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+            <PopoverTrigger asChild>
               <Button>
-                <Plus className="mr-2 h-4 w-4" /> Crea Rubrica
+                <Plus className="mr-2 h-4 w-4" /> Nuovo
               </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-[95vw] xl:max-w-[1400px] w-full h-[90vh] p-0 flex flex-col md:flex-row overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
-              <RubricFormPage />
-            </DialogContent>
-          </Dialog>
+            </PopoverTrigger>
+            <PopoverContent className="w-[600px] p-8 max-h-[85vh] overflow-y-auto" align="end">
+              <h3 className="font-semibold text-lg mb-4">Nuova Rubrica</h3>
+              <CreateRubricForm 
+                onSave={handleSaveNewRubric} 
+                onCancel={() => setIsPopoverOpen(false)} 
+                isBinary={draftIsBinary}
+                setIsBinary={setDraftIsBinary}
+                levels={draftLevels}
+                setLevels={setDraftLevels}
+              />
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 
