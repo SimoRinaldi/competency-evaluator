@@ -13,7 +13,19 @@ export class CompetencyRepository {
   ) {}
 
   findById(id: number): Promise<CompetencyEntity | null> {
-    return this.repository.findOne({ where: { id }, relations: ['subcompetencies'] });
+    return this.repository.findOne({
+      where: { id },
+      relations: [
+        'subcompetencies',
+        'subcompetencies.observation_object',
+        'subcompetencies.observation_object.indicators',
+        'subcompetencies.observation_object.indicators.rubric_set',
+        'subcompetencies.observation_object.indicators.rubric_set.levels',
+        'subcompetencies.tools',
+        'subcompetencies.methods',
+        'subcompetencies.skills',
+      ],
+    });
   }
 
   findByTitle(title: string): Promise<CompetencyEntity | null> {

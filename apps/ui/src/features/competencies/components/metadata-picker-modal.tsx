@@ -33,7 +33,7 @@ export function MetadataPickerModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4">
       <div className="w-full max-w-md rounded-lg border bg-white p-6 shadow-lg">
         <div className="mb-4">
           <h2 className="text-lg font-semibold leading-none tracking-tight">{title}</h2>

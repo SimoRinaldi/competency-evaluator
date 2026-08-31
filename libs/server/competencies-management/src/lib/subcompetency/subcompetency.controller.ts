@@ -42,7 +42,7 @@ export class SubCompetencyController {
 
   @Post() // POST /subcompetencies
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
   @ApiBearerAuth()
   create(@Body(ValidationPipe) subCompetency: CreateSubCompetencyDto) {
     return this.subCompetencyService.create(subCompetency);
@@ -50,7 +50,7 @@ export class SubCompetencyController {
 
   @Patch(':id') // PATCH /subcompetencies/:id
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
   @ApiBearerAuth()
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -61,7 +61,7 @@ export class SubCompetencyController {
 
   @Delete(':id') // DELETE /subcompetencies/:id
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
   @ApiBearerAuth()
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.subCompetencyService.remove(id);

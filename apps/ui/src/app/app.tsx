@@ -75,7 +75,7 @@ export function App() {
                 <Route path="/users/edit/:id" element={<UserFormPage />} />
                 <Route
                   path="/tests-overview"
-                  element={<Placeholder title="Visualizzazione Test (Admin)" />}
+                  element={<TestsManagementPage readOnly={true} />}
                 />
               </Route>
 

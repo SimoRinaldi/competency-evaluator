@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Pencil, Plus, Search, UserX, ArrowUpRight } from "lucide-react";
+import { Pencil, Plus, Search, RefreshCw, UserX, ArrowUpRight } from "lucide-react";
 import { UserFormPage } from "./user-form.page";
 
 const roleMap: Record<string, string> = {
@@ -86,8 +86,8 @@ export function UsersDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [globalFilter, setGlobalFilter] = useState("");
 
-  useEffect(() => {
-    async function loadData() {
+  async function loadData() {
+      setLoading(true);
       try {
         const result = await getUsers();
         setData(result);
@@ -97,6 +97,8 @@ export function UsersDashboardPage() {
         setLoading(false);
       }
     }
+
+  useEffect(() => {
     loadData();
   }, []);
 
@@ -132,7 +134,7 @@ export function UsersDashboardPage() {
             <Dialog>
               <DialogTrigger asChild>
                 <Button>
-                  <Plus className="mr-2 h-4 w-4" /> Crea Utente
+                  <Plus className="mr-2 h-4 w-4" /> Nuovo
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-[95vw] xl:max-w-[1400px] w-full h-[90vh] p-0 flex flex-col md:flex-row overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
@@ -157,23 +159,26 @@ export function UsersDashboardPage() {
       description="Visualizza, crea e modifica gli utenti di sistema."
     >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4">
-        <div className="relative w-full sm:max-w-sm">
+        <div className="flex items-center gap-3 w-full max-w-md">
+        <div className="relative w-full">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Cerca per nome o email..."
             value={globalFilter ?? ""}
             onChange={(event) => setGlobalFilter(String(event.target.value))}
-            className="!pl-10"
+            className="!pl-10 bg-white"
           />
         </div>
+        <Button variant="outline" size="icon" onClick={loadData} disabled={loading} className="shrink-0 bg-white" title="Aggiorna tabella">
+          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+        </Button>
+      </div>
         <div className="flex items-center gap-4">
-          <div className="text-sm font-medium text-muted-foreground hidden sm:block">
-            Totale: {data.length}
-          </div>
+          
           <Dialog>
             <DialogTrigger asChild>
               <Button>
-                <Plus className="mr-2 h-4 w-4" /> Crea Utente
+                <Plus className="mr-2 h-4 w-4" /> Nuovo
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-[95vw] xl:max-w-[1400px] w-full h-[90vh] p-0 flex flex-col md:flex-row overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
@@ -241,6 +246,11 @@ export function UsersDashboardPage() {
             )}
           </TableBody>
         </Table>
+      </div>
+      <div className="flex items-center justify-between py-4 px-1">
+        <div className="text-sm font-medium text-slate-500">
+          {data.length} elementi
+        </div>
       </div>
     </PageContainer>
   );
