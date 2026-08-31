@@ -41,12 +41,28 @@ export class TestEvaluatorController {
     return this.service.findAll();
   }
 
+  @Get('by-test/:testId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER, UserRole.EVALUATOR, UserRole.USER)
+  @ApiBearerAuth()
+  findByTest(@Param('testId', ParseIntPipe) testId: number) {
+    return this.service.findByTestId(testId);
+  }
+
   @Get(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
   @ApiBearerAuth()
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.service.findOne(id);
+  }
+
+  @Get('by-user/:userId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.EVALUATOR)
+  @ApiBearerAuth()
+  findByUserId(@Param('userId', ParseIntPipe) userId: number) {
+    return this.service.findByUserId(userId);
   }
 
   @Patch(':id')

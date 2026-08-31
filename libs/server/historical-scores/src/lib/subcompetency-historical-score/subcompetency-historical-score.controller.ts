@@ -51,6 +51,14 @@ export class SubCompetencyHistoricalScoreController {
     return this.service.findOne(id);
   }
 
+  @Get('by-user/:userId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.USER)
+  @ApiBearerAuth()
+  findByUser(@Param('userId', ParseIntPipe) userId: number) {
+    return this.service.findByUser(userId);
+  }
+
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)

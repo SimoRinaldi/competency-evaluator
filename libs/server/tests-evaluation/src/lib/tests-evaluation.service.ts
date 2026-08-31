@@ -131,17 +131,41 @@ export class TestsEvaluationService {
       await queryRunner.release();
     }
 
-    // ricalcolo i punteggi
-    await this.calculateTestScores(dto.test_execution_id, testExecution.user_id);
+    const allEvaluated = await this.allTestEvaluatorsHaveEvaluatedTest(
+      dto.test_execution_id,
+      testExecution.test.id
+    );
+
+    // ricalcolo i punteggi solo se tutti i valutatori hanno espresso le loro valutazioni
+    if (allEvaluated) {
+      const realUserId = testExecution.evaluated_user?.user_id ?? testExecution.user_id;
+      await this.calculateTestScores(dto.test_execution_id, realUserId);
+    }
 
     return {
-      message: 'Valutazione salvata e punteggi ricalcolati con successo.',
+      message: 'Valutazione salvata' + (allEvaluated ? ' e punteggi ricalcolati' : '') + ' con successo.',
       test_execution_id: dto.test_execution_id,
       evaluator_id: evaluator.id,
     };
   }
 
-  async calculateTestScores(test_execution_id: number, user_id: number): Promise<void> {
+  async allTestEvaluatorsHaveEvaluatedTest(test_execution_id: number, test_id: number): Promise<boolean> {
+    const rubricLevelAssignments =
+      await this.rubricLevelAssignmentsService.findByTestExecutionWithRelations(test_execution_id);
+
+    // Recupera i valutatori assegnati a questo test
+    const assignedEvaluators = await this.testEvaluatorService.findByTestId(test_id);
+    const expectedEvaluatorsCount = assignedEvaluators.length;
+
+    // Estrai gli id univoci dei valutatori che hanno già sottomesso valutazioni per questa execution
+    const uniqueEvaluators = new Set(
+      rubricLevelAssignments.map((assignment) => assignment.evaluator_id)
+    );
+
+    return expectedEvaluatorsCount === uniqueEvaluators.size;
+  }
+
+  async calculateTestScores(test_execution_id: number, evaluated_user_id: number): Promise<void> {
     // Estrazione di tutti i rubricLevelAssignments relativi ad una test_execution
     const rubricLevelAssignments =
       await this.rubricLevelAssignmentsService.findByTestExecutionWithRelations(test_execution_id);
@@ -157,13 +181,13 @@ export class TestsEvaluationService {
     const subCompetencyScores = this.calculateSubCompetencyTestScores(groupedIndicators);
 
     // Inserimento o aggiornamento dei record delle sotto-competenze associate a questo test
-    await this.upsertSubCompetenciesScores(subCompetencyScores, user_id);
+    await this.upsertSubCompetenciesScores(subCompetencyScores, evaluated_user_id);
 
     // Identificazione delle competenze associate al test
     const testCompetencies = await this.identifyTestCompetencies(subCompetencyScores);
 
     // Ricalcolo del punteggio storico per ogni competenza associata al test
-    await this.recalculateHistoricalCompetencies(testCompetencies, user_id);
+    await this.recalculateHistoricalCompetencies(testCompetencies, evaluated_user_id);
 
     // Aggiornamento del punteggio del test
     await this.updateTestExecutionScore(test_execution_id, subCompetencyScores);

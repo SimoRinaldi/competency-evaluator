@@ -111,6 +111,81 @@ export class CompetenciesManagementService {
     }
   }
 
+  async handleUpdateCompetencyChain(id: number, dto: CreateCompetencyChainDto): Promise<CompetencyEntity> {
+    // Implementazione base: Elimina e ricrea per semplicità, oppure implementa logica fine
+    // NOTA: in un ambiente produttivo l'eliminazione potrebbe violare foreign keys (es. test esistenti).
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const manager = queryRunner.manager;
+      const existingCompetency = await manager.findOne(CompetencyEntity, { where: { id }, relations: ['subcompetencies'] });
+      
+      if (!existingCompetency) {
+        throw new NotFoundException(`Competenza con id ${id} non trovata`);
+      }
+
+      // Elimina le subcompetencies esistenti per ricrearle
+      if (existingCompetency.subcompetencies?.length > 0) {
+        await manager.remove(existingCompetency.subcompetencies);
+      }
+
+      // Aggiorna dati base della competenza
+      existingCompetency.title = dto.title;
+      existingCompetency.weight = dto.weight;
+      existingCompetency.threshold = dto.threshold;
+      const saved_competency = await manager.save(existingCompetency);
+
+      const toolsCache = new Map<string, ToolEntity>();
+      const methodsCache = new Map<string, MethodEntity>();
+      const skillsCache = new Map<string, SkillEntity>();
+      const rubricSetsCache: RubricSetEntity[] = [];
+
+      for (const subcompetency_dto of dto.subcompetencies) {
+        const tools = await this.createToolsChain(manager, subcompetency_dto, toolsCache);
+        const methods = await this.createMethodsChain(manager, subcompetency_dto, methodsCache);
+        const skills = await this.createSkillsChain(manager, subcompetency_dto, skillsCache);
+
+        const saved_subcompetency = await this.createSubCompetencyChain(
+          manager,
+          subcompetency_dto,
+          saved_competency,
+          tools,
+          methods,
+          skills,
+        );
+
+        const observation_object_dto = subcompetency_dto.observationObject;
+        const saved_observation_object = await this.createObservationObjectsChain(
+          manager,
+          observation_object_dto,
+          saved_subcompetency,
+        );
+
+        saved_observation_object.indicators = await this.createIndicatorsChain(
+          manager,
+          observation_object_dto,
+          saved_observation_object,
+          rubricSetsCache,
+        );
+      }
+
+      await queryRunner.commitTransaction();
+      return saved_competency;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        `Errore durante l'aggiornamento della catena di competenze: ${(error as Error).message || 'Operazione annullata.'}`,
+      );
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
   // Crea e salva l'entità principale della competenza
   async createCompetencyChain(
     manager: EntityManager,

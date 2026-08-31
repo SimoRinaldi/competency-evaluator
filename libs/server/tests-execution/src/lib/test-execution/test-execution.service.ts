@@ -20,16 +20,16 @@ export class TestExecutionService {
       throw new NotFoundException(`Test con ID ${dto.test_id} non trovato.`);
     }
 
-    const evaluatedUser = await this.evaluatedUsersRepository.findById(
+    let evaluatedUser = await this.evaluatedUsersRepository.findByUserId(
       dto.user_id
     );
     if (!evaluatedUser) {
-      throw new NotFoundException(
-        `Evaluated user con ID ${dto.user_id} non trovato.`
-      );
+      // Auto-create EvaluatedUser if it doesn't exist yet
+      evaluatedUser = await this.evaluatedUsersRepository.createOne({ user_id: dto.user_id });
     }
 
-    return this.testExecutionsRepository.createOne(dto);
+    const realDto = { ...dto, user_id: evaluatedUser.id };
+    return this.testExecutionsRepository.createOne(realDto);
   }
 
   async findAll(): Promise<TestExecutionEntity[]> {
@@ -47,14 +47,12 @@ export class TestExecutionService {
   }
 
   async findByEvaluatedUser(userId: number): Promise<TestExecutionEntity[]> {
-    const evaluatedUser = await this.evaluatedUsersRepository.findById(userId);
+    const evaluatedUser = await this.evaluatedUsersRepository.findByUserId(userId);
     if (!evaluatedUser) {
-      throw new NotFoundException(
-        `Evaluated user con ID ${userId} non trovato.`
-      );
+      return [];
     }
 
-    return this.testExecutionsRepository.findByEvaluatedUserId(userId);
+    return this.testExecutionsRepository.findByEvaluatedUserId(evaluatedUser.id);
   }
 
   async findByTest(testId: number): Promise<TestExecutionEntity[]> {
