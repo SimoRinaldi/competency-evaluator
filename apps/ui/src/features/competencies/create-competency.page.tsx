@@ -1,14 +1,19 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Step1Competency } from './components/step1-competency';
 import { SubCompetencyPanel } from './components/sub-competency-panel';
 import { Step3Summary } from './components/step3-summary';
 import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { createCompetencyChain } from './competencies.api';
+import { useFeedback } from '../../providers/feedback-provider';
 
 export function CreateCompetencyPage() {
+  const navigate = useNavigate();
+  const { showSuccess } = useFeedback();
   // Menu principale: 1 = Competenza, 2 = Sottocompetenze, 3 = Riepilogo
   const [activeMenu, setActiveMenu] = useState(1);
-  const [isSubmitting] = useState(false);
-  const [submitError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   // Sottocompetenza attiva?
   // -1 = Nessuna, 0, 1, 2 = Indice dell'array
@@ -87,15 +92,80 @@ export function CreateCompetencyPage() {
   }
 
   const handleFinalSave = async () => {
-    // API logic will go here
-    console.log('Dati pronti per il salvataggio:', {
-      competencyData,
-      subCompetencies,
-      newRubrics,
-      newTools,
-      newMethods,
-      newSkills,
-    });
+    setIsSubmitting(true);
+    setSubmitError('');
+
+    try {
+      const payload = {
+        title: competencyData.title,
+        weight: parseInt(competencyData.weight),
+        threshold: parseInt(competencyData.threshold),
+        subcompetencies: subCompetencies.map(sub => {
+          const tool_ids = sub.tools.filter((t: any) => typeof t === 'number' || (typeof t === 'string' && t.startsWith('db_'))).map((t: any) => typeof t === 'string' ? parseInt(t.replace('db_', '')) : t);
+          const tools = sub.tools.filter((t: any) => typeof t === 'string' && t.startsWith('temp_')).map((t: any) => ({ name: newTools.find(nt => nt.tempId === t)?.name }));
+
+          const method_ids = sub.methods.filter((m: any) => typeof m === 'number' || (typeof m === 'string' && m.startsWith('db_'))).map((m: any) => typeof m === 'string' ? parseInt(m.replace('db_', '')) : m);
+          const methods = sub.methods.filter((m: any) => typeof m === 'string' && m.startsWith('temp_')).map((m: any) => ({ name: newMethods.find(nm => nm.tempId === m)?.name }));
+
+          const skill_ids = sub.skills.filter((s: any) => typeof s === 'number' || (typeof s === 'string' && s.startsWith('db_'))).map((s: any) => typeof s === 'string' ? parseInt(s.replace('db_', '')) : s);
+          const skills = sub.skills.filter((s: any) => typeof s === 'string' && s.startsWith('temp_')).map((s: any) => ({ name: newSkills.find(ns => ns.tempId === s)?.name }));
+
+          return {
+            title: sub.title,
+            weight: parseInt(sub.weight),
+            threshold: parseInt(sub.threshold),
+            input: sub.input || undefined,
+            action: sub.action || undefined,
+            output: sub.output || undefined,
+            tool_ids,
+            tools: tools.filter((t: any) => t.name),
+            method_ids,
+            methods: methods.filter((m: any) => m.name),
+            skill_ids,
+            skills: skills.filter((s: any) => s.name),
+            observationObject: {
+              description: sub.obsDescription,
+              indicators: sub.indicators.map((ind: any) => {
+                const isTempRubric = typeof ind.rubricId === 'string' && ind.rubricId.startsWith('temp_');
+                const isDbRubric = typeof ind.rubricId === 'string' && ind.rubricId.startsWith('db_');
+                let rubric_set_id = undefined;
+                let rubricSet = undefined;
+
+                if (isDbRubric) {
+                  rubric_set_id = parseInt(ind.rubricId.replace('db_', ''));
+                } else if (typeof ind.rubricId === 'number') {
+                  rubric_set_id = ind.rubricId;
+                } else if (isTempRubric) {
+                  const idx = parseInt(ind.rubricId.replace('temp_', ''));
+                  const rData = newRubrics[idx];
+                  rubricSet = {
+                    yes_no: rData.yesNo,
+                    levels: rData.levels.map((l: any) => ({
+                      description: l.description,
+                      rank: l.rank
+                    }))
+                  };
+                }
+
+                return {
+                  description: ind.description,
+                  weight: parseInt(ind.weight),
+                  ...(rubric_set_id ? { rubric_set_id } : { rubricSet })
+                };
+              })
+            }
+          };
+        })
+      };
+
+      await createCompetencyChain(payload);
+      showSuccess('Competenza creata con successo!');
+      navigate('/competencies');
+    } catch (err: any) {
+      setSubmitError(err.message || 'Errore durante il salvataggio');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const isStep2Enabled = isStep1Valid && hasPassedStep1;

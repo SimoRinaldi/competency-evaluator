@@ -1,6 +1,8 @@
 import {
   Controller,
   Post,
+  Put,
+  Param,
   Body,
   ValidationPipe,
   UseGuards,
@@ -59,5 +61,25 @@ export class CompetenciesManagementController {
   })
   async createChain(@Body(ValidationPipe) dto: CreateCompetencyChainDto) {
     return this.competenciesManagementService.handleCreateCompetencyChain(dto);
+  }
+
+  @Put('chain/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiBody({ type: CreateCompetencyChainDto }) // Reuse Create DTO per semplificare la chain intera
+  @ApiOperation({
+    summary:
+      'Aggiorna a cascata una catena completa di competenze, sotto-competenze, oggetti di osservazione, indicatori e rubriche',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Catena aggiornata con successo in una singola transazione',
+  })
+  async updateChain(
+    @Param('id') id: string,
+    @Body(ValidationPipe) dto: CreateCompetencyChainDto
+  ) {
+    return this.competenciesManagementService.handleUpdateCompetencyChain(+id, dto);
   }
 }
