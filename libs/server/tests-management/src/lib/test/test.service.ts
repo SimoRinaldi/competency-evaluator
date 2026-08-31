@@ -157,7 +157,64 @@ export class TestService {
       }
     }
 
-    return this.testsRepository.updateOne(test, dto);
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const manager = queryRunner.manager;
+
+      if (dto.assessment_situation !== undefined) test.assessment_situation = dto.assessment_situation;
+      if (dto.test_designer_id !== undefined) test.test_designer_id = dto.test_designer_id;
+      
+      const savedTest = await manager.save(test);
+
+      if (dto.subcompetency_ids !== undefined) {
+        await manager.delete('test_subcompetency', { test_id: id });
+        if (dto.subcompetency_ids.length > 0) {
+          const subRows = dto.subcompetency_ids.map((subId) => ({
+            test_id: id,
+            subcompetency_id: subId,
+          }));
+          await manager.insert('test_subcompetency', subRows);
+        }
+      }
+
+      if (dto.evaluator_ids !== undefined) {
+        await manager.delete('test_evaluation', { test_id: id });
+        if (dto.evaluator_ids.length > 0) {
+          const evaluatorRows = dto.evaluator_ids.map((evaluatorId) => ({
+            test_id: id,
+            test_evaluator_id: evaluatorId,
+          }));
+          await manager.insert('test_evaluation', evaluatorRows);
+        }
+      }
+
+      if (dto.evaluated_user_ids !== undefined) {
+        await manager.delete('test_execution', { test_id: id });
+        if (dto.evaluated_user_ids.length > 0) {
+          const executionRows = dto.evaluated_user_ids.map((userId) => ({
+            test_id: id,
+            user_id: userId,
+            test_score: null,
+            max_score: null,
+          }));
+          await manager.insert('test_execution', executionRows);
+        }
+      }
+
+      await queryRunner.commitTransaction();
+      return savedTest;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException(
+        `Errore durante l'aggiornamento del test: ${(error as Error).message}`
+      );
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async remove(id: number): Promise<void> {
