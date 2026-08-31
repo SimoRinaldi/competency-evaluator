@@ -67,13 +67,21 @@ export class TestService {
         );
       }
 
-      // 1. Creazione e salvataggio dell'entità Test con le relative sotto-competenze
+      // 1. Creazione e salvataggio dell'entità Test
       const test = manager.create(TestEntity, {
         assessment_situation: dto.assessment_situation,
         test_designer_id: dto.test_designer_id,
-        subcompetencies: subcompetencies,
       });
       const savedTest = await manager.save(test);
+
+      // 1.5. Collegamento sottocompetenze nella tabella pivot
+      if (dto.subcompetency_ids && dto.subcompetency_ids.length > 0) {
+        const subRows = dto.subcompetency_ids.map((subId) => ({
+          test_id: savedTest.id,
+          subcompetency_id: subId,
+        }));
+        await manager.insert('test_subcompetency', subRows);
+      }
 
       // 2. Collegamento valutatori nella tabella N:N test_evaluation
       if (dto.evaluator_ids && dto.evaluator_ids.length > 0) {
