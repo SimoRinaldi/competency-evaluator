@@ -30,7 +30,7 @@ export function RubricPickerModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4">
       <div className="w-full max-w-[90vw] md:max-w-5xl max-h-[85vh] overflow-y-auto rounded-lg border bg-white p-6 shadow-lg relative">
         <button
           onClick={onClose}

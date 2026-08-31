@@ -24,6 +24,8 @@ import { RubricsDashboardPage } from '../features/admin/rubrics-dashboard.page';
 
 import { TestsOverviewPage } from '../features/admin/tests-overview.page';
 
+import { IndicatorsManagementPage } from '../features/tests/indicators-management.page';
+
 const Placeholder = ({ title }: { title: string }) => (
   <PageContainer title={title} description="Questa pagina è in costruzione.">
     <div className="flex items-center justify-center h-64 bg-slate-50 border border-dashed rounded-lg text-slate-500">
@@ -87,7 +89,7 @@ export function App() {
                 <Route path="/tests/new" element={<CreateTestPage />} />
                 <Route
                   path="/indicators-management"
-                  element={<Placeholder title="Gestione Oggetto di Osservazione e Indicatori" />}
+                  element={<IndicatorsManagementPage />}
                 />
               </Route>
 
