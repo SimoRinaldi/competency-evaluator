@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Field,
   FieldContent,
@@ -98,5 +99,27 @@ export function CreateRubricForm({
         </Button>
       </div>
     </div>
+  );
+}
+
+export function CreateRubricModal({ onSave, onCancel }: { onSave: (data: any) => void, onCancel?: () => void }) {
+  const [isBinary, setIsBinary] = useState('false');
+  const [levels, setLevels] = useState([
+    { description: '', rank: 1 },
+    { description: '', rank: 2 },
+    { description: '', rank: 3 },
+    { description: '', rank: 4 },
+    { description: '', rank: 5 },
+  ]);
+
+  return (
+    <CreateRubricForm 
+      onSave={onSave} 
+      onCancel={onCancel}
+      isBinary={isBinary}
+      setIsBinary={setIsBinary}
+      levels={levels}
+      setLevels={setLevels}
+    />
   );
 }
