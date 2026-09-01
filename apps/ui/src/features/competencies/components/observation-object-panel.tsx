@@ -25,6 +25,7 @@ export function ObservationObjectPanel({
   dbRubrics,
   newRubrics,
   setNewRubrics,
+  allowCreateRubric = true,
 }: any) {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -340,6 +341,7 @@ export function ObservationObjectPanel({
           setIsRubricPickerOpen(false);
         }}
         onCreateNew={handleCreateNewRubricFromPicker}
+        allowCreate={allowCreateRubric}
       />
     </div>
   );

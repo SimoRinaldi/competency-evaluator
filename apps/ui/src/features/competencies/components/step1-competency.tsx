@@ -9,8 +9,11 @@ export function Step1Competency({ data, onChange, onNext }: any) {
       <div>
         <h2 className="text-2xl font-bold tracking-tight text-foreground">Dati della Competenza</h2>
         <p className="text-muted-foreground text-sm mt-1">
-          Definisci il titolo della competenza, il suo peso (intero da 1 a 5) e la soglia minima di
-          acquisizione della competenza.
+          Definisci il titolo della competenza e il suo peso (intero da 1 a 5).
+        </p>
+        <p className="text-muted-foreground text-sm mt-1">
+          La soglia di acquisizione della competenza sarà calcolata automaticamente come somma delle
+          soglie delle sotto- competenze.
         </p>
       </div>
 
@@ -43,21 +46,6 @@ export function Step1Competency({ data, onChange, onNext }: any) {
               required
               value={data.weight}
               onChange={(e) => onChange({ ...data, weight: e.target.value })}
-              className="flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
-            />
-          </div>
-
-          {/* Soglia */}
-          <div className="space-y-2 w-full md:w-36 shrink-0">
-            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-              Soglia minima <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="number"
-              min="1"
-              required
-              value={data.threshold}
-              onChange={(e) => onChange({ ...data, threshold: e.target.value })}
               className="flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
             />
           </div>

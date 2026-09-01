@@ -22,13 +22,9 @@ export function CreateCompetencyPage() {
   const [competencyData, setCompetencyData] = useState({
     title: '',
     weight: '',
-    threshold: '',
   });
 
-  const isStep1Valid =
-    competencyData.title.trim() !== '' &&
-    competencyData.weight !== '' &&
-    competencyData.threshold !== '';
+  const isStep1Valid = competencyData.title.trim() !== '' && competencyData.weight !== '';
 
   const [subCompetencies, setSubCompetencies] = useState<any[]>([]);
 
@@ -99,16 +95,33 @@ export function CreateCompetencyPage() {
       const payload = {
         title: competencyData.title,
         weight: parseInt(competencyData.weight),
-        threshold: parseInt(competencyData.threshold),
-        subcompetencies: subCompetencies.map(sub => {
-          const tool_ids = sub.tools.filter((t: any) => typeof t === 'number' || (typeof t === 'string' && t.startsWith('db_'))).map((t: any) => typeof t === 'string' ? parseInt(t.replace('db_', '')) : t);
-          const tools = sub.tools.filter((t: any) => typeof t === 'string' && t.startsWith('temp_')).map((t: any) => ({ name: newTools.find(nt => nt.tempId === t)?.name }));
+        subcompetencies: subCompetencies.map((sub) => {
+          const tool_ids = sub.tools
+            .filter(
+              (t: any) => typeof t === 'number' || (typeof t === 'string' && t.startsWith('db_')),
+            )
+            .map((t: any) => (typeof t === 'string' ? parseInt(t.replace('db_', '')) : t));
+          const tools = sub.tools
+            .filter((t: any) => typeof t === 'string' && t.startsWith('temp_'))
+            .map((t: any) => ({ name: newTools.find((nt) => nt.tempId === t)?.name }));
 
-          const method_ids = sub.methods.filter((m: any) => typeof m === 'number' || (typeof m === 'string' && m.startsWith('db_'))).map((m: any) => typeof m === 'string' ? parseInt(m.replace('db_', '')) : m);
-          const methods = sub.methods.filter((m: any) => typeof m === 'string' && m.startsWith('temp_')).map((m: any) => ({ name: newMethods.find(nm => nm.tempId === m)?.name }));
+          const method_ids = sub.methods
+            .filter(
+              (m: any) => typeof m === 'number' || (typeof m === 'string' && m.startsWith('db_')),
+            )
+            .map((m: any) => (typeof m === 'string' ? parseInt(m.replace('db_', '')) : m));
+          const methods = sub.methods
+            .filter((m: any) => typeof m === 'string' && m.startsWith('temp_'))
+            .map((m: any) => ({ name: newMethods.find((nm) => nm.tempId === m)?.name }));
 
-          const skill_ids = sub.skills.filter((s: any) => typeof s === 'number' || (typeof s === 'string' && s.startsWith('db_'))).map((s: any) => typeof s === 'string' ? parseInt(s.replace('db_', '')) : s);
-          const skills = sub.skills.filter((s: any) => typeof s === 'string' && s.startsWith('temp_')).map((s: any) => ({ name: newSkills.find(ns => ns.tempId === s)?.name }));
+          const skill_ids = sub.skills
+            .filter(
+              (s: any) => typeof s === 'number' || (typeof s === 'string' && s.startsWith('db_')),
+            )
+            .map((s: any) => (typeof s === 'string' ? parseInt(s.replace('db_', '')) : s));
+          const skills = sub.skills
+            .filter((s: any) => typeof s === 'string' && s.startsWith('temp_'))
+            .map((s: any) => ({ name: newSkills.find((ns) => ns.tempId === s)?.name }));
 
           return {
             title: sub.title,
@@ -126,8 +139,10 @@ export function CreateCompetencyPage() {
             observationObject: {
               description: sub.obsDescription,
               indicators: sub.indicators.map((ind: any) => {
-                const isTempRubric = typeof ind.rubricId === 'string' && ind.rubricId.startsWith('temp_');
-                const isDbRubric = typeof ind.rubricId === 'string' && ind.rubricId.startsWith('db_');
+                const isTempRubric =
+                  typeof ind.rubricId === 'string' && ind.rubricId.startsWith('temp_');
+                const isDbRubric =
+                  typeof ind.rubricId === 'string' && ind.rubricId.startsWith('db_');
                 let rubric_set_id = undefined;
                 let rubricSet = undefined;
 
@@ -142,20 +157,20 @@ export function CreateCompetencyPage() {
                     yes_no: rData.yesNo,
                     levels: rData.levels.map((l: any) => ({
                       description: l.description,
-                      rank: l.rank
-                    }))
+                      rank: l.rank,
+                    })),
                   };
                 }
 
                 return {
                   description: ind.description,
                   weight: parseInt(ind.weight),
-                  ...(rubric_set_id ? { rubric_set_id } : { rubricSet })
+                  ...(rubric_set_id ? { rubric_set_id } : { rubricSet }),
                 };
-              })
-            }
+              }),
+            },
           };
-        })
+        }),
       };
 
       await createCompetencyChain(payload);
@@ -247,9 +262,7 @@ export function CreateCompetencyPage() {
                 </div>
                 <div className="text-xs text-slate-400 mt-0.5">
                   {subCompetencies.length > 0
-                    ? `${subCompetencies.length} inserit${
-                        subCompetencies.length === 1 ? 'a' : 'e'
-                      }`
+                    ? `${subCompetencies.length} inserit${subCompetencies.length === 1 ? 'a' : 'e'}`
                     : 'Definizione struttura'}
                 </div>
               </div>
@@ -336,12 +349,12 @@ export function CreateCompetencyPage() {
       <div className="flex-1 flex flex-col bg-white h-full overflow-hidden">
         <DialogHeader className="p-4 md:p-8 md:pb-4 border-b border-slate-100 md:border-b-0">
           <DialogTitle className="text-xl md:text-2xl font-bold text-slate-800">
-            {activeMenu === 1 && "Dati generali"}
-            {activeMenu === 2 && "Sottocompetenze"}
-            {activeMenu === 3 && "Riepilogo"}
+            {activeMenu === 1 && 'Dati generali'}
+            {activeMenu === 2 && 'Sottocompetenze'}
+            {activeMenu === 3 && 'Riepilogo'}
           </DialogTitle>
         </DialogHeader>
-        
+
         <div className="flex-1 overflow-y-auto px-4 md:px-8 pb-4 pt-4 md:pt-0">
           {activeMenu === 1 && (
             <Step1Competency

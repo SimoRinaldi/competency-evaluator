@@ -21,7 +21,7 @@ import { Search, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { ApiCompetency, ApiSubCompetency, ApiUser } from './tests.api';
 import { TestSummaryView } from './test-summary-view';
 
-const PAGE_SIZE = 4;
+const PAGE_SIZE = 50;
 
 export interface CreateTestModalProps {
   isOpen: boolean;
@@ -32,6 +32,13 @@ export interface CreateTestModalProps {
   evaluators: ApiUser[];
   isLoading?: boolean;
   isSubmitting?: boolean;
+  initialData?: {
+    assessmentSituation: string;
+    competencyId: number;
+    subcompetencyIds: number[];
+    userIds: number[];
+    evaluatorIds: number[];
+  } | null;
   onConfirm: (testData: {
     assessmentSituation: string;
     competencyId: number;
@@ -50,6 +57,7 @@ export function CreateTestModal({
   evaluators = [],
   isLoading = false,
   isSubmitting = false,
+  initialData = null,
   onConfirm,
 }: CreateTestModalProps) {
   // Descrizione contesto
@@ -77,14 +85,25 @@ export function CreateTestModal({
   const [evaluatorPage, setEvaluatorPage] = useState<number>(1);
   const [compPage, setCompPage] = useState<number>(1);
 
-  // Reset del form alla chiusura
+  // Modifica: Step attivi (1=Competenza, 2=Sottocompetenze, 3=Utenti, 4=Valutatori)
+  const [activeStep, setActiveStep] = useState(1);
+
+  // Reset del form alla chiusura o apertura
   const resetForm = () => {
     setActiveStep(1);
-    setAssessmentSituation('Valutazione delle competenze pratiche e teoriche');
-    setSelectedCompetencyId('');
-    setSelectedSubcompetencyIds([]);
-    setSelectedUserIds([]);
-    setSelectedEvaluatorIds([]);
+    if (initialData) {
+      setAssessmentSituation(initialData.assessmentSituation);
+      setSelectedCompetencyId(String(initialData.competencyId));
+      setSelectedSubcompetencyIds(initialData.subcompetencyIds);
+      setSelectedUserIds(initialData.userIds);
+      setSelectedEvaluatorIds(initialData.evaluatorIds);
+    } else {
+      setAssessmentSituation('Valutazione delle competenze pratiche e teoriche');
+      setSelectedCompetencyId('');
+      setSelectedSubcompetencyIds([]);
+      setSelectedUserIds([]);
+      setSelectedEvaluatorIds([]);
+    }
     setSubSearch('');
     setUserSearch('');
     setEvaluatorSearch('');
@@ -101,10 +120,12 @@ export function CreateTestModal({
   };
 
   useEffect(() => {
-    if (!isOpen) {
+    if (isOpen) {
+      resetForm();
+    } else {
       resetForm();
     }
-  }, [isOpen]);
+  }, [isOpen, initialData]);
 
   // Filtro Sottocompetenze
   const allSubcompetenciesForCompetency = useMemo(() => {
@@ -158,8 +179,6 @@ export function CreateTestModal({
     return filteredEvaluators.slice(start, start + PAGE_SIZE);
   }, [filteredEvaluators, evaluatorPage]);
 
-  // Modifica: Step attivi (1=Competenza, 2=Sottocompetenze, 3=Utenti, 4=Valutatori)
-  const [activeStep, setActiveStep] = useState(1);
 
   // Filtro Competenze (per la tabella step 1)
   const filteredCompetencies = useMemo(() => {
@@ -278,7 +297,7 @@ export function CreateTestModal({
         {/* COLONNA SINISTRA: SIDEBAR STEPS */}
         <div className="w-full md:w-72 shrink-0 p-6 md:p-8 border-b md:border-b-0 md:border-r border-slate-200 bg-slate-50/50 flex flex-col md:block">
           <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 md:mb-8 hidden md:block">
-            Creazione Test
+            {initialData ? "Gestione Test" : "Gestione Test"}
           </h2>
 
           <ul className="flex flex-row md:flex-col gap-2 md:gap-6 relative overflow-x-auto md:overflow-visible pb-2 md:pb-0">
@@ -509,16 +528,17 @@ export function CreateTestModal({
                                 <TableRow
                                   key={comp.id}
                                   data-state={isSelected ? 'selected' : undefined}
-                                  className="cursor-pointer group hover:bg-transparent"
-                                  onClick={() => handleCompetencyChange(String(comp.id))}
+                                  className={`${!!initialData ? 'cursor-not-allowed opacity-70' : 'cursor-pointer group hover:bg-transparent'}`}
+                                  onClick={() => !initialData && handleCompetencyChange(String(comp.id))}
                                 >
                                   <TableCell className="text-center py-3" onClick={(e) => e.stopPropagation()}>
                                     <input
                                       type="radio"
                                       name="competencySelection"
-                                      className="h-4 w-4 rounded-full border-slate-300 text-primary focus:ring-primary cursor-pointer"
+                                      className={`h-4 w-4 rounded-full border-slate-300 text-primary focus:ring-primary ${!!initialData ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                                       checked={isSelected}
-                                      onChange={() => handleCompetencyChange(String(comp.id))}
+                                      onChange={() => !initialData && handleCompetencyChange(String(comp.id))}
+                                      disabled={!!initialData}
                                     />
                                   </TableCell>
                                   <TableCell className="font-medium text-slate-900 py-3">
