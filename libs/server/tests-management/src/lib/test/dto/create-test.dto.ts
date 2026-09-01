@@ -44,7 +44,7 @@ export class CreateTestDto {
   subcompetency_ids!: number[];
 
   @ApiPropertyOptional({
-    description: 'Array di ID dei Test Evaluator assegnati a questo test',
+    description: 'Array di ID dei Test Evaluator (test_evaluator.id) assegnati a questo test',
     example: [1, 2],
     type: [Number],
   })
@@ -52,7 +52,7 @@ export class CreateTestDto {
   @IsInt({ each: true })
   @IsPositive({ each: true })
   @IsOptional()
-  evaluator_ids?: number[];
+  test_evaluator_ids?: number[];
 
   @ApiPropertyOptional({
     description: 'Array di ID degli Evaluated User assegnati a questo test',

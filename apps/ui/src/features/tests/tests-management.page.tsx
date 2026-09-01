@@ -124,13 +124,12 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
       ]);
       setCompetencies(compRes);
       setSubCompetencies(subCompRes);
-      
-      const uniqueEvaluators = Array.from(new Map(evalRes.map(item => [item.user_id, item.user])).values()).filter(Boolean) as ApiUser[];
-      setEvaluators(uniqueEvaluators);
-      
-      const uniqueUsers = Array.from(new Map(usersRes.map(item => [item.user_id, item.user])).values()).filter(Boolean) as ApiUser[];
-      setUsers(uniqueUsers);
-      
+
+      // Mappa i test_evaluator con id = test_evaluator.id e dati utente per il display
+      setEvaluators(evalRes.filter((te) => te.user).map((te) => ({ ...te.user!, id: te.id })));
+
+      // Mappa gli evaluated_user con id = evaluated_user.id e dati utente per il display
+      setUsers(usersRes.filter((eu) => eu.user).map((eu) => ({ ...eu.user!, id: eu.id })));
     } catch (error) {
       console.error('Errore nel caricamento dei dati per la modale:', error);
     }
@@ -189,7 +188,7 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
         test_designer_id: designerId,
         subcompetency_ids: testData.subcompetencyIds,
         evaluated_user_ids: testData.userIds,
-        evaluator_ids: testData.evaluatorIds,
+        test_evaluator_ids: testData.evaluatorIds,
       };
 
       if (editingTestData) {

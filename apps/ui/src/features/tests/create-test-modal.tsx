@@ -528,17 +528,17 @@ export function CreateTestModal({
                                 <TableRow
                                   key={comp.id}
                                   data-state={isSelected ? 'selected' : undefined}
-                                  className={`${!!initialData ? 'cursor-not-allowed opacity-70' : 'cursor-pointer group hover:bg-transparent'}`}
+                                  className={`${initialData ? 'cursor-not-allowed opacity-70' : 'cursor-pointer group hover:bg-transparent'}`}
                                   onClick={() => !initialData && handleCompetencyChange(String(comp.id))}
                                 >
                                   <TableCell className="text-center py-3" onClick={(e) => e.stopPropagation()}>
                                     <input
                                       type="radio"
                                       name="competencySelection"
-                                      className={`h-4 w-4 rounded-full border-slate-300 text-primary focus:ring-primary ${!!initialData ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                                      className={`h-4 w-4 rounded-full border-slate-300 text-primary focus:ring-primary ${initialData ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                                       checked={isSelected}
                                       onChange={() => !initialData && handleCompetencyChange(String(comp.id))}
-                                      disabled={!!initialData}
+                                      disabled={Boolean(initialData)}
                                     />
                                   </TableCell>
                                   <TableCell className="font-medium text-slate-900 py-3">

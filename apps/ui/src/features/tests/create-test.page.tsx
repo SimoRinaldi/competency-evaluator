@@ -21,10 +21,12 @@ import {
 import {
   ApiCompetency,
   ApiSubCompetency,
-  ApiUser,
+  ApiTestEvaluator,
+  ApiEvaluatedUser,
   fetchCompetencies,
   fetchSubCompetencies,
-  fetchUsers,
+  fetchTestEvaluators,
+  fetchEvaluatedUsers,
   fetchTestDesigners,
   createTest,
 } from './tests.api';
@@ -48,8 +50,8 @@ export function CreateTestPage() {
   // Dati API
   const [competencies, setCompetencies] = useState<ApiCompetency[]>([]);
   const [subCompetencies, setSubCompetencies] = useState<ApiSubCompetency[]>([]);
-  const [users, setUsers] = useState<ApiUser[]>([]);
-  const [evaluators, setEvaluators] = useState<ApiUser[]>([]);
+  const [evaluatedUsers, setEvaluatedUsers] = useState<ApiEvaluatedUser[]>([]);
+  const [testEvaluators, setTestEvaluators] = useState<ApiTestEvaluator[]>([]);
 
   // Stati form
   const [assessmentSituation, setAssessmentSituation] = useState(
@@ -57,8 +59,8 @@ export function CreateTestPage() {
   );
   const [selectedCompetencyId, setSelectedCompetencyId] = useState<string>('');
   const [selectedSubcompetencyIds, setSelectedSubcompetencyIds] = useState<number[]>([]);
-  const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
-  const [selectedEvaluatorIds, setSelectedEvaluatorIds] = useState<number[]>([]);
+  const [selectedEvaluatedUserIds, setSelectedEvaluatedUserIds] = useState<number[]>([]);
+  const [selectedTestEvaluatorIds, setSelectedTestEvaluatorIds] = useState<number[]>([]);
 
   // Stati ricerca
   const [subSearch, setSubSearch] = useState<string>('');
@@ -81,22 +83,17 @@ export function CreateTestPage() {
     async function loadData() {
       setIsLoading(true);
       try {
-        const [compRes, subRes, allUsers] = await Promise.all([
+        const [compRes, subRes, evaluatedUsersRes, testEvaluatorsRes] = await Promise.all([
           fetchCompetencies().catch(() => []),
           fetchSubCompetencies().catch(() => []),
-          fetchUsers().catch(() => []),
+          fetchEvaluatedUsers().catch(() => []),
+          fetchTestEvaluators().catch(() => []),
         ]);
 
         setCompetencies(compRes);
         setSubCompetencies(subRes);
-
-        const students = allUsers.filter((u: ApiUser) => u.role === 'USER');
-        const evals = allUsers.filter(
-          (u: ApiUser) => u.role === 'EVALUATOR' || u.role === 'TEST_DESIGNER'
-        );
-
-        setUsers(students);
-        setEvaluators(evals);
+        setEvaluatedUsers(evaluatedUsersRes);
+        setTestEvaluators(testEvaluatorsRes);
       } catch (err: any) {
         console.error('Errore caricamento dati test:', err);
       } finally {
@@ -134,35 +131,35 @@ export function CreateTestPage() {
     return filteredSubcompetencies.slice(start, start + PAGE_SIZE);
   }, [filteredSubcompetencies, subPage]);
 
-  // Utenti filtrati
-  const filteredUsers = useMemo(() => {
+  // Utenti valutati filtrati
+  const filteredEvaluatedUsers = useMemo(() => {
     const q = userSearch.trim().toLowerCase();
-    if (!q) return users;
-    return users.filter(
-      (u) => u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)
+    if (!q) return evaluatedUsers;
+    return evaluatedUsers.filter(
+      (eu) => eu.user?.name.toLowerCase().includes(q) || eu.user?.email.toLowerCase().includes(q)
     );
-  }, [users, userSearch]);
+  }, [evaluatedUsers, userSearch]);
 
-  const totalUserPages = Math.ceil(filteredUsers.length / PAGE_SIZE) || 1;
-  const paginatedUsers = useMemo(() => {
+  const totalUserPages = Math.ceil(filteredEvaluatedUsers.length / PAGE_SIZE) || 1;
+  const paginatedEvaluatedUsers = useMemo(() => {
     const start = (userPage - 1) * PAGE_SIZE;
-    return filteredUsers.slice(start, start + PAGE_SIZE);
-  }, [filteredUsers, userPage]);
+    return filteredEvaluatedUsers.slice(start, start + PAGE_SIZE);
+  }, [filteredEvaluatedUsers, userPage]);
 
   // Valutatori filtrati
-  const filteredEvaluators = useMemo(() => {
+  const filteredTestEvaluators = useMemo(() => {
     const q = evaluatorSearch.trim().toLowerCase();
-    if (!q) return evaluators;
-    return evaluators.filter(
-      (ev) => ev.name.toLowerCase().includes(q) || ev.email.toLowerCase().includes(q)
+    if (!q) return testEvaluators;
+    return testEvaluators.filter(
+      (te) => te.user?.name.toLowerCase().includes(q) || te.user?.email.toLowerCase().includes(q)
     );
-  }, [evaluators, evaluatorSearch]);
+  }, [testEvaluators, evaluatorSearch]);
 
-  const totalEvaluatorPages = Math.ceil(filteredEvaluators.length / PAGE_SIZE) || 1;
-  const paginatedEvaluators = useMemo(() => {
+  const totalEvaluatorPages = Math.ceil(filteredTestEvaluators.length / PAGE_SIZE) || 1;
+  const paginatedTestEvaluators = useMemo(() => {
     const start = (evaluatorPage - 1) * PAGE_SIZE;
-    return filteredEvaluators.slice(start, start + PAGE_SIZE);
-  }, [filteredEvaluators, evaluatorPage]);
+    return filteredTestEvaluators.slice(start, start + PAGE_SIZE);
+  }, [filteredTestEvaluators, evaluatorPage]);
 
   // Cambio competenza
   const handleCompetencyChange = (val: string) => {
@@ -189,45 +186,45 @@ export function CreateTestPage() {
     }
   };
 
-  // Toggle Utente
-  const toggleUser = (id: number) => {
-    setSelectedUserIds((prev) =>
+  // Toggle Utente Valutato
+  const toggleEvaluatedUser = (id: number) => {
+    setSelectedEvaluatedUserIds((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   };
 
-  const toggleAllVisibleUsers = () => {
-    const visibleIds = paginatedUsers.map((u) => u.id);
-    const allSelected = visibleIds.every((id) => selectedUserIds.includes(id));
+  const toggleAllVisibleEvaluatedUsers = () => {
+    const visibleIds = paginatedEvaluatedUsers.map((eu) => eu.id);
+    const allSelected = visibleIds.every((id) => selectedEvaluatedUserIds.includes(id));
     if (allSelected) {
-      setSelectedUserIds((prev) => prev.filter((id) => !visibleIds.includes(id)));
+      setSelectedEvaluatedUserIds((prev) => prev.filter((id) => !visibleIds.includes(id)));
     } else {
-      setSelectedUserIds((prev) => Array.from(new Set([...prev, ...visibleIds])));
+      setSelectedEvaluatedUserIds((prev) => Array.from(new Set([...prev, ...visibleIds])));
     }
   };
 
   // Toggle Valutatore
-  const toggleEval = (id: number) => {
-    setSelectedEvaluatorIds((prev) =>
+  const toggleTestEvaluator = (id: number) => {
+    setSelectedTestEvaluatorIds((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   };
 
-  const toggleAllVisibleEvals = () => {
-    const visibleIds = paginatedEvaluators.map((e) => e.id);
-    const allSelected = visibleIds.every((id) => selectedEvaluatorIds.includes(id));
+  const toggleAllVisibleTestEvaluators = () => {
+    const visibleIds = paginatedTestEvaluators.map((te) => te.id);
+    const allSelected = visibleIds.every((id) => selectedTestEvaluatorIds.includes(id));
     if (allSelected) {
-      setSelectedEvaluatorIds((prev) => prev.filter((id) => !visibleIds.includes(id)));
+      setSelectedTestEvaluatorIds((prev) => prev.filter((id) => !visibleIds.includes(id)));
     } else {
-      setSelectedEvaluatorIds((prev) => Array.from(new Set([...prev, ...visibleIds])));
+      setSelectedTestEvaluatorIds((prev) => Array.from(new Set([...prev, ...visibleIds])));
     }
   };
 
   // Validità step
   const isStep1Valid = Boolean(selectedCompetencyId);
   const isStep2Valid = isStep1Valid && selectedSubcompetencyIds.length > 0;
-  const isStep3Valid = selectedUserIds.length > 0;
-  const isStep4Valid = selectedEvaluatorIds.length > 0;
+  const isStep3Valid = selectedEvaluatedUserIds.length > 0;
+  const isStep4Valid = selectedTestEvaluatorIds.length > 0;
   const isAllValid = isStep1Valid && isStep2Valid && isStep3Valid && isStep4Valid;
 
   // Invio finale
@@ -247,8 +244,8 @@ export function CreateTestPage() {
         assessment_situation: assessmentSituation.trim() || 'Assessment di valutazione',
         test_designer_id: designerId,
         subcompetency_ids: selectedSubcompetencyIds,
-        evaluated_user_ids: selectedUserIds,
-        evaluator_ids: selectedEvaluatorIds,
+        evaluated_user_ids: selectedEvaluatedUserIds,
+        test_evaluator_ids: selectedTestEvaluatorIds,
       });
 
       setSubmitSuccess(true);
@@ -376,7 +373,7 @@ export function CreateTestPage() {
                   className={`flex shrink-0 items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-all ${
                     activeMenu === 3
                       ? 'bg-slate-900 text-white shadow-md scale-110'
-                      : selectedUserIds.length > 0
+                      : selectedEvaluatedUserIds.length > 0
                       ? 'bg-white border-2 border-slate-300 text-slate-900 group-hover:border-slate-400'
                       : 'bg-slate-100 text-slate-400'
                   }`}
@@ -394,8 +391,8 @@ export function CreateTestPage() {
                     Utenti
                   </div>
                   <div className="text-xs text-slate-400 mt-0.5">
-                    {selectedUserIds.length > 0
-                      ? `${selectedUserIds.length} partecipanti`
+                    {selectedEvaluatedUserIds.length > 0
+                      ? `${selectedEvaluatedUserIds.length} partecipanti`
                       : 'Candidati'}
                   </div>
                 </div>
@@ -416,7 +413,7 @@ export function CreateTestPage() {
                   className={`flex shrink-0 items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-all ${
                     activeMenu === 4
                       ? 'bg-slate-900 text-white shadow-md scale-110'
-                      : selectedEvaluatorIds.length > 0
+                      : selectedTestEvaluatorIds.length > 0
                       ? 'bg-white border-2 border-slate-300 text-slate-900 group-hover:border-slate-400'
                       : 'bg-slate-100 text-slate-400'
                   }`}
@@ -434,8 +431,8 @@ export function CreateTestPage() {
                     Valutatori
                   </div>
                   <div className="text-xs text-slate-400 mt-0.5">
-                    {selectedEvaluatorIds.length > 0
-                      ? `${selectedEvaluatorIds.length} docenti/eval`
+                    {selectedTestEvaluatorIds.length > 0
+                      ? `${selectedTestEvaluatorIds.length} docenti/eval`
                       : 'Commissione'}
                   </div>
                 </div>
@@ -741,10 +738,10 @@ export function CreateTestPage() {
                           type="checkbox"
                           className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer"
                           checked={
-                            paginatedUsers.length > 0 &&
-                            paginatedUsers.every((u) => selectedUserIds.includes(u.id))
+                            paginatedEvaluatedUsers.length > 0 &&
+                            paginatedEvaluatedUsers.every((eu) => selectedEvaluatedUserIds.includes(eu.id))
                           }
-                          onChange={toggleAllVisibleUsers}
+                          onChange={toggleAllVisibleEvaluatedUsers}
                         />
                       </TableHead>
                       <TableHead className="font-semibold text-slate-700">Nome Utente</TableHead>
@@ -752,35 +749,35 @@ export function CreateTestPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {paginatedUsers.length === 0 ? (
+                    {paginatedEvaluatedUsers.length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={3} className="h-32 text-center text-xs text-slate-400">
                           Nessun utente trovato.
                         </TableCell>
                       </TableRow>
                     ) : (
-                      paginatedUsers.map((user) => {
-                        const isSelected = selectedUserIds.includes(user.id);
+                      paginatedEvaluatedUsers.map((eu) => {
+                        const isSelected = selectedEvaluatedUserIds.includes(eu.id);
                         return (
                           <TableRow
-                            key={user.id}
+                            key={eu.id}
                             data-state={isSelected ? 'selected' : undefined}
                             className="cursor-pointer hover:bg-slate-50"
-                            onClick={() => toggleUser(user.id)}
+                            onClick={() => toggleEvaluatedUser(eu.id)}
                           >
                             <TableCell className="text-center" onClick={(e) => e.stopPropagation()}>
                               <input
                                 type="checkbox"
                                 className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer"
                                 checked={isSelected}
-                                onChange={() => toggleUser(user.id)}
+                                onChange={() => toggleEvaluatedUser(eu.id)}
                               />
                             </TableCell>
                             <TableCell className="font-medium text-slate-900 text-sm">
-                              {user.name}
+                              {eu.user?.name ?? '-'}
                             </TableCell>
                             <TableCell className="text-slate-600 text-xs">
-                              {user.email}
+                              {eu.user?.email ?? '-'}
                             </TableCell>
                           </TableRow>
                         );
@@ -789,10 +786,10 @@ export function CreateTestPage() {
                   </TableBody>
                 </Table>
 
-                {filteredUsers.length > 0 && (
+                {filteredEvaluatedUsers.length > 0 && (
                   <div className="flex items-center justify-between px-4 py-2 bg-slate-50 border-t border-slate-200 text-xs text-slate-500">
                     <span>
-                      {selectedUserIds.length} selezionati su {filteredUsers.length}
+                      {selectedEvaluatedUserIds.length} selezionati su {filteredEvaluatedUsers.length}
                     </span>
                     <div className="flex items-center gap-2">
                       <span>Pagina {userPage} di {totalUserPages}</span>
@@ -832,7 +829,7 @@ export function CreateTestPage() {
                 </Button>
                 <Button
                   type="button"
-                  disabled={selectedUserIds.length === 0}
+                  disabled={selectedEvaluatedUserIds.length === 0}
                   onClick={() => setActiveMenu(4)}
                   className="bg-slate-900 hover:bg-slate-800 text-white px-8"
                 >
@@ -879,10 +876,10 @@ export function CreateTestPage() {
                           type="checkbox"
                           className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer"
                           checked={
-                            paginatedEvaluators.length > 0 &&
-                            paginatedEvaluators.every((ev) => selectedEvaluatorIds.includes(ev.id))
+                            paginatedTestEvaluators.length > 0 &&
+                            paginatedTestEvaluators.every((te) => selectedTestEvaluatorIds.includes(te.id))
                           }
-                          onChange={toggleAllVisibleEvals}
+                          onChange={toggleAllVisibleTestEvaluators}
                         />
                       </TableHead>
                       <TableHead className="font-semibold text-slate-700">Nome Valutatore</TableHead>
@@ -890,35 +887,35 @@ export function CreateTestPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {paginatedEvaluators.length === 0 ? (
+                    {paginatedTestEvaluators.length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={3} className="h-32 text-center text-xs text-slate-400">
                           Nessun valutatore trovato.
                         </TableCell>
                       </TableRow>
                     ) : (
-                      paginatedEvaluators.map((ev) => {
-                        const isSelected = selectedEvaluatorIds.includes(ev.id);
+                      paginatedTestEvaluators.map((te) => {
+                        const isSelected = selectedTestEvaluatorIds.includes(te.id);
                         return (
                           <TableRow
-                            key={ev.id}
+                            key={te.id}
                             data-state={isSelected ? 'selected' : undefined}
                             className="cursor-pointer hover:bg-slate-50"
-                            onClick={() => toggleEval(ev.id)}
+                            onClick={() => toggleTestEvaluator(te.id)}
                           >
                             <TableCell className="text-center" onClick={(e) => e.stopPropagation()}>
                               <input
                                 type="checkbox"
                                 className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer"
                                 checked={isSelected}
-                                onChange={() => toggleEval(ev.id)}
+                                onChange={() => toggleTestEvaluator(te.id)}
                               />
                             </TableCell>
                             <TableCell className="font-medium text-slate-900 text-sm">
-                              {ev.name}
+                              {te.user?.name ?? '-'}
                             </TableCell>
                             <TableCell className="text-slate-600 text-xs">
-                              {ev.email}
+                              {te.user?.email ?? '-'}
                             </TableCell>
                           </TableRow>
                         );
@@ -927,10 +924,10 @@ export function CreateTestPage() {
                   </TableBody>
                 </Table>
 
-                {filteredEvaluators.length > 0 && (
+                {filteredTestEvaluators.length > 0 && (
                   <div className="flex items-center justify-between px-4 py-2 bg-slate-50 border-t border-slate-200 text-xs text-slate-500">
                     <span>
-                      {selectedEvaluatorIds.length} selezionati su {filteredEvaluators.length}
+                      {selectedTestEvaluatorIds.length} selezionati su {filteredTestEvaluators.length}
                     </span>
                     <div className="flex items-center gap-2">
                       <span>Pagina {evaluatorPage} di {totalEvaluatorPages}</span>
@@ -970,7 +967,7 @@ export function CreateTestPage() {
                 </Button>
                 <Button
                   type="button"
-                  disabled={selectedEvaluatorIds.length === 0}
+                  disabled={selectedTestEvaluatorIds.length === 0}
                   onClick={() => setActiveMenu(5)}
                   className="bg-slate-900 hover:bg-slate-800 text-white px-8"
                 >
@@ -1042,23 +1039,23 @@ export function CreateTestPage() {
 
                     <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-1">
                       <div className="flex justify-between items-center text-xs text-slate-400 font-bold uppercase tracking-wider">
-                        <span>Utenti ({selectedUserIds.length})</span>
+                        <span>Utenti ({selectedEvaluatedUserIds.length})</span>
                         <button onClick={() => setActiveMenu(3)} className="text-sky-600 hover:underline">Modifica</button>
                       </div>
-                      <p className="font-semibold text-slate-900 text-sm">{selectedUserIds.length} partecipanti</p>
+                      <p className="font-semibold text-slate-900 text-sm">{selectedEvaluatedUserIds.length} partecipanti</p>
                       <p className="text-xs text-slate-500 truncate">
-                        {users.filter((u) => selectedUserIds.includes(u.id)).map((u) => u.name).join(', ')}
+                        {evaluatedUsers.filter((eu) => selectedEvaluatedUserIds.includes(eu.id)).map((eu) => eu.user?.name ?? '-').join(', ')}
                       </p>
                     </div>
 
                     <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-1">
                       <div className="flex justify-between items-center text-xs text-slate-400 font-bold uppercase tracking-wider">
-                        <span>Valutatori ({selectedEvaluatorIds.length})</span>
+                        <span>Valutatori ({selectedTestEvaluatorIds.length})</span>
                         <button onClick={() => setActiveMenu(4)} className="text-sky-600 hover:underline">Modifica</button>
                       </div>
-                      <p className="font-semibold text-slate-900 text-sm">{selectedEvaluatorIds.length} valutatori</p>
+                      <p className="font-semibold text-slate-900 text-sm">{selectedTestEvaluatorIds.length} valutatori</p>
                       <p className="text-xs text-slate-500 truncate">
-                        {evaluators.filter((e) => selectedEvaluatorIds.includes(e.id)).map((e) => e.name).join(', ')}
+                        {testEvaluators.filter((te) => selectedTestEvaluatorIds.includes(te.id)).map((te) => te.user?.name ?? '-').join(', ')}
                       </p>
                     </div>
                   </div>

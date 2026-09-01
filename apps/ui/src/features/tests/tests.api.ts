@@ -69,7 +69,7 @@ export interface CreateTestPayload {
   assessment_situation: string;
   test_designer_id: number;
   subcompetency_ids: number[];
-  evaluator_ids?: number[];
+  test_evaluator_ids?: number[];
   evaluated_user_ids?: number[];
 }
 
@@ -251,11 +251,19 @@ export async function fetchTestDetails(testId: number): Promise<ApiTestDetails> 
   }
 
   const students: ApiUser[] = executions
-    .map((exec) => exec.evaluated_user?.user)
+    .map((exec) =>
+      exec.evaluated_user?.user
+        ? { ...exec.evaluated_user.user, id: exec.evaluated_user.id }
+        : exec.user_id
+        ? ({ id: exec.user_id } as ApiUser)
+        : undefined
+    )
     .filter((u): u is ApiUser => !!u);
 
   const evaluators: ApiUser[] = evaluatorsList
-    .map((te) => te.user)
+    .map((te) =>
+      te.user ? { ...te.user, id: te.id } : ({ id: te.id } as ApiUser)
+    )
     .filter((u): u is ApiUser => !!u);
 
   return {

@@ -12,7 +12,6 @@ import { CreateTestDto } from './dto/create-test.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
 import { TestRepository } from './test.repository';
 import { SubCompetencyEntity } from '@server/competencies-management';
-import { TestEvaluatorEntity } from '@server/tests-evaluation';
 
 @Injectable()
 export class TestService {
@@ -45,7 +44,7 @@ export class TestService {
     try {
       const manager = queryRunner.manager;
 
-      // 0. Verifica che tutte le sotto-competenze esistano e appartengano alla STESSA competenza
+      // Verifica che tutte le sotto-competenze esistano e appartengano alla STESSA competenza
       const subcompetencies = await manager.find(SubCompetencyEntity, {
         where: { id: In(dto.subcompetency_ids) },
       });
@@ -68,14 +67,14 @@ export class TestService {
         );
       }
 
-      // 1. Creazione e salvataggio dell'entità Test
+      // Creazione e salvataggio dell'entità Test
       const test = manager.create(TestEntity, {
         assessment_situation: dto.assessment_situation,
         test_designer_id: dto.test_designer_id,
       });
       const savedTest = await manager.save(test);
 
-      // 1.5. Collegamento sottocompetenze nella tabella pivot
+      // Collegamento sottocompetenze nella tabella pivot
       if (dto.subcompetency_ids && dto.subcompetency_ids.length > 0) {
         const subRows = dto.subcompetency_ids.map((subId) => ({
           test_id: savedTest.id,
@@ -84,30 +83,23 @@ export class TestService {
         await manager.insert('test_subcompetency', subRows);
       }
 
-      // 2. Collegamento valutatori nella tabella N:N test_evaluation
-      if (dto.evaluator_ids && dto.evaluator_ids.length > 0) {
-        const evaluators = await manager.find(TestEvaluatorEntity, {
-          where: { user_id: In(dto.evaluator_ids) }
-        });
-        const evaluatorRows = evaluators.map((ev) => ({
+      // Collegamento valutatori nella tabella N:N test_evaluation
+      if (dto.test_evaluator_ids && dto.test_evaluator_ids.length > 0) {
+        const evaluatorRows = dto.test_evaluator_ids.map((testEvaluatorId) => ({
           test_id: savedTest.id,
-          test_evaluator_id: ev.id,
+          test_evaluator_id: testEvaluatorId,
         }));
-
-        if (evaluatorRows.length > 0) {
-          await manager.insert('test_evaluation', evaluatorRows);
-        }
+        await manager.insert('test_evaluation', evaluatorRows);
       }
 
-      // 3. Creazione record test_execution per ciascun evaluated_user assegnato
+      // Creazione record test_execution per ciascun evaluated_user assegnato
       if (dto.evaluated_user_ids && dto.evaluated_user_ids.length > 0) {
-        const executionRows = dto.evaluated_user_ids.map((userId) => ({
+        const executionRows = dto.evaluated_user_ids.map((evaluatedUserId) => ({
           test_id: savedTest.id,
-          user_id: userId,
+          user_id: evaluatedUserId,
           test_score: null,
           max_score: null,
         }));
-
         await manager.insert('test_execution', executionRows);
       }
 
@@ -180,7 +172,7 @@ export class TestService {
 
       if (dto.assessment_situation !== undefined) test.assessment_situation = dto.assessment_situation;
       if (dto.test_designer_id !== undefined) test.test_designer_id = dto.test_designer_id;
-      
+
       const savedTest = await manager.save(test);
 
       if (dto.subcompetency_ids !== undefined) {
@@ -194,28 +186,23 @@ export class TestService {
         }
       }
 
-      if (dto.evaluator_ids !== undefined) {
+      if (dto.test_evaluator_ids !== undefined) {
         await manager.delete('test_evaluation', { test_id: id });
-        if (dto.evaluator_ids.length > 0) {
-          const evaluators = await manager.find(TestEvaluatorEntity, {
-            where: { user_id: In(dto.evaluator_ids) }
-          });
-          const evaluatorRows = evaluators.map((ev) => ({
+        if (dto.test_evaluator_ids.length > 0) {
+          const evaluatorRows = dto.test_evaluator_ids.map((testEvaluatorId) => ({
             test_id: id,
-            test_evaluator_id: ev.id,
+            test_evaluator_id: testEvaluatorId,
           }));
-          if (evaluatorRows.length > 0) {
-            await manager.insert('test_evaluation', evaluatorRows);
-          }
+          await manager.insert('test_evaluation', evaluatorRows);
         }
       }
 
       if (dto.evaluated_user_ids !== undefined) {
         await manager.delete('test_execution', { test_id: id });
         if (dto.evaluated_user_ids.length > 0) {
-          const executionRows = dto.evaluated_user_ids.map((userId) => ({
+          const executionRows = dto.evaluated_user_ids.map((evaluatedUserId) => ({
             test_id: id,
-            user_id: userId,
+            user_id: evaluatedUserId,
             test_score: null,
             max_score: null,
           }));
