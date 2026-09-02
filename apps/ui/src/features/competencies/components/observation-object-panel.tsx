@@ -14,8 +14,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 import { Button } from "@/components/ui/button";
-import { Pencil, Plus } from "lucide-react";
+import { Plus, Trash2, Pencil } from "lucide-react";
 
 export function ObservationObjectPanel({
   obsDescription,
@@ -84,41 +89,93 @@ export function ObservationObjectPanel({
     closeForm();
   }
 
+  function handleDeleteIndicator() {
+    if (editingIndex === null) return;
+    const updated = indicators.filter((_, idx) => idx !== editingIndex);
+    setIndicators(updated);
+    closeForm();
+  }
+
   const handleCreateNewRubricFromPicker = (rubricData: any) => {
     // Aggiunge la rubrica alla lista di quelle temporanee e la rende disponibile nel picker
     setNewRubrics([...newRubrics, rubricData]);
   };
 
-  function getSelectedRubric(idStr: string) {
+  function getSelectedRubric(idStr: any) {
     if (!idStr) return null;
-    if (idStr.startsWith('db_')) {
-      const id = parseInt(idStr.replace('db_', ''));
-      return dbRubrics.find((r: any) => r.id === id);
+    if (typeof idStr === 'number') {
+      return dbRubrics?.find((r: any) => r.id === idStr);
     }
-    if (idStr.startsWith('temp_')) {
-      const id = parseInt(idStr.replace('temp_', ''));
+    const str = String(idStr);
+    if (str.startsWith('db_')) {
+      const id = parseInt(str.replace('db_', ''), 10);
+      return dbRubrics?.find((r: any) => r.id === id);
+    }
+    if (str.startsWith('temp_')) {
+      const id = parseInt(str.replace('temp_', ''), 10);
       return newRubrics?.[id];
     }
     return null;
   }
 
+  function getLevelColorClassByColIndex(colIndex: number) {
+    switch (colIndex) {
+      case 1: return "bg-red-100 text-slate-700 border-red-200";
+      case 2: return "bg-orange-100 text-slate-700 border-orange-200";
+      case 3: return "bg-slate-100 text-slate-700 border-slate-200";
+      case 4: return "bg-lime-100 text-slate-700 border-lime-200";
+      case 5: return "bg-green-100 text-slate-700 border-green-200";
+      default: return "bg-slate-100 text-slate-700 border-slate-200";
+    }
+  }
+
+  function getLevelForColumn(rubric: any, colIndex: number) {
+    if (!rubric || !rubric.levels) return null;
+    if (rubric.yes_no || rubric.levels.length === 2) {
+      if (colIndex === 1) return rubric.levels.find((l: any) => l.rank === 1) || rubric.levels[0];
+      if (colIndex === 5) return rubric.levels.find((l: any) => l.rank === 5) || rubric.levels[1];
+      return null;
+    }
+    return rubric.levels.find((l: any) => l.rank === colIndex);
+  }
+
   const RubricLevelsPreview = ({ rubric }: { rubric: any }) => {
-    if (!rubric || !rubric.levels)
-      return <span className="text-muted-foreground italic">Nessuna rubrica</span>;
-    const sortedLevels = [...rubric.levels].sort((a: any, b: any) => a.rank - b.rank);
+    if (!rubric || !rubric.levels || rubric.levels.length === 0)
+      return <span className="text-muted-foreground italic text-xs">Nessuna rubrica</span>;
+
+    const isBinary = rubric.yes_no || rubric.levels.length === 2;
+    const colIndices = isBinary ? [1, 5] : [1, 2, 3, 4, 5];
+
     return (
-      <div className="flex gap-1 overflow-x-auto scrollbar-thin">
-        {sortedLevels.map((l: any, i: number) => (
-          <div
-            key={i}
-            className="flex-shrink-0 bg-muted rounded px-2 py-1 text-[10px] border border-border max-w-[120px]"
-          >
-            <span className="font-bold text-slate-700">{l.rank}.</span>{' '}
-            <span className="text-slate-600 truncate inline-block align-bottom max-w-[90px]">
-              {l.description}
-            </span>
-          </div>
-        ))}
+      <div className="flex items-center gap-1.5 flex-nowrap overflow-x-auto py-0.5">
+        {colIndices.map((colIdx) => {
+          const level = getLevelForColumn(rubric, colIdx);
+          if (!level) return null;
+          const colorClass = getLevelColorClassByColIndex(colIdx);
+          return (
+            <HoverCard key={colIdx} openDelay={10} closeDelay={100}>
+              <HoverCardTrigger asChild>
+                <span
+                  className={`inline-block max-w-[90px] sm:max-w-[110px] truncate px-2 py-0.5 rounded text-[11px] font-medium border cursor-default select-none shrink-0 ${colorClass}`}
+                >
+                  {level.description || `Livello ${colIdx}`}
+                </span>
+              </HoverCardTrigger>
+              <HoverCardContent className="flex w-64 flex-col gap-0.5 z-50 bg-white shadow-md border p-3 rounded-lg" side="top">
+                <div className="font-semibold text-xs text-slate-900">Livello {colIdx}</div>
+                <div className="text-xs text-slate-700 break-words mt-1">{level.description}</div>
+                <div className="mt-1 text-[10px] text-muted-foreground">
+                  {rubric.yes_no ? "Scala Binaria" : "Scala Standard"}
+                </div>
+              </HoverCardContent>
+            </HoverCard>
+          );
+        })}
+        {isBinary && (
+          <span className="text-[10px] text-slate-500 font-medium ml-1 shrink-0">
+            (Binaria)
+          </span>
+        )}
       </div>
     );
   };
@@ -127,11 +184,20 @@ export function ObservationObjectPanel({
     {
       accessorKey: "description",
       header: "Descrizione",
+      cell: ({ row }) => (
+        <span className="block truncate font-medium text-slate-900 max-w-[180px] sm:max-w-xs">
+          {row.getValue("description")}
+        </span>
+      ),
     },
     {
       accessorKey: "weight",
       header: () => <div className="text-center">Peso</div>,
-      cell: ({ row }) => <div className="text-center">{row.getValue("weight")}</div>,
+      cell: ({ row }) => (
+        <div className="text-center font-medium text-slate-700">
+          {row.getValue("weight")}
+        </div>
+      ),
     },
     {
       id: "rubric",
@@ -143,22 +209,22 @@ export function ObservationObjectPanel({
     },
     {
       id: "actions",
-      cell: ({ row }) => {
-        return (
-          <div className="flex justify-end">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="h-8 w-8 p-0"
-              onClick={() => openEditForm(row.index)}
-            >
-              <span className="sr-only">Modifica</span>
-              <Pencil className="h-4 w-4" />
-            </Button>
-          </div>
-        );
-      }
-    }
+      header: () => <div className="text-right">Azioni</div>,
+      cell: ({ row }) => (
+        <div className="flex items-center justify-end">
+          <Button 
+            type="button"
+            variant="ghost" 
+            size="sm" 
+            className="h-8 w-8 p-0 text-slate-500 hover:text-sky-600 cursor-pointer"
+            title="Modifica indicatore"
+            onClick={() => openEditForm(row.index)}
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
+        </div>
+      ),
+    },
   ], [dbRubrics, newRubrics]);
 
   const table = useReactTable({
@@ -190,7 +256,7 @@ export function ObservationObjectPanel({
           <h3 className="text-lg font-semibold text-slate-800">
             Indicatori associati ({indicators.length})
           </h3>
-          <Button onClick={openNewForm} disabled={isFormOpen}>
+          <Button type="button" onClick={openNewForm} disabled={isFormOpen}>
             <Plus className="mr-2 h-4 w-4" /> Nuovo
           </Button>
         </div>
@@ -265,22 +331,38 @@ export function ObservationObjectPanel({
                 </div>
               </div>
 
-              <div className="pt-4 flex justify-end gap-2 border-t border-border mt-4">
-                <Button variant="outline" onClick={closeForm}>
-                  Annulla
-                </Button>
-                <Button 
-                  onClick={handleSaveIndicator}
-                  disabled={
-                    !indDesc.trim() ||
-                    !indWeight ||
-                    parseInt(indWeight) < 1 ||
-                    parseInt(indWeight) > 5 ||
-                    !indRubricId
-                  }
-                >
-                  {editingIndex !== null ? 'Salva modifiche' : 'Crea'}
-                </Button>
+              <div className="pt-4 flex justify-between items-center border-t border-border mt-4">
+                <div>
+                  {editingIndex !== null && (
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      onClick={handleDeleteIndicator}
+                    >
+                      <Trash2 className="h-4 w-4 mr-1.5" />
+                      Rimuovi indicatore
+                    </Button>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <Button type="button" variant="outline" onClick={closeForm}>
+                    Annulla
+                  </Button>
+                  <Button 
+                    type="button"
+                    onClick={handleSaveIndicator}
+                    disabled={
+                      !indDesc.trim() ||
+                      !indWeight ||
+                      parseInt(indWeight) < 1 ||
+                      parseInt(indWeight) > 5 ||
+                      !indRubricId
+                    }
+                  >
+                    {editingIndex !== null ? 'Salva modifiche' : 'Crea'}
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
@@ -314,7 +396,7 @@ export function ObservationObjectPanel({
                     data-state={row.getIsSelected() && "selected"}
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className="px-4 py-2">
+                      <TableCell key={cell.id} className="px-4 py-2.5">
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()

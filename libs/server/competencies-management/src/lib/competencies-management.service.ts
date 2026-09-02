@@ -190,6 +190,79 @@ export class CompetenciesManagementService {
     }
   }
 
+  // Aggiorna in modo mirato l'oggetto di osservazione e gli indicatori di una singola sotto-competenza
+  async handleUpdateSubCompetencyObservationObject(
+    subcompetency_id: number,
+    dto: CreateObservationObjectChainDto,
+  ): Promise<SubCompetencyEntity> {
+    const query_runner = this.dataSource.createQueryRunner();
+    await query_runner.connect();
+    await query_runner.startTransaction();
+
+    try {
+      const manager = query_runner.manager;
+
+      const subcompetency = await manager.findOne(SubCompetencyEntity, {
+        where: { id: subcompetency_id },
+        relations: {
+          observation_object: {
+            indicators: true,
+          },
+          competency: true,
+        },
+      });
+
+      if (!subcompetency) {
+        throw new NotFoundException(
+          `Sotto-competenza con ID ${subcompetency_id} non trovata`,
+        );
+      }
+
+      //cache per i set di rubriche usati in questa transazione
+      const rubric_sets_cache: RubricSetEntity[] = [];
+
+      // dincronizzo l'oggetto di osservazione e gli indicatori (riutilizzando il metodo modulare di diffing)
+      await this.syncObservationObjectChain(
+        manager,
+        dto,
+        subcompetency,
+        rubric_sets_cache,
+      );
+
+      const updated_sub = await manager.findOne(SubCompetencyEntity, {
+        where: { id: subcompetency_id },
+        relations: {
+          competency: true,
+          tools: true,
+          methods: true,
+          skills: true,
+          observation_object: {
+            indicators: {
+              rubric_set: {
+                levels: true,
+              },
+            },
+          },
+        },
+      });
+
+      await query_runner.commitTransaction();
+      return updated_sub ?? subcompetency;
+    } catch (error) {
+      await query_runner.rollbackTransaction();
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        `Errore durante l'aggiornamento dell'oggetto di osservazione: ${
+          (error as Error).message || 'Operazione annullata.'
+        }`,
+      );
+    } finally {
+      await query_runner.release();
+    }
+  }
+
   // Crea l'entità principale per la competenza (controllando che il titolo non esista già)
   async createCompetencyChain(
     manager: EntityManager,

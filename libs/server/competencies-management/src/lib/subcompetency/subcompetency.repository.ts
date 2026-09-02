@@ -18,7 +18,16 @@ export class SubCompetencyRepository {
   findById(id: number): Promise<SubCompetencyEntity | null> {
     return this.repository.findOne({
       where: { id },
-      relations: ['competency', 'tools', 'methods', 'skills'],
+      relations: [
+        'competency',
+        'tools',
+        'methods',
+        'skills',
+        'observation_object',
+        'observation_object.indicators',
+        'observation_object.indicators.rubric_set',
+        'observation_object.indicators.rubric_set.levels',
+      ],
     });
   }
 
@@ -40,7 +49,16 @@ export class SubCompetencyRepository {
   findAll(): Promise<SubCompetencyEntity[]> {
     return this.repository.find({
       order: { id: 'ASC' },
-      relations: ['competency', 'tools', 'methods', 'skills'],
+      relations: [
+        'competency',
+        'tools',
+        'methods',
+        'skills',
+        'observation_object',
+        'observation_object.indicators',
+        'observation_object.indicators.rubric_set',
+        'observation_object.indicators.rubric_set.levels',
+      ],
     });
   }
 

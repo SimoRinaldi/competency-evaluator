@@ -148,6 +148,14 @@ export async function updateCompetencyChain(id: string | number, payload: any) {
   return response.json();
 }
 
+export async function getSubCompetencies() {
+  const response = await fetch(`${API_URL}/subcompetencies`, {
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) throw new Error('Errore nel caricamento delle sottocompetenze');
+  return response.json();
+}
+
 export async function getSubCompetencyById(id: string | number) {
   const response = await fetch(`${API_URL}/subcompetencies/${id}`, {
     headers: getAuthHeaders(),
@@ -156,15 +164,24 @@ export async function getSubCompetencyById(id: string | number) {
   return response.json();
 }
 
-export async function updateSubCompetency(id: string | number, payload: any, obsId?: number | null) {
-  const response = await fetch(`${API_URL}/subcompetencies/${id}`, {
-    method: 'PATCH',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(payload),
-  });
+export async function updateSubCompetencyObservationObject(
+  id: string | number,
+  payload: any,
+) {
+  const response = await fetch(
+    `${API_URL}/competencies_management/subcompetency/${id}/observation-object`,
+    {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(payload),
+    },
+  );
   if (!response.ok) {
     const errorData = await response.json().catch(() => null);
-    throw new Error(errorData?.message || 'Errore durante l\'aggiornamento della sottocompetenza');
+    throw new Error(
+      errorData?.message ||
+        "Errore durante l'aggiornamento dell'oggetto di osservazione",
+    );
   }
   return response.json();
 }

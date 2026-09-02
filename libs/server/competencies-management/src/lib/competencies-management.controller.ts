@@ -21,7 +21,10 @@ import {
 import { JwtAuthGuard, Roles, RolesGuard } from '@server/security';
 import { UserRole } from '@server/users';
 import { CompetenciesManagementService } from './competencies-management.service';
-import { CreateCompetencyChainDto } from './dto/create-chain.dto';
+import {
+  CreateCompetencyChainDto,
+  CreateObservationObjectChainDto,
+} from './dto/create-chain.dto';
 
 @ApiTags('Competencies Management APIs')
 @Controller('competencies_management')
@@ -81,5 +84,29 @@ export class CompetenciesManagementController {
     @Body(ValidationPipe) dto: CreateCompetencyChainDto
   ) {
     return this.competenciesManagementService.handleUpdateCompetencyChain(+id, dto);
+  }
+
+  @Put('subcompetency/:id/observation-object')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
+  @ApiBearerAuth()
+  @ApiBody({ type: CreateObservationObjectChainDto })
+  @ApiOperation({
+    summary:
+      "Aggiorna l'oggetto di osservazione e i relativi indicatori di una specifica sotto-competenza",
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Oggetto di osservazione e indicatori aggiornati con successo in una singola transazione',
+  })
+  async updateSubCompetencyObservationObject(
+    @Param('id') id: string,
+    @Body(ValidationPipe) dto: CreateObservationObjectChainDto
+  ) {
+    return this.competenciesManagementService.handleUpdateSubCompetencyObservationObject(
+      +id,
+      dto
+    );
   }
 }
