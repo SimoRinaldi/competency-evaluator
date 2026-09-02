@@ -359,11 +359,11 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
 
   return (
     <PageContainer
-      title={readOnly ? 'Consultazione Test' : 'Gestione Test'}
+      title={readOnly ? 'Consultazione Test' : 'Gestione test'}
       description={
         readOnly
           ? 'Visualizza tutti i test configurati nel sistema.'
-          : 'Visualizza e gestisci tutti i test configurati nel sistema.'
+          : 'Visualizza e gestisci tutti i tuoi test.'
       }
     >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4">
@@ -372,7 +372,7 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="text"
-              placeholder="Cerca test per descrizione o ID..."
+              placeholder="Cerca test per descrizione..."
               value={globalFilter}
               onChange={(e) => setGlobalFilter(e.target.value)}
               className="pl-9 h-9 w-full bg-white"

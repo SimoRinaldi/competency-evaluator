@@ -7,8 +7,8 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Table,
   TableBody,
@@ -62,7 +62,7 @@ export function CreateTestModal({
 }: CreateTestModalProps) {
   // Descrizione contesto
   const [assessmentSituation, setAssessmentSituation] = useState(
-    'Valutazione delle competenze pratiche e teoriche'
+    'Valutazione delle competenze pratiche e teoriche',
   );
 
   // Stato selezione competenza
@@ -130,17 +130,13 @@ export function CreateTestModal({
   // Filtro Sottocompetenze
   const allSubcompetenciesForCompetency = useMemo(() => {
     if (!selectedCompetencyId) return [];
-    return subCompetencies.filter(
-      (sub) => sub.competency_id === Number(selectedCompetencyId)
-    );
+    return subCompetencies.filter((sub) => sub.competency_id === Number(selectedCompetencyId));
   }, [selectedCompetencyId, subCompetencies]);
 
   const filteredSubcompetencies = useMemo(() => {
     const q = subSearch.trim().toLowerCase();
     if (!q) return allSubcompetenciesForCompetency;
-    return allSubcompetenciesForCompetency.filter((sub) =>
-      sub.title.toLowerCase().includes(q)
-    );
+    return allSubcompetenciesForCompetency.filter((sub) => sub.title.toLowerCase().includes(q));
   }, [allSubcompetenciesForCompetency, subSearch]);
 
   const totalSubPages = Math.ceil(filteredSubcompetencies.length / PAGE_SIZE) || 1;
@@ -154,7 +150,7 @@ export function CreateTestModal({
     const q = userSearch.trim().toLowerCase();
     if (!q) return users;
     return users.filter(
-      (u) => u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)
+      (u) => u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q),
     );
   }, [users, userSearch]);
 
@@ -169,7 +165,7 @@ export function CreateTestModal({
     const q = evaluatorSearch.trim().toLowerCase();
     if (!q) return evaluators;
     return evaluators.filter(
-      (ev) => ev.name.toLowerCase().includes(q) || ev.email.toLowerCase().includes(q)
+      (ev) => ev.name.toLowerCase().includes(q) || ev.email.toLowerCase().includes(q),
     );
   }, [evaluators, evaluatorSearch]);
 
@@ -178,7 +174,6 @@ export function CreateTestModal({
     const start = (evaluatorPage - 1) * PAGE_SIZE;
     return filteredEvaluators.slice(start, start + PAGE_SIZE);
   }, [filteredEvaluators, evaluatorPage]);
-
 
   // Filtro Competenze (per la tabella step 1)
   const filteredCompetencies = useMemo(() => {
@@ -204,67 +199,49 @@ export function CreateTestModal({
   // Toggle selezioni
   const toggleSubcompetency = (id: number) => {
     setSelectedSubcompetencyIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
     );
   };
 
   const toggleAllVisibleSubcompetencies = () => {
     const visibleIds = paginatedSubcompetencies.map((s) => s.id);
-    const areAllVisibleSelected = visibleIds.every((id) =>
-      selectedSubcompetencyIds.includes(id)
-    );
+    const areAllVisibleSelected = visibleIds.every((id) => selectedSubcompetencyIds.includes(id));
     if (areAllVisibleSelected) {
-      setSelectedSubcompetencyIds((prev) =>
-        prev.filter((id) => !visibleIds.includes(id))
-      );
+      setSelectedSubcompetencyIds((prev) => prev.filter((id) => !visibleIds.includes(id)));
     } else {
-      setSelectedSubcompetencyIds((prev) =>
-        Array.from(new Set([...prev, ...visibleIds]))
-      );
+      setSelectedSubcompetencyIds((prev) => Array.from(new Set([...prev, ...visibleIds])));
     }
   };
 
   const toggleUser = (id: number) => {
     setSelectedUserIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
     );
   };
 
   const toggleAllVisibleUsers = () => {
     const visibleIds = paginatedUsers.map((u) => u.id);
-    const areAllVisibleSelected = visibleIds.every((id) =>
-      selectedUserIds.includes(id)
-    );
+    const areAllVisibleSelected = visibleIds.every((id) => selectedUserIds.includes(id));
     if (areAllVisibleSelected) {
-      setSelectedUserIds((prev) =>
-        prev.filter((id) => !visibleIds.includes(id))
-      );
+      setSelectedUserIds((prev) => prev.filter((id) => !visibleIds.includes(id)));
     } else {
-      setSelectedUserIds((prev) =>
-        Array.from(new Set([...prev, ...visibleIds]))
-      );
+      setSelectedUserIds((prev) => Array.from(new Set([...prev, ...visibleIds])));
     }
   };
 
   const toggleEvaluator = (id: number) => {
     setSelectedEvaluatorIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
     );
   };
 
   const toggleAllVisibleEvaluators = () => {
     const visibleIds = paginatedEvaluators.map((e) => e.id);
-    const areAllVisibleSelected = visibleIds.every((id) =>
-      selectedEvaluatorIds.includes(id)
-    );
+    const areAllVisibleSelected = visibleIds.every((id) => selectedEvaluatorIds.includes(id));
     if (areAllVisibleSelected) {
-      setSelectedEvaluatorIds((prev) =>
-        prev.filter((id) => !visibleIds.includes(id))
-      );
+      setSelectedEvaluatorIds((prev) => prev.filter((id) => !visibleIds.includes(id)));
     } else {
-      setSelectedEvaluatorIds((prev) =>
-        Array.from(new Set([...prev, ...visibleIds]))
-      );
+      setSelectedEvaluatorIds((prev) => Array.from(new Set([...prev, ...visibleIds])));
     }
   };
 
@@ -293,11 +270,10 @@ export function CreateTestModal({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent className="max-w-[95vw] xl:max-w-[1400px] w-full h-[90vh] p-0 flex flex-col md:flex-row overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
-        
         {/* COLONNA SINISTRA: SIDEBAR STEPS */}
         <div className="w-full md:w-72 shrink-0 p-6 md:p-8 border-b md:border-b-0 md:border-r border-slate-200 bg-slate-50/50 flex flex-col md:block">
           <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 md:mb-8 hidden md:block">
-            {initialData ? "Gestione Test" : "Gestione Test"}
+            {initialData ? 'Gestione Test' : 'Gestione Test'}
           </h2>
 
           <ul className="flex flex-row md:flex-col gap-2 md:gap-6 relative overflow-x-auto md:overflow-visible pb-2 md:pb-0">
@@ -310,20 +286,28 @@ export function CreateTestModal({
                 onClick={() => setActiveStep(1)}
                 className="flex items-center md:items-start gap-2 md:gap-4 text-left group"
               >
-                <div className={`flex shrink-0 items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-all ${
-                  activeStep === 1
-                    ? 'bg-primary text-primary-foreground shadow-md scale-110'
-                    : isStep1Valid
-                    ? 'bg-white border-2 border-slate-300 text-slate-900 group-hover:border-slate-400'
-                    : 'bg-slate-100 text-slate-400'
-                }`}>
+                <div
+                  className={`flex shrink-0 items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-all ${
+                    activeStep === 1
+                      ? 'bg-primary text-primary-foreground shadow-md scale-110'
+                      : isStep1Valid
+                      ? 'bg-white border-2 border-slate-300 text-slate-900 group-hover:border-slate-400'
+                      : 'bg-slate-100 text-slate-400'
+                  }`}
+                >
                   1
                 </div>
                 <div className="pt-1.5 hidden md:block">
-                  <div className={`font-semibold transition-colors ${activeStep === 1 ? 'text-slate-900' : 'text-slate-500 group-hover:text-slate-900'}`}>
+                  <div
+                    className={`font-semibold transition-colors ${
+                      activeStep === 1
+                        ? 'text-slate-900'
+                        : 'text-slate-500 group-hover:text-slate-900'
+                    }`}
+                  >
                     Dati di base
                   </div>
-                  <div className="text-xs text-slate-400 mt-0.5">Competenza e nome</div>
+                  <div className="text-xs text-slate-400 mt-0.5">Nome e scelta competenze</div>
                 </div>
               </button>
             </li>
@@ -333,23 +317,33 @@ export function CreateTestModal({
               <button
                 onClick={() => setActiveStep(2)}
                 disabled={!isStep1Valid}
-                className={`flex items-center md:items-start gap-2 md:gap-4 text-left group ${!isStep1Valid ? 'cursor-not-allowed opacity-60' : ''}`}
+                className={`flex items-center md:items-start gap-2 md:gap-4 text-left group ${
+                  !isStep1Valid ? 'cursor-not-allowed opacity-60' : ''
+                }`}
               >
-                <div className={`flex shrink-0 items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-all ${
-                  activeStep === 2
-                    ? 'bg-primary text-primary-foreground shadow-md scale-110'
-                    : isStep2Valid
-                    ? 'bg-white border-2 border-slate-300 text-slate-900 group-hover:border-slate-400'
-                    : 'bg-slate-100 text-slate-400'
-                }`}>
+                <div
+                  className={`flex shrink-0 items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-all ${
+                    activeStep === 2
+                      ? 'bg-primary text-primary-foreground shadow-md scale-110'
+                      : isStep2Valid
+                      ? 'bg-white border-2 border-slate-300 text-slate-900 group-hover:border-slate-400'
+                      : 'bg-slate-100 text-slate-400'
+                  }`}
+                >
                   2
                 </div>
                 <div className="pt-1.5 hidden md:block">
-                  <div className={`font-semibold transition-colors ${activeStep === 2 ? 'text-slate-900' : 'text-slate-500 group-hover:text-slate-900'}`}>
+                  <div
+                    className={`font-semibold transition-colors ${
+                      activeStep === 2
+                        ? 'text-slate-900'
+                        : 'text-slate-500 group-hover:text-slate-900'
+                    }`}
+                  >
                     Sottocompetenze
                   </div>
                   <div className="text-xs text-slate-400 mt-0.5">
-                    {selectedSubcompetencyIds.length > 0 
+                    {selectedSubcompetencyIds.length > 0
                       ? `${selectedSubcompetencyIds.length} selezionate`
                       : 'Scegli le prove'}
                   </div>
@@ -362,23 +356,33 @@ export function CreateTestModal({
               <button
                 onClick={() => setActiveStep(3)}
                 disabled={!isStep1Valid || !isStep2Valid}
-                className={`flex items-center md:items-start gap-2 md:gap-4 text-left group ${(!isStep1Valid || !isStep2Valid) ? 'cursor-not-allowed opacity-60' : ''}`}
+                className={`flex items-center md:items-start gap-2 md:gap-4 text-left group ${
+                  !isStep1Valid || !isStep2Valid ? 'cursor-not-allowed opacity-60' : ''
+                }`}
               >
-                <div className={`flex shrink-0 items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-all ${
-                  activeStep === 3
-                    ? 'bg-primary text-primary-foreground shadow-md scale-110'
-                    : selectedUserIds.length > 0
-                    ? 'bg-white border-2 border-slate-300 text-slate-900 group-hover:border-slate-400'
-                    : 'bg-slate-100 text-slate-600 group-hover:text-slate-900'
-                }`}>
+                <div
+                  className={`flex shrink-0 items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-all ${
+                    activeStep === 3
+                      ? 'bg-primary text-primary-foreground shadow-md scale-110'
+                      : selectedUserIds.length > 0
+                      ? 'bg-white border-2 border-slate-300 text-slate-900 group-hover:border-slate-400'
+                      : 'bg-slate-100 text-slate-600 group-hover:text-slate-900'
+                  }`}
+                >
                   3
                 </div>
                 <div className="pt-1.5 hidden md:block">
-                  <div className={`font-semibold transition-colors ${activeStep === 3 ? 'text-slate-900' : 'text-slate-500 group-hover:text-slate-900'}`}>
+                  <div
+                    className={`font-semibold transition-colors ${
+                      activeStep === 3
+                        ? 'text-slate-900'
+                        : 'text-slate-500 group-hover:text-slate-900'
+                    }`}
+                  >
                     Studenti <span className="text-xs text-slate-400 font-normal">(opzionale)</span>
                   </div>
                   <div className="text-xs text-slate-400 mt-0.5">
-                    {selectedUserIds.length > 0 
+                    {selectedUserIds.length > 0
                       ? `${selectedUserIds.length} assegnati`
                       : 'Chi farà il test'}
                   </div>
@@ -391,23 +395,34 @@ export function CreateTestModal({
               <button
                 onClick={() => setActiveStep(4)}
                 disabled={!isStep1Valid || !isStep2Valid}
-                className={`flex items-center md:items-start gap-2 md:gap-4 text-left group ${(!isStep1Valid || !isStep2Valid) ? 'cursor-not-allowed opacity-60' : ''}`}
+                className={`flex items-center md:items-start gap-2 md:gap-4 text-left group ${
+                  !isStep1Valid || !isStep2Valid ? 'cursor-not-allowed opacity-60' : ''
+                }`}
               >
-                <div className={`flex shrink-0 items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-all ${
-                  activeStep === 4
-                    ? 'bg-primary text-primary-foreground shadow-md scale-110'
-                    : selectedEvaluatorIds.length > 0
-                    ? 'bg-white border-2 border-slate-300 text-slate-900 group-hover:border-slate-400'
-                    : 'bg-slate-100 text-slate-600 group-hover:text-slate-900'
-                }`}>
+                <div
+                  className={`flex shrink-0 items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-all ${
+                    activeStep === 4
+                      ? 'bg-primary text-primary-foreground shadow-md scale-110'
+                      : selectedEvaluatorIds.length > 0
+                      ? 'bg-white border-2 border-slate-300 text-slate-900 group-hover:border-slate-400'
+                      : 'bg-slate-100 text-slate-600 group-hover:text-slate-900'
+                  }`}
+                >
                   4
                 </div>
                 <div className="pt-1.5 hidden md:block">
-                  <div className={`font-semibold transition-colors ${activeStep === 4 ? 'text-slate-900' : 'text-slate-500 group-hover:text-slate-900'}`}>
-                    Valutatori <span className="text-xs text-slate-400 font-normal">(opzionale)</span>
+                  <div
+                    className={`font-semibold transition-colors ${
+                      activeStep === 4
+                        ? 'text-slate-900'
+                        : 'text-slate-500 group-hover:text-slate-900'
+                    }`}
+                  >
+                    Valutatori{' '}
+                    <span className="text-xs text-slate-400 font-normal">(opzionale)</span>
                   </div>
                   <div className="text-xs text-slate-400 mt-0.5">
-                    {selectedEvaluatorIds.length > 0 
+                    {selectedEvaluatorIds.length > 0
                       ? `${selectedEvaluatorIds.length} assegnati`
                       : 'Chi valuterà'}
                   </div>
@@ -420,19 +435,29 @@ export function CreateTestModal({
               <button
                 onClick={() => setActiveStep(5)}
                 disabled={!isStep1Valid || !isStep2Valid}
-                className={`flex items-center md:items-start gap-2 md:gap-4 text-left group ${(!isStep1Valid || !isStep2Valid) ? 'cursor-not-allowed opacity-60' : ''}`}
+                className={`flex items-center md:items-start gap-2 md:gap-4 text-left group ${
+                  !isStep1Valid || !isStep2Valid ? 'cursor-not-allowed opacity-60' : ''
+                }`}
               >
-                <div className={`flex shrink-0 items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-all ${
-                  activeStep === 5
-                    ? 'bg-primary text-primary-foreground shadow-md scale-110'
-                    : (isStep1Valid && isStep2Valid)
-                    ? 'bg-white border-2 border-slate-300 text-slate-900 group-hover:border-slate-400'
-                    : 'bg-slate-100 text-slate-400'
-                }`}>
+                <div
+                  className={`flex shrink-0 items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-all ${
+                    activeStep === 5
+                      ? 'bg-primary text-primary-foreground shadow-md scale-110'
+                      : isStep1Valid && isStep2Valid
+                      ? 'bg-white border-2 border-slate-300 text-slate-900 group-hover:border-slate-400'
+                      : 'bg-slate-100 text-slate-400'
+                  }`}
+                >
                   5
                 </div>
                 <div className="pt-1.5 hidden md:block">
-                  <div className={`font-semibold transition-colors ${activeStep === 5 ? 'text-slate-900' : 'text-slate-500 group-hover:text-slate-900'}`}>
+                  <div
+                    className={`font-semibold transition-colors ${
+                      activeStep === 5
+                        ? 'text-slate-900'
+                        : 'text-slate-500 group-hover:text-slate-900'
+                    }`}
+                  >
                     Riepilogo
                   </div>
                   <div className="text-xs text-slate-400 mt-0.5">Conferma finale</div>
@@ -446,11 +471,11 @@ export function CreateTestModal({
         <div className="flex-1 flex flex-col bg-white h-full overflow-hidden">
           <DialogHeader className="p-4 md:px-8 md:pt-8 md:pb-2">
             <DialogTitle className="text-xl md:text-2xl font-bold text-slate-800">
-              {activeStep === 1 && "Dati di base"}
-              {activeStep === 2 && "Selezione Sottocompetenze"}
-              {activeStep === 3 && "Assegnazione Studenti"}
-              {activeStep === 4 && "Assegnazione Valutatori"}
-              {activeStep === 5 && "Riepilogo"}
+              {activeStep === 1 && 'Dati di base'}
+              {activeStep === 2 && 'Selezione Sottocompetenze'}
+              {activeStep === 3 && 'Assegnazione Studenti'}
+              {activeStep === 4 && 'Assegnazione Valutatori'}
+              {activeStep === 5 && 'Riepilogo'}
             </DialogTitle>
             <div className="w-auto mx-2 mt-4 mb-3 h-px bg-slate-200" />
           </DialogHeader>
@@ -462,7 +487,6 @@ export function CreateTestModal({
             </div>
           ) : (
             <div className="flex-1 overflow-y-auto px-4 md:px-8 pb-4">
-              
               {/* STEP 1: Dati Base */}
               {activeStep === 1 && (
                 <div className="space-y-6 flex flex-col h-full">
@@ -528,16 +552,29 @@ export function CreateTestModal({
                                 <TableRow
                                   key={comp.id}
                                   data-state={isSelected ? 'selected' : undefined}
-                                  className={`${initialData ? 'cursor-not-allowed opacity-70' : 'cursor-pointer group hover:bg-transparent'}`}
-                                  onClick={() => !initialData && handleCompetencyChange(String(comp.id))}
+                                  className={`${
+                                    initialData
+                                      ? 'cursor-not-allowed opacity-70'
+                                      : 'cursor-pointer group hover:bg-transparent'
+                                  }`}
+                                  onClick={() =>
+                                    !initialData && handleCompetencyChange(String(comp.id))
+                                  }
                                 >
-                                  <TableCell className="text-center py-3" onClick={(e) => e.stopPropagation()}>
+                                  <TableCell
+                                    className="text-center py-3"
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
                                     <input
                                       type="radio"
                                       name="competencySelection"
-                                      className={`h-4 w-4 rounded-full border-slate-300 text-primary focus:ring-primary ${initialData ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                                      className={`h-4 w-4 rounded-full border-slate-300 text-primary focus:ring-primary ${
+                                        initialData ? 'cursor-not-allowed' : 'cursor-pointer'
+                                      }`}
                                       checked={isSelected}
-                                      onChange={() => !initialData && handleCompetencyChange(String(comp.id))}
+                                      onChange={() =>
+                                        !initialData && handleCompetencyChange(String(comp.id))
+                                      }
                                       disabled={Boolean(initialData)}
                                     />
                                   </TableCell>
@@ -561,18 +598,31 @@ export function CreateTestModal({
                     {/* Paginazione Competenze */}
                     {filteredCompetencies.length > 0 && (
                       <div className="flex items-center justify-between text-sm text-slate-500 pt-2 border-t border-slate-100">
-                        <span>Pagina {compPage} di {totalCompPages} - {filteredCompetencies.length} elementi totali</span>
+                        <span>
+                          Pagina {compPage} di {totalCompPages} - {filteredCompetencies.length}{' '}
+                          elementi totali
+                        </span>
                         <div className="flex items-center gap-2">
                           <Button
-                            type="button" variant="outline" size="icon"
-                            disabled={compPage <= 1} onClick={() => setCompPage(p => Math.max(1, p - 1))}
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            disabled={compPage <= 1}
+                            onClick={() => setCompPage((p) => Math.max(1, p - 1))}
                             className="h-8 w-8"
-                          ><ChevronLeft className="h-4 w-4" /></Button>
+                          >
+                            <ChevronLeft className="h-4 w-4" />
+                          </Button>
                           <Button
-                            type="button" variant="outline" size="icon"
-                            disabled={compPage >= totalCompPages} onClick={() => setCompPage(p => Math.min(totalCompPages, p + 1))}
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            disabled={compPage >= totalCompPages}
+                            onClick={() => setCompPage((p) => Math.min(totalCompPages, p + 1))}
                             className="h-8 w-8"
-                          ><ChevronRight className="h-4 w-4" /></Button>
+                          >
+                            <ChevronRight className="h-4 w-4" />
+                          </Button>
                         </div>
                       </div>
                     )}
@@ -611,18 +661,30 @@ export function CreateTestModal({
                               checked={
                                 paginatedSubcompetencies.length > 0 &&
                                 paginatedSubcompetencies.every((s) =>
-                                  selectedSubcompetencyIds.includes(s.id)
+                                  selectedSubcompetencyIds.includes(s.id),
                                 )
                               }
                               onChange={toggleAllVisibleSubcompetencies}
                             />
                           </TableHead>
-                          <TableHead className="font-semibold text-slate-700 py-3">Titolo</TableHead>
-                          <TableHead className="font-semibold text-slate-700 py-3 hidden md:table-cell">Input</TableHead>
-                          <TableHead className="font-semibold text-slate-700 py-3 hidden md:table-cell">Azione</TableHead>
-                          <TableHead className="font-semibold text-slate-700 py-3 hidden lg:table-cell">Output</TableHead>
-                          <TableHead className="w-16 text-center font-semibold text-slate-700 py-3">Peso</TableHead>
-                          <TableHead className="w-16 text-center font-semibold text-slate-700 py-3">Soglia</TableHead>
+                          <TableHead className="font-semibold text-slate-700 py-3">
+                            Titolo
+                          </TableHead>
+                          <TableHead className="font-semibold text-slate-700 py-3 hidden md:table-cell">
+                            Input
+                          </TableHead>
+                          <TableHead className="font-semibold text-slate-700 py-3 hidden md:table-cell">
+                            Azione
+                          </TableHead>
+                          <TableHead className="font-semibold text-slate-700 py-3 hidden lg:table-cell">
+                            Output
+                          </TableHead>
+                          <TableHead className="w-16 text-center font-semibold text-slate-700 py-3">
+                            Peso
+                          </TableHead>
+                          <TableHead className="w-16 text-center font-semibold text-slate-700 py-3">
+                            Soglia
+                          </TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -648,7 +710,10 @@ export function CreateTestModal({
                                 className="cursor-pointer group hover:bg-transparent"
                                 onClick={() => toggleSubcompetency(sub.id)}
                               >
-                                <TableCell className="text-center py-3" onClick={(e) => e.stopPropagation()}>
+                                <TableCell
+                                  className="text-center py-3"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
                                   <input
                                     type="checkbox"
                                     className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer"
@@ -659,13 +724,22 @@ export function CreateTestModal({
                                 <TableCell className="font-medium text-slate-900 py-3">
                                   {sub.title}
                                 </TableCell>
-                                <TableCell className="text-slate-600 py-3 hidden md:table-cell max-w-[150px] truncate" title={sub.input}>
+                                <TableCell
+                                  className="text-slate-600 py-3 hidden md:table-cell max-w-[150px] truncate"
+                                  title={sub.input}
+                                >
                                   {sub.input || '-'}
                                 </TableCell>
-                                <TableCell className="text-slate-600 py-3 hidden md:table-cell max-w-[150px] truncate" title={sub.action}>
+                                <TableCell
+                                  className="text-slate-600 py-3 hidden md:table-cell max-w-[150px] truncate"
+                                  title={sub.action}
+                                >
                                   {sub.action || '-'}
                                 </TableCell>
-                                <TableCell className="text-slate-600 py-3 hidden lg:table-cell max-w-[150px] truncate" title={sub.output}>
+                                <TableCell
+                                  className="text-slate-600 py-3 hidden lg:table-cell max-w-[150px] truncate"
+                                  title={sub.output}
+                                >
                                   {sub.output || '-'}
                                 </TableCell>
                                 <TableCell className="text-center text-slate-600 py-3">
@@ -685,18 +759,31 @@ export function CreateTestModal({
                   {/* Paginazione */}
                   {selectedCompetencyId && filteredSubcompetencies.length > 0 && (
                     <div className="flex items-center justify-between text-sm text-slate-500 pt-2 border-t border-slate-100">
-                      <span>Pagina {subPage} di {totalSubPages} - {filteredSubcompetencies.length} elementi totali ({selectedSubcompetencyIds.length} selezionati)</span>
+                      <span>
+                        Pagina {subPage} di {totalSubPages} - {filteredSubcompetencies.length}{' '}
+                        elementi totali ({selectedSubcompetencyIds.length} selezionati)
+                      </span>
                       <div className="flex items-center gap-2">
                         <Button
-                          type="button" variant="outline" size="icon"
-                          disabled={subPage <= 1} onClick={() => setSubPage((p) => Math.max(1, p - 1))}
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          disabled={subPage <= 1}
+                          onClick={() => setSubPage((p) => Math.max(1, p - 1))}
                           className="h-8 w-8"
-                        ><ChevronLeft className="h-4 w-4" /></Button>
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </Button>
                         <Button
-                          type="button" variant="outline" size="icon"
-                          disabled={subPage >= totalSubPages} onClick={() => setSubPage((p) => Math.min(totalSubPages, p + 1))}
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          disabled={subPage >= totalSubPages}
+                          onClick={() => setSubPage((p) => Math.min(totalSubPages, p + 1))}
                           className="h-8 w-8"
-                        ><ChevronRight className="h-4 w-4" /></Button>
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
                   )}
@@ -758,7 +845,10 @@ export function CreateTestModal({
                                 className="cursor-pointer group hover:bg-transparent"
                                 onClick={() => toggleUser(user.id)}
                               >
-                                <TableCell className="text-center py-3" onClick={(e) => e.stopPropagation()}>
+                                <TableCell
+                                  className="text-center py-3"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
                                   <input
                                     type="checkbox"
                                     className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer"
@@ -766,7 +856,9 @@ export function CreateTestModal({
                                     onChange={() => toggleUser(user.id)}
                                   />
                                 </TableCell>
-                                <TableCell className="font-medium text-slate-900 py-3">{user.name}</TableCell>
+                                <TableCell className="font-medium text-slate-900 py-3">
+                                  {user.name}
+                                </TableCell>
                                 <TableCell className="text-slate-600 py-3">{user.email}</TableCell>
                               </TableRow>
                             );
@@ -778,18 +870,31 @@ export function CreateTestModal({
 
                   {filteredUsers.length > 0 && (
                     <div className="flex items-center justify-between text-sm text-slate-500 pt-2 border-t border-slate-100">
-                      <span>Pagina {userPage} di {totalUserPages} - {filteredUsers.length} elementi totali ({selectedUserIds.length} selezionati)</span>
+                      <span>
+                        Pagina {userPage} di {totalUserPages} - {filteredUsers.length} elementi
+                        totali ({selectedUserIds.length} selezionati)
+                      </span>
                       <div className="flex items-center gap-2">
                         <Button
-                          type="button" variant="outline" size="icon"
-                          disabled={userPage <= 1} onClick={() => setUserPage(p => Math.max(1, p - 1))}
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          disabled={userPage <= 1}
+                          onClick={() => setUserPage((p) => Math.max(1, p - 1))}
                           className="h-8 w-8"
-                        ><ChevronLeft className="h-4 w-4" /></Button>
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </Button>
                         <Button
-                          type="button" variant="outline" size="icon"
-                          disabled={userPage >= totalUserPages} onClick={() => setUserPage(p => Math.min(totalUserPages, p + 1))}
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          disabled={userPage >= totalUserPages}
+                          onClick={() => setUserPage((p) => Math.min(totalUserPages, p + 1))}
                           className="h-8 w-8"
-                        ><ChevronRight className="h-4 w-4" /></Button>
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
                   )}
@@ -825,7 +930,9 @@ export function CreateTestModal({
                               className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer"
                               checked={
                                 paginatedEvaluators.length > 0 &&
-                                paginatedEvaluators.every((ev) => selectedEvaluatorIds.includes(ev.id))
+                                paginatedEvaluators.every((ev) =>
+                                  selectedEvaluatorIds.includes(ev.id),
+                                )
                               }
                               onChange={toggleAllVisibleEvaluators}
                             />
@@ -851,7 +958,10 @@ export function CreateTestModal({
                                 className="cursor-pointer group hover:bg-transparent"
                                 onClick={() => toggleEvaluator(ev.id)}
                               >
-                                <TableCell className="text-center py-3" onClick={(e) => e.stopPropagation()}>
+                                <TableCell
+                                  className="text-center py-3"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
                                   <input
                                     type="checkbox"
                                     className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer"
@@ -859,7 +969,9 @@ export function CreateTestModal({
                                     onChange={() => toggleEvaluator(ev.id)}
                                   />
                                 </TableCell>
-                                <TableCell className="font-medium text-slate-900 py-3">{ev.name}</TableCell>
+                                <TableCell className="font-medium text-slate-900 py-3">
+                                  {ev.name}
+                                </TableCell>
                                 <TableCell className="text-slate-600 py-3">{ev.email}</TableCell>
                               </TableRow>
                             );
@@ -871,18 +983,34 @@ export function CreateTestModal({
 
                   {filteredEvaluators.length > 0 && (
                     <div className="flex items-center justify-between text-sm text-slate-500 pt-2 border-t border-slate-100">
-                      <span>Pagina {evaluatorPage} di {totalEvaluatorPages} - {filteredEvaluators.length} elementi totali ({selectedEvaluatorIds.length} selezionati)</span>
+                      <span>
+                        Pagina {evaluatorPage} di {totalEvaluatorPages} -{' '}
+                        {filteredEvaluators.length} elementi totali ({selectedEvaluatorIds.length}{' '}
+                        selezionati)
+                      </span>
                       <div className="flex items-center gap-2">
                         <Button
-                          type="button" variant="outline" size="icon"
-                          disabled={evaluatorPage <= 1} onClick={() => setEvaluatorPage(p => Math.max(1, p - 1))}
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          disabled={evaluatorPage <= 1}
+                          onClick={() => setEvaluatorPage((p) => Math.max(1, p - 1))}
                           className="h-8 w-8"
-                        ><ChevronLeft className="h-4 w-4" /></Button>
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </Button>
                         <Button
-                          type="button" variant="outline" size="icon"
-                          disabled={evaluatorPage >= totalEvaluatorPages} onClick={() => setEvaluatorPage(p => Math.min(totalEvaluatorPages, p + 1))}
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          disabled={evaluatorPage >= totalEvaluatorPages}
+                          onClick={() =>
+                            setEvaluatorPage((p) => Math.min(totalEvaluatorPages, p + 1))
+                          }
                           className="h-8 w-8"
-                        ><ChevronRight className="h-4 w-4" /></Button>
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
                   )}
@@ -893,13 +1021,17 @@ export function CreateTestModal({
               {activeStep === 5 && (
                 <TestSummaryView
                   assessmentSituation={assessmentSituation}
-                  competencyTitle={competencies.find(c => String(c.id) === String(selectedCompetencyId))?.title || '-'}
-                  subcompetencies={subCompetencies.filter(s => selectedSubcompetencyIds.includes(s.id))}
-                  students={users.filter(u => selectedUserIds.includes(u.id))}
-                  evaluators={evaluators.filter(e => selectedEvaluatorIds.includes(e.id))}
+                  competencyTitle={
+                    competencies.find((c) => String(c.id) === String(selectedCompetencyId))
+                      ?.title || '-'
+                  }
+                  subcompetencies={subCompetencies.filter((s) =>
+                    selectedSubcompetencyIds.includes(s.id),
+                  )}
+                  students={users.filter((u) => selectedUserIds.includes(u.id))}
+                  evaluators={evaluators.filter((e) => selectedEvaluatorIds.includes(e.id))}
                 />
               )}
-
             </div>
           )}
 
@@ -914,7 +1046,7 @@ export function CreateTestModal({
             >
               Annulla
             </Button>
-            
+
             <div className="flex items-center gap-2 md:gap-3">
               {activeStep > 1 && (
                 <Button
@@ -931,8 +1063,7 @@ export function CreateTestModal({
                   type="button"
                   onClick={() => setActiveStep(activeStep + 1)}
                   disabled={
-                    (activeStep === 1 && !isStep1Valid) ||
-                    (activeStep === 2 && !isStep2Valid)
+                    (activeStep === 1 && !isStep1Valid) || (activeStep === 2 && !isStep2Valid)
                   }
                   className="px-6 md:px-8"
                 >
