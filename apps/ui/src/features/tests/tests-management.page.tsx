@@ -1,6 +1,21 @@
 import { useEffect, useState, useMemo } from 'react';
 import { PageContainer } from '@/components/page-container';
-import { fetchTests, deleteTest, ApiTest, ApiCompetency, ApiSubCompetency, ApiUser, fetchCompetencies, fetchSubCompetencies, fetchTestDesigners, createTest, updateTest, fetchTestDetails, fetchEvaluatedUsers, fetchTestEvaluators } from './tests.api';
+import {
+  fetchTests,
+  deleteTest,
+  ApiTest,
+  ApiCompetency,
+  ApiSubCompetency,
+  ApiUser,
+  fetchCompetencies,
+  fetchSubCompetencies,
+  fetchTestDesigners,
+  createTest,
+  updateTest,
+  fetchTestDetails,
+  fetchEvaluatedUsers,
+  fetchTestEvaluators,
+} from './tests.api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -11,7 +26,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table";
+} from '@tanstack/react-table';
 import {
   Table,
   TableBody,
@@ -27,7 +42,18 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '@/components/ui/empty';
-import { Plus, Loader2, FolderCode, Edit, Trash2, RefreshCw, Search, TriangleAlert, ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  Plus,
+  Loader2,
+  FolderCode,
+  Edit,
+  Trash2,
+  RefreshCw,
+  Search,
+  TriangleAlert,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,8 +66,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { CreateTestModal } from './create-test-modal';
 import { ViewTestModal } from './view-test-modal';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 
 interface TestsManagementPageProps {
   readOnly?: boolean;
@@ -50,7 +76,7 @@ interface TestsManagementPageProps {
 export function TestsManagementPage({ readOnly = false }: TestsManagementPageProps) {
   const [tests, setTests] = useState<ApiTest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // Data per modal
   const [competencies, setCompetencies] = useState<ApiCompetency[]>([]);
   const [subCompetencies, setSubCompetencies] = useState<ApiSubCompetency[]>([]);
@@ -64,7 +90,6 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
   const [isDeletingId, setIsDeletingId] = useState<number | null>(null);
   const [globalFilter, setGlobalFilter] = useState('');
   const [editingTestData, setEditingTestData] = useState<any>(null);
-
 
   useEffect(() => {
     loadTests();
@@ -97,15 +122,21 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
         }
       }
 
-      setTests(testsRes.map((test) => ({
-        ...test,
-        evaluated_users_count: evaluatedUsersCountByTest.get(test.id) || 0,
-        evaluators_count: evaluatorsCountByTest.get(test.id) || 0,
-      })));
+      setTests(
+        testsRes.map((test) => ({
+          ...test,
+          evaluated_users_count: evaluatedUsersCountByTest.get(test.id) || 0,
+          evaluators_count: evaluatorsCountByTest.get(test.id) || 0,
+        })),
+      );
 
       if (!readOnly) {
-        setUsers(evaluatedUsersRes.filter((eu) => eu.user).map((eu) => ({ ...eu.user!, id: eu.id })));
-        setEvaluators(testEvaluatorsRes.filter((te) => te.user).map((te) => ({ ...te.user!, id: te.id })));
+        setUsers(
+          evaluatedUsersRes.filter((eu) => eu.user).map((eu) => ({ ...eu.user!, id: eu.id })),
+        );
+        setEvaluators(
+          testEvaluatorsRes.filter((te) => te.user).map((te) => ({ ...te.user!, id: te.id })),
+        );
       }
     } catch (err) {
       console.error('Failed to fetch tests', err);
@@ -142,7 +173,7 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
       await deleteTest(deleteTargetTest.id);
       await loadTests();
     } catch (error) {
-      console.error('Errore durante l\'eliminazione del test:', error);
+      console.error("Errore durante l'eliminazione del test:", error);
     } finally {
       setIsDeletingId(null);
       setDeleteTargetTest(null);
@@ -152,20 +183,20 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
   const handleEditClick = async (testId: number) => {
     try {
       const details = await fetchTestDetails(testId);
-      
+
       let competencyId = null;
       if (details.subcompetencies.length > 0) {
         const firstSub = details.subcompetencies[0] as any;
         competencyId = firstSub.competency_id || firstSub.competency?.id;
       }
-      
+
       setEditingTestData({
         id: testId,
         assessmentSituation: details.test.assessment_situation,
         competencyId,
-        subcompetencyIds: details.subcompetencies.map(s => s.id),
-        userIds: details.students.map(s => s.id),
-        evaluatorIds: details.evaluators.map(e => e.id)
+        subcompetencyIds: details.subcompetencies.map((s) => s.id),
+        userIds: details.students.map((s) => s.id),
+        evaluatorIds: details.evaluators.map((e) => e.id),
       });
       setIsModalOpen(true);
     } catch (err) {
@@ -213,39 +244,42 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
   const columns = useMemo<ColumnDef<ApiTest>[]>(() => {
     const baseCols: ColumnDef<ApiTest>[] = [
       {
-        accessorKey: "assessment_situation",
-        header: "Descrizione test",
+        accessorKey: 'assessment_situation',
+        header: 'Descrizione test',
         cell: ({ row }) => (
-          <span 
-            className="block truncate font-medium text-slate-900 cursor-pointer hover:text-primary hover:underline"
-            onClick={() => setViewingTestId(row.original.id)}
-          >
-            {row.original.assessment_situation}
-          </span>
-        )
+          <HoverCard>
+            <HoverCardTrigger asChild>
+              <span
+                className="block truncate max-w-150 font-medium text-slate-900
+  cursor-pointer hover:text-primary hover:underline"
+                onClick={() => setViewingTestId(row.original.id)}
+              >
+                {row.original.assessment_situation}
+              </span>
+            </HoverCardTrigger>
+            <HoverCardContent
+              className="w-96 bg-white text-sm text-slate-700 shadow-lg
+  border border-slate-200"
+            >
+              <p className="font-semibold text-slate-900 mb-1">Descrizione test</p>
+              <p className="leading-relaxed">{row.original.assessment_situation}</p>
+            </HoverCardContent>
+          </HoverCard>
+        ),
       },
       {
-        accessorKey: "test_designer_id",
-        header: "Test Designer",
-        cell: ({ row }) => (
-          <span className="text-slate-600">
-            {row.original.test_designer?.user?.name || `ID: ${row.original.test_designer_id}`}
-          </span>
-        )
-      },
-      {
-        accessorKey: "evaluated_users_count",
-        header: () => <div className="text-center">Studenti</div>,
+        accessorKey: 'evaluated_users_count',
+        header: () => <div className="text-center">Utenti</div>,
         cell: ({ row }) => (
           <div className="flex justify-center">
             <span className="inline-flex items-center justify-center bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full text-xs font-semibold border border-slate-200">
               {row.original.evaluated_users_count || 0}
             </span>
           </div>
-        )
+        ),
       },
       {
-        accessorKey: "evaluators_count",
+        accessorKey: 'evaluators_count',
         header: () => <div className="text-center">Valutatori</div>,
         cell: ({ row }) => (
           <div className="flex justify-center">
@@ -253,46 +287,52 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
               {row.original.evaluators_count || 0}
             </span>
           </div>
-        )
+        ),
       },
       {
-        accessorKey: "subcompetencies",
-        header: "Sottocompetenze",
+        accessorKey: 'subcompetencies_count',
+        header: () => <div className="text-center">Sottocompetenze</div>,
         cell: ({ row }) => (
-          <span className="inline-flex items-center justify-center bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-xs font-medium border border-slate-200">
-            {row.original.subcompetencies?.length || 0} prove
-          </span>
-        )
-      }
+          <div className="flex justify-center">
+            <span className="inline-flex items-center justify-center bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full text-xs font-semibold border border-slate-200">
+              {row.original.subcompetencies?.length || 0}
+            </span>
+          </div>
+        ),
+      },
     ];
 
     if (!readOnly) {
       baseCols.push({
-        id: "actions",
+        id: 'actions',
         header: () => <div className="text-right">Azioni</div>,
         cell: ({ row }) => (
           <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-8 w-8 text-slate-500 hover:text-sky-600 cursor-pointer" 
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-slate-500 hover:text-sky-600 cursor-pointer"
               title="Modifica"
               onClick={() => handleEditClick(row.original.id)}
             >
               <Edit className="h-4 w-4" />
             </Button>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-8 w-8 text-slate-500 hover:text-red-600 cursor-pointer" 
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-slate-500 hover:text-red-600 cursor-pointer"
               title="Elimina"
               onClick={() => setDeleteTargetTest(row.original)}
               disabled={isDeletingId === row.original.id}
             >
-              {isDeletingId === row.original.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+              {isDeletingId === row.original.id ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Trash2 className="h-4 w-4" />
+              )}
             </Button>
           </div>
-        )
+        ),
       });
     }
 
@@ -313,14 +353,18 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
     initialState: {
       pagination: {
         pageSize: 10,
-      }
-    }
+      },
+    },
   });
 
   return (
-    <PageContainer 
-      title={readOnly ? "Consultazione Test" : "Gestione Test"} 
-      description={readOnly ? "Visualizza tutti i test configurati nel sistema." : "Visualizza e gestisci tutti i test configurati nel sistema."}
+    <PageContainer
+      title={readOnly ? 'Consultazione Test' : 'Gestione Test'}
+      description={
+        readOnly
+          ? 'Visualizza tutti i test configurati nel sistema.'
+          : 'Visualizza e gestisci tutti i test configurati nel sistema.'
+      }
     >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4">
         <div className="flex items-center gap-3 w-full max-w-md">
@@ -334,14 +378,27 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
               className="pl-9 h-9 w-full bg-white"
             />
           </div>
-          <Button variant="outline" size="icon" onClick={loadTests} disabled={isLoading} className="h-9 w-9 shrink-0 bg-white" title="Aggiorna tabella">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={loadTests}
+            disabled={isLoading}
+            className="h-9 w-9 shrink-0 bg-white"
+            title="Aggiorna tabella"
+          >
             <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
-        
+
         <div className="flex items-center gap-4">
           {!readOnly && (
-            <Button onClick={() => { setEditingTestData(null); setIsModalOpen(true); }} className="flex items-center gap-2 h-9">
+            <Button
+              onClick={() => {
+                setEditingTestData(null);
+                setIsModalOpen(true);
+              }}
+              className="flex items-center gap-2 h-9"
+            >
               <Plus className="h-4 w-4" />
               Nuovo
             </Button>
@@ -359,10 +416,7 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
                     <TableHead key={header.id} className="px-4 whitespace-nowrap">
                       {header.isPlaceholder
                         ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                        : flexRender(header.column.columnDef.header, header.getContext())}
                     </TableHead>
                   ))}
                 </TableRow>
@@ -379,15 +433,12 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
                 table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
+                    data-state={row.getIsSelected() && 'selected'}
                     className="hover:bg-slate-50/50 group"
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id} className="px-4 py-3 align-middle">
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </TableCell>
                     ))}
                   </TableRow>
@@ -402,9 +453,9 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
                         </EmptyMedia>
                         <EmptyTitle>Nessun Test</EmptyTitle>
                         <EmptyDescription>
-                          {readOnly 
-                            ? "Nessun test presente nel sistema." 
-                            : "Non hai ancora creato nessun test. Inizia creando il tuo primo test per valutare le competenze."}
+                          {readOnly
+                            ? 'Nessun test presente nel sistema.'
+                            : 'Non hai ancora creato nessun test. Inizia creando il tuo primo test per valutare le competenze.'}
                         </EmptyDescription>
                       </EmptyHeader>
                     </Empty>
@@ -417,9 +468,7 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
       </div>
 
       <div className="flex items-center justify-between py-4 px-1">
-        <div className="text-sm font-medium text-slate-500">
-          {tests.length} elementi
-        </div>
+        <div className="text-sm font-medium text-slate-500">{tests.length} elementi</div>
         {table.getPageCount() > 1 && (
           <div className="flex items-center space-x-2">
             <Button
@@ -473,15 +522,18 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
                   Conferma Eliminazione
                 </AlertDialogTitle>
                 <AlertDialogDescription className="text-slate-600">
-                  Sei sicuro di voler eliminare il test <span className="font-semibold text-slate-900">"{deleteTargetTest?.assessment_situation}"</span> (ID: #{deleteTargetTest?.id})?
+                  Sei sicuro di voler eliminare il test{' '}
+                  <span className="font-semibold text-slate-900">
+                    "{deleteTargetTest?.assessment_situation}"
+                  </span>{' '}
+                  (ID: #{deleteTargetTest?.id})?
                   <br className="my-1" />
-                  Questa operazione è irreversibile e cancellerà definitivamente tutti i dati e le assegnazioni associate.
+                  Questa operazione è irreversibile e cancellerà definitivamente tutti i dati e le
+                  assegnazioni associate.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel disabled={isDeletingId !== null}>
-                  Annulla
-                </AlertDialogCancel>
+                <AlertDialogCancel disabled={isDeletingId !== null}>Annulla</AlertDialogCancel>
                 <AlertDialogAction
                   variant="destructive"
                   disabled={isDeletingId !== null}
