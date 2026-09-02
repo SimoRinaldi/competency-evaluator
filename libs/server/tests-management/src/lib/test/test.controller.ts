@@ -24,21 +24,18 @@ import { TestDesignerService } from '../test-designer/test-designer.service';
 export class TestController {
   constructor(
     private readonly testService: TestService,
-    private readonly testDesignerService: TestDesignerService
+    private readonly testDesignerService: TestDesignerService,
   ) {}
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
   @ApiBearerAuth()
-  async create(
-    @CurrentUser() user: UserEntity,
-    @Body(ValidationPipe) dto: CreateTestDto
-  ) {
+  async create(@CurrentUser() user: UserEntity, @Body(ValidationPipe) dto: CreateTestDto) {
     if (user.role === UserRole.TEST_DESIGNER) {
       const designer = await this.testDesignerService.findByUserId(user.id);
       if (!designer) {
-        throw new ForbiddenException("Il tuo utente non è associato ad alcun Test Designer.");
+        throw new ForbiddenException('Il tuo utente non è associato ad alcun Test Designer.');
       }
       dto.test_designer_id = designer.id;
     }
@@ -48,51 +45,35 @@ export class TestController {
 
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(
-    UserRole.ADMIN,
-    UserRole.TEST_DESIGNER,
-    UserRole.EVALUATOR,
-    UserRole.USER
-  )
+  @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER, UserRole.EVALUATOR, UserRole.USER)
   @ApiBearerAuth()
-  findAll() {
+  async findAll(@CurrentUser() user: UserEntity) {
+    // Se è un TestDesigner vengono filtrati i test
+    if (user.role === UserRole.TEST_DESIGNER) {
+      const designer = await this.testDesignerService.findByUserId(user.id);
+      if (!designer) return [];
+
+      return this.testService.findByTestDesigner(designer.id);
+    }
     return this.testService.findAll();
   }
 
   @Get(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(
-    UserRole.ADMIN,
-    UserRole.TEST_DESIGNER,
-    UserRole.EVALUATOR,
-    UserRole.USER
-  )
+  @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER, UserRole.EVALUATOR, UserRole.USER)
   @ApiBearerAuth()
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.testService.findOne(id);
-  }
-
-  @Get('by-designer/:designerId')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(
-    UserRole.ADMIN,
-    UserRole.TEST_DESIGNER,
-    UserRole.EVALUATOR,
-    UserRole.USER
-  )
-  @ApiBearerAuth()
-  findByDesigner(@Param('designerId', ParseIntPipe) designerId: number) {
-    return this.testService.findByTestDesigner(designerId);
   }
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
   @ApiBearerAuth()
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body(ValidationPipe)
-    dto: UpdateTestDto
+    dto: UpdateTestDto,
   ) {
     return this.testService.update(id, dto);
   }
@@ -101,7 +82,7 @@ export class TestController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.TEST_DESIGNER)
   @ApiBearerAuth()
-  remove(@Param('id', ParseIntPipe) id: number) {
+  async remove(@Param('id', ParseIntPipe) id: number) {
     return this.testService.remove(id);
   }
 }
