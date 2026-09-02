@@ -50,14 +50,12 @@ export interface CreateTestModalProps {
   }) => void;
 }
 
-const SITUATION_ASSESSMENT_TEMPLATE = `DETTAGLI DI SVOLGIMENTO
-  • Luogo (es. presenza/online, tipologia di aula, serve PC?): ...
-  • Tempo di somministrazione: ...
-  • Materiale necessario: ...
-  • Numero di valutatori: ...
-  • Esperienza richiesta valutatori: ...
+const SITUATION_ASSESSMENT_TEMPLATE = `• Luogo:
+• Tempo di somministrazione:
+• Materiale necessario:
+• Numero di valutatori:
+• Esperienza richiesta valutatori:
 
-DESCRIZIONE SITUAZIONE: 
 [Descrivere il contesto della prova...]`;
 
 export function CreateTestModal({
