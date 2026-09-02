@@ -250,7 +250,7 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
           <HoverCard>
             <HoverCardTrigger asChild>
               <span
-                className="block truncate max-w-150 font-medium text-slate-900
+                className="block truncate max-w-150 text-slate-700
   cursor-pointer hover:text-primary hover:underline"
                 onClick={() => setViewingTestId(row.original.id)}
               >
@@ -307,7 +307,7 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
         id: 'actions',
         header: () => <div className="text-right">Azioni</div>,
         cell: ({ row }) => (
-          <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex items-center justify-end gap-2">
             <Button
               variant="ghost"
               size="icon"

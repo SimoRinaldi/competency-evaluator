@@ -16,15 +16,15 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Search, Loader2, RefreshCw, ChevronLeft, ChevronRight, Edit } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { getCompetencies, getCompetencyById, updateCompetencyChain, fetchRubrics } from '../competencies/competencies.api';
+import {
+  getCompetencies,
+  getCompetencyById,
+  updateCompetencyChain,
+  fetchRubrics,
+} from '../competencies/competencies.api';
 import { ObservationObjectPanel } from '../competencies/components/observation-object-panel';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -96,7 +96,7 @@ export function IndicatorsManagementPage() {
     const mappedIndicators = (sub.observation_object?.indicators || []).map((ind: any) => ({
       description: ind.description,
       weight: ind.weight.toString(),
-      rubricId: ind.rubric_set?.id ? `db_${ind.rubric_set.id}` : ''
+      rubricId: ind.rubric_set?.id ? `db_${ind.rubric_set.id}` : '',
     }));
     setIndicators(mappedIndicators);
     setNewRubrics([]);
@@ -124,24 +124,24 @@ export function IndicatorsManagementPage() {
               skill_ids: sub.skills?.map((s: any) => s.id) || [],
               observationObject: {
                 description: obsDescription,
-                indicators: indicators.map(ind => {
+                indicators: indicators.map((ind) => {
                   const isTemp = ind.rubricId?.toString().startsWith('temp_');
                   if (isTemp) {
                     const tempIdx = parseInt(ind.rubricId.replace('temp_', ''));
                     return {
                       description: ind.description,
                       weight: parseInt(ind.weight),
-                      rubricSet: newRubrics[tempIdx]
+                      rubricSet: newRubrics[tempIdx],
                     };
                   } else {
                     return {
                       description: ind.description,
                       weight: parseInt(ind.weight),
-                      rubric_set_id: parseInt(ind.rubricId?.toString().replace('db_', ''))
+                      rubric_set_id: parseInt(ind.rubricId?.toString().replace('db_', '')),
                     };
                   }
-                })
-              }
+                }),
+              },
             };
           } else {
             return {
@@ -155,18 +155,18 @@ export function IndicatorsManagementPage() {
               method_ids: sub.methods?.map((m: any) => m.id) || [],
               skill_ids: sub.skills?.map((s: any) => s.id) || [],
               observationObject: {
-                description: sub.observation_object?.description || "Mancante",
+                description: sub.observation_object?.description || 'Mancante',
                 indicators: (sub.observation_object?.indicators || []).map((ind: any) => ({
                   description: ind.description,
                   weight: ind.weight,
-                  rubric_set_id: ind.rubric_set?.id
-                }))
-              }
+                  rubric_set_id: ind.rubric_set?.id,
+                })),
+              },
             };
           }
-        })
+        }),
       };
-      
+
       await updateCompetencyChain(detailedCompetency.id, payload);
       toast.success('Sottocompetenza aggiornata con successo');
       await handleSelectCompetency(detailedCompetency.id); // Ricarica
@@ -178,42 +178,45 @@ export function IndicatorsManagementPage() {
     }
   };
 
-  const columns: ColumnDef<Competency>[] = useMemo(() => [
-    {
-      accessorKey: "title",
-      header: "Titolo",
-      cell: ({ row }) => (
-        <span 
-          className="block truncate font-medium text-slate-900 cursor-pointer hover:text-primary hover:underline"
-          onClick={() => handleSelectCompetency(row.original.id)}
-        >
-          {row.original.title}
-        </span>
-      )
-    },
-    {
-      id: "subcompetencies",
-      header: "Sottocompetenze",
-      cell: ({ row }) => {
-        const count = row.original.subcompetencies?.length || 0;
-        return (
-          <span className="inline-flex items-center justify-center bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-xs font-medium border border-slate-200">
-            {count} prove
+  const columns: ColumnDef<Competency>[] = useMemo(
+    () => [
+      {
+        accessorKey: 'title',
+        header: 'Titolo',
+        cell: ({ row }) => (
+          <span
+            className="block truncate font-medium text-slate-900 cursor-pointer hover:text-primary hover:underline"
+            onClick={() => handleSelectCompetency(row.original.id)}
+          >
+            {row.original.title}
           </span>
-        );
+        ),
       },
-    },
-    {
-      accessorKey: "weight",
-      header: () => <div className="text-center">Peso</div>,
-      cell: ({ row }) => <div className="text-center">{row.getValue("weight")}</div>,
-    },
-    {
-      accessorKey: "threshold",
-      header: () => <div className="text-center">Soglia</div>,
-      cell: ({ row }) => <div className="text-center">{row.getValue("threshold")}</div>,
-    }
-  ], []);
+      {
+        id: 'subcompetencies',
+        header: 'Sottocompetenze',
+        cell: ({ row }) => {
+          const count = row.original.subcompetencies?.length || 0;
+          return (
+            <span className="inline-flex items-center justify-center bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-xs font-medium border border-slate-200">
+              {count} prove
+            </span>
+          );
+        },
+      },
+      {
+        accessorKey: 'weight',
+        header: () => <div className="text-center">Peso</div>,
+        cell: ({ row }) => <div className="text-center">{row.getValue('weight')}</div>,
+      },
+      {
+        accessorKey: 'threshold',
+        header: () => <div className="text-center">Soglia</div>,
+        cell: ({ row }) => <div className="text-center">{row.getValue('threshold')}</div>,
+      },
+    ],
+    [],
+  );
 
   const table = useReactTable({
     data,
@@ -228,8 +231,8 @@ export function IndicatorsManagementPage() {
     initialState: {
       pagination: {
         pageSize: 10,
-      }
-    }
+      },
+    },
   });
 
   const handleModalClose = () => {
@@ -251,12 +254,19 @@ export function IndicatorsManagementPage() {
             <Input
               type="text"
               placeholder="Cerca per titolo..."
-              value={globalFilter ?? ""}
+              value={globalFilter ?? ''}
               onChange={(event) => setGlobalFilter(String(event.target.value))}
               className="pl-9 h-9 w-full bg-white"
             />
           </div>
-          <Button variant="outline" size="icon" onClick={loadCompetencies} disabled={loading} className="h-9 w-9 shrink-0 bg-white" title="Aggiorna tabella">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={loadCompetencies}
+            disabled={loading}
+            className="h-9 w-9 shrink-0 bg-white"
+            title="Aggiorna tabella"
+          >
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
@@ -273,10 +283,7 @@ export function IndicatorsManagementPage() {
                       <TableHead key={header.id} className="px-4 whitespace-nowrap">
                         {header.isPlaceholder
                           ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
+                          : flexRender(header.column.columnDef.header, header.getContext())}
                       </TableHead>
                     );
                   })}
@@ -294,15 +301,12 @@ export function IndicatorsManagementPage() {
                 table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
+                    data-state={row.getIsSelected() && 'selected'}
                     className="hover:bg-slate-50/50 group"
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id} className="px-4 py-3 align-middle">
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </TableCell>
                     ))}
                   </TableRow>
@@ -320,9 +324,7 @@ export function IndicatorsManagementPage() {
       </div>
 
       <div className="flex items-center justify-between py-4 px-1">
-        <div className="text-sm font-medium text-slate-500">
-          {data.length} elementi
-        </div>
+        <div className="text-sm font-medium text-slate-500">{data.length} elementi</div>
         {table.getPageCount() > 1 && (
           <div className="flex items-center space-x-2">
             <Button
@@ -349,7 +351,10 @@ export function IndicatorsManagementPage() {
       </div>
 
       {/* MODALE 1: Lista Sottocompetenze */}
-      <Dialog open={isModalOpen && !editingSubCompetency} onOpenChange={(open) => !open && handleModalClose()}>
+      <Dialog
+        open={isModalOpen && !editingSubCompetency}
+        onOpenChange={(open) => !open && handleModalClose()}
+      >
         <DialogContent className="max-w-[95vw] xl:max-w-[1400px] w-full h-[90vh] p-0 flex flex-col md:flex-row overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
           <div className="flex-1 flex flex-col bg-white h-full overflow-hidden">
             <DialogHeader className="p-4 md:px-8 md:pt-8 md:pb-2">
@@ -357,9 +362,7 @@ export function IndicatorsManagementPage() {
                 Sottocompetenze e Indicatori
               </DialogTitle>
               {detailedCompetency && (
-                <p className="text-sm text-slate-500 mt-1">
-                  {detailedCompetency.title}
-                </p>
+                <p className="text-sm text-slate-500 mt-1">{detailedCompetency.title}</p>
               )}
               <div className="w-auto mx-2 mt-4 mb-3 h-px bg-slate-200" />
             </DialogHeader>
@@ -388,21 +391,24 @@ export function IndicatorsManagementPage() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {detailedCompetency.subcompetencies && detailedCompetency.subcompetencies.length > 0 ? (
+                        {detailedCompetency.subcompetencies &&
+                        detailedCompetency.subcompetencies.length > 0 ? (
                           detailedCompetency.subcompetencies.map((sub: any) => (
                             <TableRow key={sub.id} className="hover:bg-slate-50 group">
                               <TableCell className="font-medium text-slate-900 py-3 align-middle">
                                 {sub.title}
                               </TableCell>
                               <TableCell className="text-slate-600 py-3 align-middle">
-                                {sub.observation_object?.description || <span className="text-slate-400 italic">Non definito</span>}
+                                {sub.observation_object?.description || (
+                                  <span className="text-slate-400 italic">Non definito</span>
+                                )}
                               </TableCell>
                               <TableCell className="text-right py-3 align-middle">
-                                <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <Button 
-                                    variant="ghost" 
-                                    size="icon" 
-                                    className="h-8 w-8 text-slate-500 hover:text-sky-600 cursor-pointer" 
+                                <div className="flex items-center justify-end gap-2">
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8 text-slate-500 hover:text-sky-600 cursor-pointer"
                                     title="Modifica"
                                     onClick={() => handleEditClick(sub)}
                                   >
@@ -430,14 +436,19 @@ export function IndicatorsManagementPage() {
               )}
             </div>
             <div className="p-4 md:px-8 md:py-4 border-t border-slate-200 flex justify-end gap-3 bg-slate-50/50">
-               <Button variant="outline" onClick={handleModalClose}>Chiudi</Button>
+              <Button variant="outline" onClick={handleModalClose}>
+                Chiudi
+              </Button>
             </div>
           </div>
         </DialogContent>
       </Dialog>
 
       {/* MODALE 2: Modifica Sottocompetenza */}
-      <Dialog open={!!editingSubCompetency} onOpenChange={(open) => !open && setEditingSubCompetency(null)}>
+      <Dialog
+        open={!!editingSubCompetency}
+        onOpenChange={(open) => !open && setEditingSubCompetency(null)}
+      >
         <DialogContent className="max-w-[95vw] xl:max-w-[1400px] w-full h-[90vh] p-0 flex flex-col md:flex-row overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
           <div className="flex-1 flex flex-col bg-white h-full overflow-hidden">
             <DialogHeader className="p-4 md:px-8 md:pt-8 md:pb-2">
@@ -467,11 +478,17 @@ export function IndicatorsManagementPage() {
               </div>
             </div>
             <div className="p-4 md:px-8 md:py-4 border-t border-slate-200 flex justify-end gap-3 bg-slate-50/50">
-               <Button variant="outline" onClick={() => setEditingSubCompetency(null)} disabled={isSaving}>Annulla</Button>
-               <Button onClick={handleSaveEdits} disabled={isSaving}>
-                 {isSaving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                 Salva Modifiche
-               </Button>
+              <Button
+                variant="outline"
+                onClick={() => setEditingSubCompetency(null)}
+                disabled={isSaving}
+              >
+                Annulla
+              </Button>
+              <Button onClick={handleSaveEdits} disabled={isSaving}>
+                {isSaving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                Salva Modifiche
+              </Button>
             </div>
           </div>
         </DialogContent>
@@ -479,4 +496,3 @@ export function IndicatorsManagementPage() {
     </PageContainer>
   );
 }
-
