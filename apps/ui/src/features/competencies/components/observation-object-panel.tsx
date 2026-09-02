@@ -64,7 +64,14 @@ export function ObservationObjectPanel({
   function handleSaveIndicator() {
     if (!indDesc || !indWeight || !indRubricId) return;
     
-    const newIndicator = { description: indDesc, weight: indWeight, rubricId: indRubricId };
+    const newIndicator = {
+      ...(editingIndex !== null && indicators[editingIndex]?.id
+        ? { id: indicators[editingIndex].id }
+        : {}),
+      description: indDesc,
+      weight: indWeight,
+      rubricId: indRubricId,
+    };
 
     if (editingIndex !== null) {
       const updated = [...indicators];

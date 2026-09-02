@@ -94,6 +94,7 @@ export function IndicatorsManagementPage() {
     setEditingSubCompetency(sub);
     setObsDescription(sub.observation_object?.description || '');
     const mappedIndicators = (sub.observation_object?.indicators || []).map((ind: any) => ({
+      id: ind.id,
       description: ind.description,
       weight: ind.weight.toString(),
       rubricId: ind.rubric_set?.id ? `db_${ind.rubric_set.id}` : ''
@@ -113,6 +114,7 @@ export function IndicatorsManagementPage() {
         subcompetencies: detailedCompetency.subcompetencies.map((sub: any) => {
           if (sub.id === editingSubCompetency.id) {
             return {
+              id: sub.id,
               title: sub.title,
               weight: sub.weight,
               threshold: sub.threshold,
@@ -123,18 +125,21 @@ export function IndicatorsManagementPage() {
               method_ids: sub.methods?.map((m: any) => m.id) || [],
               skill_ids: sub.skills?.map((s: any) => s.id) || [],
               observationObject: {
+                id: sub.observation_object?.id,
                 description: obsDescription,
                 indicators: indicators.map(ind => {
                   const isTemp = ind.rubricId?.toString().startsWith('temp_');
                   if (isTemp) {
                     const tempIdx = parseInt(ind.rubricId.replace('temp_', ''));
                     return {
+                      ...(ind.id ? { id: ind.id } : {}),
                       description: ind.description,
                       weight: parseInt(ind.weight),
                       rubricSet: newRubrics[tempIdx]
                     };
                   } else {
                     return {
+                      ...(ind.id ? { id: ind.id } : {}),
                       description: ind.description,
                       weight: parseInt(ind.weight),
                       rubric_set_id: parseInt(ind.rubricId?.toString().replace('db_', ''))
@@ -145,6 +150,7 @@ export function IndicatorsManagementPage() {
             };
           } else {
             return {
+              id: sub.id,
               title: sub.title,
               weight: sub.weight,
               threshold: sub.threshold,
@@ -155,8 +161,10 @@ export function IndicatorsManagementPage() {
               method_ids: sub.methods?.map((m: any) => m.id) || [],
               skill_ids: sub.skills?.map((s: any) => s.id) || [],
               observationObject: {
+                id: sub.observation_object?.id,
                 description: sub.observation_object?.description || "Mancante",
                 indicators: (sub.observation_object?.indicators || []).map((ind: any) => ({
+                  id: ind.id,
                   description: ind.description,
                   weight: ind.weight,
                   rubric_set_id: ind.rubric_set?.id
