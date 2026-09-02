@@ -17,6 +17,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
+import { Textarea } from '@/components/ui/textarea';
 import { Search, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { ApiCompetency, ApiSubCompetency, ApiUser } from './tests.api';
 import { TestSummaryView } from './test-summary-view';
@@ -48,6 +50,16 @@ export interface CreateTestModalProps {
   }) => void;
 }
 
+const SITUATION_ASSESSMENT_TEMPLATE = `DETTAGLI DI SVOLGIMENTO
+  • Luogo (es. presenza/online, tipologia di aula, serve PC?): ...
+  • Tempo di somministrazione: ...
+  • Materiale necessario: ...
+  • Numero di valutatori: ...
+  • Esperienza richiesta valutatori: ...
+
+DESCRIZIONE SITUAZIONE: 
+[Descrivere il contesto della prova...]`;
+
 export function CreateTestModal({
   isOpen,
   onClose,
@@ -61,9 +73,7 @@ export function CreateTestModal({
   onConfirm,
 }: CreateTestModalProps) {
   // Descrizione contesto
-  const [assessmentSituation, setAssessmentSituation] = useState(
-    'Valutazione delle competenze pratiche e teoriche',
-  );
+  const [assessmentSituation, setAssessmentSituation] = useState(SITUATION_ASSESSMENT_TEMPLATE);
 
   // Stato selezione competenza
   const [selectedCompetencyId, setSelectedCompetencyId] = useState<string>('');
@@ -98,7 +108,7 @@ export function CreateTestModal({
       setSelectedUserIds(initialData.userIds);
       setSelectedEvaluatorIds(initialData.evaluatorIds);
     } else {
-      setAssessmentSituation('Valutazione delle competenze pratiche e teoriche');
+      setAssessmentSituation(SITUATION_ASSESSMENT_TEMPLATE);
       setSelectedCompetencyId('');
       setSelectedSubcompetencyIds([]);
       setSelectedUserIds([]);
@@ -490,16 +500,29 @@ export function CreateTestModal({
               {/* STEP 1: Dati Base */}
               {activeStep === 1 && (
                 <div className="space-y-6 flex flex-col h-full">
-                  <div className="space-y-2 max-w-2xl">
-                    <Label className="text-sm font-semibold text-slate-800">
-                      Descrizione test (Nome del test)
-                    </Label>
-                    <Input
-                      placeholder="es. Valutazione Sviluppo Web"
-                      value={assessmentSituation}
-                      onChange={(e) => setAssessmentSituation(e.target.value)}
-                      className="bg-white border-slate-300"
-                    />
+                  <div className="max-w-2xl">
+                    <Field>
+                      <FieldLabel
+                        htmlFor="assessment-situation"
+                        className="text-sm font-semibold text-
+  slate-800"
+                      >
+                        Descrizione test
+                      </FieldLabel>
+                      <FieldDescription className="text-slate-500 mb-2">
+                        Tale descrizione deve contenere obbligatoriamente il luogo di svolgimento
+                        (on line, in presenza, tipologia di aula, se servono pc...), tempo di
+                        somministrazione, materiale necessario, numero di valutatori e se devono
+                        essere esperti della materia.
+                      </FieldDescription>
+                      <Textarea
+                        id="assessment-situation"
+                        placeholder="es. Valutazione delle competenze in..."
+                        value={assessmentSituation}
+                        onChange={(e) => setAssessmentSituation(e.target.value)}
+                        className="bg-white border-slate-300 min-h-[120px] resize-y"
+                      />
+                    </Field>
                   </div>
 
                   <div className="space-y-4 flex flex-col flex-1">
