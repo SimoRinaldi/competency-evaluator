@@ -18,32 +18,31 @@ export class ServerAuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   @ApiBody({
-          schema: {
-              type: 'object',
-              properties: {
-                  email: { type: 'string', example: 'devis.bianchini@unibs.it' },
-                  password: {type: 'string', example: 'Password1!'}
-              },
-              required: ['email', 'password'],
-          },
-      })
+    schema: {
+      type: 'object',
+      properties: {
+        email: { type: 'string', example: 'devis.bianchini@unibs.it' },
+        password: { type: 'string', example: 'Password1!' },
+      },
+      required: ['email', 'password'],
+    },
+  })
   login(@Request() req: RequestWithUser) {
     return this.serverAuthService.login(req.user);
   }
 
   @Post('register')
   @ApiBody({
-          schema: {
-              type: 'object',
-              properties: {
-                  name: { type: 'string', example: 'Devis' },
-                  email: { type: 'string', example: 'devis.bianchini@unibs.it' },
-                  password: {type: 'string', example: 'Password1!'},
-                  role: { type: 'string', enum: Object.values(UserRole), example: UserRole.USER}
-              },
-              required: ['name', 'email', 'password', 'role'],
-          },
-      })
+    schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', example: 'Mario' },
+        email: { type: 'string', example: 'nome.cognome@coeva.local' },
+        password: { type: 'string', example: 'latuapassword' },
+      },
+      required: ['name', 'email', 'password'],
+    },
+  })
   register(@Body(ValidationPipe) dto: RegisterDto) {
     return this.serverAuthService.register(dto);
   }
