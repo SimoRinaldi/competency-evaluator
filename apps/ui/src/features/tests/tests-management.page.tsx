@@ -184,7 +184,7 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
   const handleEditClick = async (test_id: number) => {
     try {
       // controllo se il test è già iniziato
-      const executions = await this.fetchTestExecutionsByTestId(test_id);
+      const executions = await fetchTestExecutionsByTestId(test_id);
       const isStarted = executions.some((ex) => ex.test_outputs && ex.test_outputs.length > 0);
 
       if (isStarted) {
