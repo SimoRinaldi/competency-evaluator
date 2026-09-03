@@ -15,6 +15,7 @@ import {
   fetchTestDetails,
   fetchEvaluatedUsers,
   fetchTestEvaluators,
+  fetchTestExecutionsByTestId,
 } from './tests.api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -180,9 +181,19 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
     }
   };
 
-  const handleEditClick = async (testId: number) => {
+  const handleEditClick = async (test_id: number) => {
     try {
-      const details = await fetchTestDetails(testId);
+      // controllo se il test è già iniziato
+      const executions = await this.fetchTestExecutionsByTestId(test_id);
+      const isStarted = executions.some((ex) => ex.test_outputs && ex.test_outputs.length > 0);
+
+      if (isStarted) {
+        toast.error('Impossibile modificare: il test è in corso');
+        return;
+      }
+
+      // se il test non è iniziato, carica i dettagli e apre la modale
+      const details = await fetchTestDetails(test_id);
 
       let competencyId = null;
       if (details.subcompetencies.length > 0) {
@@ -191,7 +202,7 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
       }
 
       setEditingTestData({
-        id: testId,
+        id: test_id,
         assessmentSituation: details.test.assessment_situation,
         competencyId,
         subcompetencyIds: details.subcompetencies.map((s) => s.id),
