@@ -13,16 +13,14 @@ import {
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard, Roles, RolesGuard } from '@server/security';
 import { UserRole } from '@server/users';
-import { SubCompetencyHistoricalScoreService } from './subcompetency-historical-score.service';
-import { CreateSubCompetencyHistoricalScoreDto } from './dto/create-subcompetency-historical-score.dto';
-import { UpdateSubCompetencyHistoricalScoreDto } from './dto/update-subcompetency-historical-score.dto';
+import { BestSubCompetencyScoreService } from './best-subcompetency-score.service';
+import { CreateBestSubCompetencyScoreDto } from './dto/create-best-subcompetency-score.dto';
+import { UpdateBestSubCompetencyScoreDto } from './dto/update-best-subcompetency-score.dto';
 
-@ApiTags('SubCompetency Historical Scores APIs')
-@Controller('subcompetency_historical_scores')
-export class SubCompetencyHistoricalScoreController {
-  constructor(
-    private readonly service: SubCompetencyHistoricalScoreService
-  ) {}
+@ApiTags('BestSubCompetencyScores APIs')
+@Controller('best_subcompetency_score')
+export class BestSubCompetencyScoreController {
+  constructor(private readonly service: BestSubCompetencyScoreService) {}
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -30,7 +28,7 @@ export class SubCompetencyHistoricalScoreController {
   @ApiBearerAuth()
   create(
     @Body(ValidationPipe)
-    dto: CreateSubCompetencyHistoricalScoreDto
+    dto: CreateBestSubCompetencyScoreDto,
   ) {
     return this.service.create(dto);
   }
@@ -66,7 +64,7 @@ export class SubCompetencyHistoricalScoreController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body(ValidationPipe)
-    dto: UpdateSubCompetencyHistoricalScoreDto
+    dto: UpdateBestSubCompetencyScoreDto,
   ) {
     return this.service.update(id, dto);
   }

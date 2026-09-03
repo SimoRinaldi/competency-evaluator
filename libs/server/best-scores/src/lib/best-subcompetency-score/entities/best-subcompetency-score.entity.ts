@@ -1,24 +1,18 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import type { Relation } from 'typeorm';
 import { UserEntity } from '@server/users';
 import { SubCompetencyEntity } from '@server/competencies-management';
 
-@Entity('subcompetency_historical_score')
-export class SubCompetencyHistoricalScoreEntity {
+@Entity('best_subcompetency_score')
+export class BestSubCompetencyScoreEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
   @Column({ type: 'integer', nullable: false })
-  score_absolute!: number;
+  best_score_absolute!: number;
 
   @Column({ type: 'numeric', nullable: false })
-  score_percentage!: string;
+  best_score_percentage!: string;
 
   @Column({ type: 'integer', nullable: false })
   user_id!: number;

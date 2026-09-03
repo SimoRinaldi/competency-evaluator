@@ -1,9 +1,6 @@
 import { useEffect, useState } from 'react';
 import { fetchCurrentUser } from '../auth/auth.api';
-import {
-  getCompetencyHistoricalScores,
-  getSubCompetencyHistoricalScores,
-} from './evaluated-user.api';
+import { getBestCompetencyScores, getBestSubCompetencyScores } from './evaluated-user.api';
 import { PageContainer } from '../../components/page-container';
 import { Separator } from '@/components/ui/separator';
 import {
@@ -23,7 +20,7 @@ import {
 } from '@/components/ui/table';
 import { RadialBarChart, RadialBar, ResponsiveContainer } from 'recharts';
 
-export function HistoricalScoresPage() {
+export function BestScoresPage() {
   const [competencyScores, setCompetencyScores] = useState<any[]>([]);
   const [subcompetencyScores, setSubcompetencyScores] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -43,8 +40,8 @@ export function HistoricalScoresPage() {
         return;
       }
 
-      const compScores = await getCompetencyHistoricalScores(user.id);
-      const subScores = await getSubCompetencyHistoricalScores(user.id);
+      const compScores = await getBestCompetencyScores(user.id);
+      const subScores = await getBestSubCompetencyScores(user.id);
 
       setCompetencyScores(compScores);
       setSubcompetencyScores(subScores);
@@ -84,14 +81,14 @@ export function HistoricalScoresPage() {
   const modalSubCompsData = selectedCompetency
     ? (selectedCompetency.competency.subcompetencies || []).map((subC: any) => {
         const subScore = subcompetencyScores.find((ss) => ss.subcompetency_id === subC.id);
-        const subScorePercent = subScore ? parseFloat(subScore.score_percentage) || 0 : 0;
+        const subScorePercent = subScore ? parseFloat(subScore.best_score_percentage) || 0 : 0;
         return {
           id: subC.id,
           title: subC.title,
           threshold: subC.threshold,
-          score_absolute: subScore ? subScore.score_absolute : 0,
-          score_percentage: subScorePercent,
-          acquired: subScore ? subScore.score_absolute >= subC.threshold : false,
+          best_score_absolute: subScore ? subScore.best_score_absolute : 0,
+          best_score_percentage: subScorePercent,
+          acquired: subScore ? subScore.best_score_absolute >= subC.threshold : false,
         };
       })
     : [];
@@ -104,7 +101,7 @@ export function HistoricalScoresPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         {competencyScores.map((cs) => {
           const competency = cs.competency;
-          const scorePercent = parseFloat(cs.score_percentage) || 0;
+          const scorePercent = parseFloat(cs.best_score_percentage) || 0;
           const chartData = [{ score: scorePercent, fill: '#0f172a' }];
 
           return (
@@ -124,7 +121,7 @@ export function HistoricalScoresPage() {
                   </div>
                   <div>
                     Ottenuto:{' '}
-                    <span className="font-semibold text-slate-900">{cs.score_absolute}</span>
+                    <span className="font-semibold text-slate-900">{cs.best_score_absolute}</span>
                   </div>
                 </div>
 
@@ -213,10 +210,10 @@ export function HistoricalScoresPage() {
                         {sc.acquired ? 'Acquisita' : 'Non acquisita'}
                       </TableCell>
                       <TableCell className="text-center text-sm text-slate-700">
-                        {sc.score_absolute} / {sc.threshold}
+                        {sc.best_score_absolute} / {sc.threshold}
                       </TableCell>
                       <TableCell className="text-center text-sm text-slate-900 font-semibold">
-                        {sc.score_percentage.toFixed(0)}%
+                        {sc.best_score_percentage.toFixed(0)}%
                       </TableCell>
                     </TableRow>
                   ))

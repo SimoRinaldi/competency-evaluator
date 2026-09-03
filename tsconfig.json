@@ -37,10 +37,10 @@
       "path": "./libs/server/competencies-management"
     },
     {
-      "path": "./libs/server/historical-scores"
+      "path": "./libs/server/tests-evaluation"
     },
     {
-      "path": "./libs/server/tests-evaluation"
+      "path": "./libs/server/best-scores"
     }
   ]
 }

@@ -15,20 +15,27 @@ export async function getTestDetails(testId: string | number) {
 }
 
 export async function getTestEvaluators(testId: string | number) {
-  const response = await fetch(`${API_URL}/test_evaluators/by-test/${testId}`, { headers: getAuthHeaders() });
+  const response = await fetch(`${API_URL}/test_evaluators/by-test/${testId}`, {
+    headers: getAuthHeaders(),
+  });
   if (!response.ok) return []; // Graceful fallback
   return response.json();
 }
 
-export async function submitTestExecution(testId: number, userId: number, outputs: { name: string, description: string, url: string, version: string }[], existingExecutionId?: number) {
+export async function submitTestExecution(
+  testId: number,
+  userId: number,
+  outputs: { name: string; description: string; url: string; version: string }[],
+  existingExecutionId?: number,
+) {
   let executionId = existingExecutionId;
-  
+
   if (!executionId) {
     // 1. Crea la test execution se non esiste
     const executionRes = await fetch(`${API_URL}/test_executions`, {
       method: 'POST',
       headers: getAuthHeaders(),
-      body: JSON.stringify({ test_id: testId, user_id: userId })
+      body: JSON.stringify({ test_id: testId, user_id: userId }),
     });
     if (!executionRes.ok) throw new Error("Errore durante la creazione dell'esecuzione del test");
     const execution = await executionRes.json();
@@ -42,8 +49,8 @@ export async function submitTestExecution(testId: number, userId: number, output
       headers: getAuthHeaders(),
       body: JSON.stringify({
         ...output,
-        test_execution_id: executionId
-      })
+        test_execution_id: executionId,
+      }),
     });
     if (!outRes.ok) throw new Error('Errore durante il salvataggio dei file output');
   }
@@ -52,21 +59,25 @@ export async function submitTestExecution(testId: number, userId: number, output
 }
 
 export async function getUserExecutions(userId: number) {
-  const response = await fetch(`${API_URL}/test_executions/by-user/${userId}`, { headers: getAuthHeaders() });
+  const response = await fetch(`${API_URL}/test_executions/by-user/${userId}`, {
+    headers: getAuthHeaders(),
+  });
   if (!response.ok) return []; // Nessuna esecuzione trovata, restituisce array vuoto
   return response.json();
 }
 
-export async function getCompetencyHistoricalScores(userId: string | number): Promise<any[]> {
-  const response = await fetch(`${API_URL}/competency_historical_scores/by-user/${userId}`, {
+export async function getBestCompetencyScores(userId: string | number): Promise<any[]> {
+  const response = await fetch(`${API_URL}/best_competency_score/by-user/${userId}`, {
     headers: getAuthHeaders(),
   });
   if (!response.ok) throw new Error('Errore nel caricamento dei punteggi delle competenze');
   return response.json();
 }
 
-export async function getSubCompetencyHistoricalScores(userId: string | number): Promise<any[]> {
-  const response = await fetch(`${API_URL}/subcompetency_historical_scores/by-user/${userId}`, { headers: getAuthHeaders() });
+export async function getBestSubCompetencyScores(userId: string | number): Promise<any[]> {
+  const response = await fetch(`${API_URL}/best_subcompetency_score/by-user/${userId}`, {
+    headers: getAuthHeaders(),
+  });
   if (!response.ok) return [];
   return response.json();
 }

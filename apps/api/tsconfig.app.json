@@ -32,7 +32,7 @@
       "path": "../../libs/server/tests-management/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/server/historical-scores/tsconfig.lib.json"
+      "path": "../../libs/server/best-scores/tsconfig.lib.json"
     },
     {
       "path": "../../libs/server/tests-evaluation/tsconfig.lib.json"
