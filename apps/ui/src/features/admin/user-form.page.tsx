@@ -1,32 +1,32 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { createUser, getUserById, updateUser, UserRole } from "../users/users.api";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { createUser, getUserById, updateUser, UserRole } from '../users/users.api';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
-export function UserFormPage({ userId, onSuccess }: { userId?: string, onSuccess?: () => void }) {
+export function UserFormPage({ userId, onSuccess }: { userId?: string; onSuccess?: () => void }) {
   const { id: paramId } = useParams();
   const id = userId || paramId;
   const isEditing = Boolean(id);
 
   const [loading, setLoading] = useState(isEditing);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "", 
-    role: "" as UserRole,
+    name: '',
+    email: '',
+    password: '',
+    role: '' as UserRole,
   });
 
   useEffect(() => {
@@ -35,10 +35,10 @@ export function UserFormPage({ userId, onSuccess }: { userId?: string, onSuccess
         try {
           const user = await getUserById(id as string);
           setFormData({
-            name: user.name || "",
-            email: user.email || "",
-            password: "", 
-            role: user.role || "USER",
+            name: user.name || '',
+            email: user.email || '',
+            password: '',
+            role: user.role || 'USER',
           });
         } catch (e) {
           setError("Impossibile caricare l'utente.");
@@ -53,7 +53,7 @@ export function UserFormPage({ userId, onSuccess }: { userId?: string, onSuccess
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    setError("");
+    setError('');
 
     try {
       if (isEditing) {
@@ -69,14 +69,14 @@ export function UserFormPage({ userId, onSuccess }: { userId?: string, onSuccess
           role: formData.role,
         });
       }
-      
+
       if (onSuccess) {
         onSuccess();
       } else {
         window.location.reload();
       }
     } catch (err: any) {
-      setError(err.message || "Errore durante il salvataggio.");
+      setError(err.message || 'Errore durante il salvataggio.');
     } finally {
       setSubmitting(false);
     }
@@ -87,7 +87,7 @@ export function UserFormPage({ userId, onSuccess }: { userId?: string, onSuccess
       {/* COLONNA SINISTRA: SIDEBAR STEPS */}
       <div className="w-full md:w-72 shrink-0 p-6 md:p-8 border-b md:border-b-0 md:border-r border-slate-200 bg-slate-50/50 flex flex-col md:block">
         <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 md:mb-8 hidden md:block">
-          {isEditing ? "Modifica Utente" : "Nuovo Utente"}
+          {isEditing ? 'Modifica Utente' : 'Nuovo Utente'}
         </h2>
 
         <ul className="flex flex-row md:flex-col gap-2 md:gap-6 relative overflow-x-auto md:overflow-visible pb-2 md:pb-0">
@@ -98,9 +98,7 @@ export function UserFormPage({ userId, onSuccess }: { userId?: string, onSuccess
                 1
               </div>
               <div className="pt-1.5 hidden md:block">
-                <div className="font-semibold transition-colors text-slate-900">
-                  Dati Utente
-                </div>
+                <div className="font-semibold transition-colors text-slate-900">Dati Utente</div>
                 <div className="text-xs text-slate-400 mt-0.5">Informazioni generali</div>
               </div>
             </button>
@@ -115,7 +113,7 @@ export function UserFormPage({ userId, onSuccess }: { userId?: string, onSuccess
             Dati Utente
           </DialogTitle>
         </DialogHeader>
-        
+
         <div className="flex-1 overflow-y-auto px-4 md:px-8 pb-4 pt-4 md:pt-0">
           {loading ? (
             <div className="text-center py-8">Caricamento dati utente...</div>
@@ -134,9 +132,7 @@ export function UserFormPage({ userId, onSuccess }: { userId?: string, onSuccess
                     id="name"
                     placeholder="es. Mario Rossi"
                     value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     required
                   />
                 </div>
@@ -148,9 +144,7 @@ export function UserFormPage({ userId, onSuccess }: { userId?: string, onSuccess
                     type="email"
                     placeholder="es. mario.rossi@email.it"
                     value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     required
                   />
                 </div>
@@ -163,22 +157,18 @@ export function UserFormPage({ userId, onSuccess }: { userId?: string, onSuccess
                       type="password"
                       placeholder="Scegli una password (min 6 caratteri)"
                       value={formData.password}
-                      onChange={(e) =>
-                        setFormData({ ...formData, password: e.target.value })
-                      }
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                       required={!isEditing}
                     />
                   </div>
                 )}
 
                 <div className="grid gap-2">
-                  <Label htmlFor="role">Ruolo nel sistema</Label>
+                  <Label htmlFor="role">Ruolo</Label>
                   <Select
                     value={formData.role || undefined}
                     disabled={isEditing}
-                    onValueChange={(val) =>
-                      setFormData({ ...formData, role: val as UserRole })
-                    }
+                    onValueChange={(val) => setFormData({ ...formData, role: val as UserRole })}
                   >
                     <SelectTrigger className="bg-white">
                       <SelectValue placeholder="Seleziona un ruolo" />
@@ -195,11 +185,7 @@ export function UserFormPage({ userId, onSuccess }: { userId?: string, onSuccess
 
               <div className="flex justify-end gap-3 pt-6">
                 <Button type="submit" disabled={submitting}>
-                  {submitting
-                    ? "Salvataggio..."
-                    : isEditing
-                    ? "Salva Modifiche"
-                    : "Crea Utente"}
+                  {submitting ? 'Salvataggio...' : isEditing ? 'Salva Modifiche' : 'Crea Utente'}
                 </Button>
               </div>
             </form>
