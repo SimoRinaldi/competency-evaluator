@@ -43,7 +43,6 @@ export interface CreateTestModalProps {
   } | null;
   onConfirm: (testData: {
     assessmentSituation: string;
-    competencyId: number;
     subcompetencyIds: number[];
     userIds: number[];
     evaluatorIds: number[];
@@ -73,9 +72,6 @@ export function CreateTestModal({
   // Descrizione contesto
   const [assessmentSituation, setAssessmentSituation] = useState(SITUATION_ASSESSMENT_TEMPLATE);
 
-  // Stato selezione competenza
-  const [selectedCompetencyId, setSelectedCompetencyId] = useState<string>('');
-
   // Stati selezioni ID
   const [selectedSubcompetencyIds, setSelectedSubcompetencyIds] = useState<number[]>([]);
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
@@ -101,13 +97,11 @@ export function CreateTestModal({
     setActiveStep(1);
     if (initialData) {
       setAssessmentSituation(initialData.assessmentSituation);
-      setSelectedCompetencyId(String(initialData.competencyId));
       setSelectedSubcompetencyIds(initialData.subcompetencyIds);
       setSelectedUserIds(initialData.userIds);
       setSelectedEvaluatorIds(initialData.evaluatorIds);
     } else {
       setAssessmentSituation(SITUATION_ASSESSMENT_TEMPLATE);
-      setSelectedCompetencyId('');
       setSelectedSubcompetencyIds([]);
       setSelectedUserIds([]);
       setSelectedEvaluatorIds([]);
@@ -135,17 +129,11 @@ export function CreateTestModal({
     }
   }, [isOpen, initialData]);
 
-  // Filtro Sottocompetenze
-  const allSubcompetenciesForCompetency = useMemo(() => {
-    if (!selectedCompetencyId) return [];
-    return subCompetencies.filter((sub) => sub.competency_id === Number(selectedCompetencyId));
-  }, [selectedCompetencyId, subCompetencies]);
-
   const filteredSubcompetencies = useMemo(() => {
     const q = subSearch.trim().toLowerCase();
-    if (!q) return allSubcompetenciesForCompetency;
-    return allSubcompetenciesForCompetency.filter((sub) => sub.title.toLowerCase().includes(q));
-  }, [allSubcompetenciesForCompetency, subSearch]);
+    if (!q) return subCompetencies;
+    return subCompetencies.filter((sub) => sub.title.toLowerCase().includes(q));
+  }, [subCompetencies, subSearch]);
 
   const totalSubPages = Math.ceil(filteredSubcompetencies.length / PAGE_SIZE) || 1;
   const paginatedSubcompetencies = useMemo(() => {
@@ -182,27 +170,6 @@ export function CreateTestModal({
     const start = (evaluatorPage - 1) * PAGE_SIZE;
     return filteredEvaluators.slice(start, start + PAGE_SIZE);
   }, [filteredEvaluators, evaluatorPage]);
-
-  // Filtro Competenze (per la tabella step 1)
-  const filteredCompetencies = useMemo(() => {
-    const q = compSearch.trim().toLowerCase();
-    if (!q) return competencies;
-    return competencies.filter((c) => c.title.toLowerCase().includes(q));
-  }, [competencies, compSearch]);
-
-  const totalCompPages = Math.ceil(filteredCompetencies.length / PAGE_SIZE) || 1;
-  const paginatedCompetencies = useMemo(() => {
-    const start = (compPage - 1) * PAGE_SIZE;
-    return filteredCompetencies.slice(start, start + PAGE_SIZE);
-  }, [filteredCompetencies, compPage]);
-
-  // Reset al cambio competenza
-  const handleCompetencyChange = (value: string) => {
-    setSelectedCompetencyId(value);
-    setSelectedSubcompetencyIds([]);
-    setSubSearch('');
-    setSubPage(1);
-  };
 
   // Toggle selezioni
   const toggleSubcompetency = (id: number) => {
@@ -253,18 +220,11 @@ export function CreateTestModal({
     }
   };
 
-  const isConfirmDisabled =
-    !selectedCompetencyId ||
-    selectedSubcompetencyIds.length === 0 ||
-    assessmentSituation.trim() === '' ||
-    isSubmitting;
-
   const handleConfirm = () => {
     if (isConfirmDisabled) return;
 
     onConfirm({
       assessmentSituation: assessmentSituation.trim() || 'Assessment di valutazione',
-      competencyId: Number(selectedCompetencyId),
       subcompetencyIds: selectedSubcompetencyIds,
       userIds: selectedUserIds,
       evaluatorIds: selectedEvaluatorIds,
@@ -272,23 +232,34 @@ export function CreateTestModal({
   };
 
   // Logica validazione step per step
-  const isStep1Valid = assessmentSituation.trim() !== '' && selectedCompetencyId !== '';
+  const isStep1Valid = assessmentSituation.trim() !== '';
   const isStep2Valid = selectedSubcompetencyIds.length > 0;
+  const isStep3Valid = selectedUserIds.length > 0;
+  const isStep4Valid = selectedEvaluatorIds.length > 0;
+
+  const isConfirmDisabled =
+    !isStep1Valid || !isStep2Valid || !isStep3Valid || !isStep4Valid || isSubmitting;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent className="max-w-[95vw] xl:max-w-[1400px] w-full h-[90vh] p-0 flex flex-col md:flex-row overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
+      <DialogContent
+        className="w-[95vw] sm:max-w-6xl h-[85vh] p-0 flex flex-col md:flex-row overflow-hidden rounded-2xl
+  bg-white shadow-2xl gap-0"
+      >
         {/* COLONNA SINISTRA: SIDEBAR STEPS */}
-        <div className="w-full md:w-72 shrink-0 p-6 md:p-8 border-b md:border-b-0 md:border-r border-slate-200 bg-slate-50/50 flex flex-col md:block">
+        <div
+          className="w-full md:w-64 shrink-0 p-4 md:p-6 border-b md:border-b-0 md:border-r border-slate-200 bg-
+  slate-50/50 flex flex-col md:block"
+        >
           <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 md:mb-8 hidden md:block">
             {initialData ? 'Gestione Test' : 'Gestione Test'}
           </h2>
 
           <ul className="flex flex-row md:flex-col gap-2 md:gap-6 relative overflow-x-auto md:overflow-visible pb-2 md:pb-0">
             {/* Linea verticale (solo desktop) */}
-            <div className="hidden md:block absolute left-[15px] top-4 bottom-[calc(100%-14rem)] w-[2px] bg-slate-200 -z-10"></div>
+            <div className="hidden md:block absolute left-3.75 top-4 bottom-[calc(100%-14rem)] w-0.5 bg-slate-200 -z-10"></div>
 
-            {/* STEP 1: Situazione e Competenza */}
+            {/* STEP 1: Situation Assessment */}
             <li className="relative shrink-0">
               <button
                 onClick={() => setActiveStep(1)}
@@ -313,9 +284,9 @@ export function CreateTestModal({
                         : 'text-slate-500 group-hover:text-slate-900'
                     }`}
                   >
-                    Dati di base
+                    Dati generali
                   </div>
-                  <div className="text-xs text-slate-400 mt-0.5">Nome e scelta competenze</div>
+                  <div className="text-xs text-slate-400 mt-0.5">Info sul test</div>
                 </div>
               </button>
             </li>
@@ -353,7 +324,7 @@ export function CreateTestModal({
                   <div className="text-xs text-slate-400 mt-0.5">
                     {selectedSubcompetencyIds.length > 0
                       ? `${selectedSubcompetencyIds.length} selezionate`
-                      : 'Scegli le prove'}
+                      : 'Scegli le sottocompetenze'}
                   </div>
                 </div>
               </button>
@@ -387,7 +358,7 @@ export function CreateTestModal({
                         : 'text-slate-500 group-hover:text-slate-900'
                     }`}
                   >
-                    Studenti <span className="text-xs text-slate-400 font-normal">(opzionale)</span>
+                    Utenti
                   </div>
                   <div className="text-xs text-slate-400 mt-0.5">
                     {selectedUserIds.length > 0
@@ -402,9 +373,11 @@ export function CreateTestModal({
             <li className="relative shrink-0">
               <button
                 onClick={() => setActiveStep(4)}
-                disabled={!isStep1Valid || !isStep2Valid}
+                disabled={!isStep1Valid || !isStep2Valid || !isStep3Valid}
                 className={`flex items-center md:items-start gap-2 md:gap-4 text-left group ${
-                  !isStep1Valid || !isStep2Valid ? 'cursor-not-allowed opacity-60' : ''
+                  !isStep1Valid || !isStep2Valid || !isStep3Valid
+                    ? 'cursor-not-allowed opacity-60'
+                    : ''
                 }`}
               >
                 <div
@@ -427,7 +400,6 @@ export function CreateTestModal({
                     }`}
                   >
                     Valutatori{' '}
-                    <span className="text-xs text-slate-400 font-normal">(opzionale)</span>
                   </div>
                   <div className="text-xs text-slate-400 mt-0.5">
                     {selectedEvaluatorIds.length > 0
@@ -442,16 +414,18 @@ export function CreateTestModal({
             <li className="relative shrink-0">
               <button
                 onClick={() => setActiveStep(5)}
-                disabled={!isStep1Valid || !isStep2Valid}
+                disabled={!isStep1Valid || !isStep2Valid || !isStep3Valid || !isStep4Valid}
                 className={`flex items-center md:items-start gap-2 md:gap-4 text-left group ${
-                  !isStep1Valid || !isStep2Valid ? 'cursor-not-allowed opacity-60' : ''
+                  !isStep1Valid || !isStep2Valid || !isStep3Valid || !isStep4Valid
+                    ? 'cursor-not-allowed opacity-60'
+                    : ''
                 }`}
               >
                 <div
                   className={`flex shrink-0 items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-all ${
                     activeStep === 5
                       ? 'bg-primary text-primary-foreground shadow-md scale-110'
-                      : isStep1Valid && isStep2Valid
+                      : isStep1Valid && isStep2Valid && isStep3Valid && isStep4Valid
                       ? 'bg-white border-2 border-slate-300 text-slate-900 group-hover:border-slate-400'
                       : 'bg-slate-100 text-slate-400'
                   }`}
@@ -468,7 +442,7 @@ export function CreateTestModal({
                   >
                     Riepilogo
                   </div>
-                  <div className="text-xs text-slate-400 mt-0.5">Conferma finale</div>
+                  <div className="text-xs text-slate-400 mt-0.5">Conferma dati</div>
                 </div>
               </button>
             </li>
@@ -479,9 +453,9 @@ export function CreateTestModal({
         <div className="flex-1 flex flex-col bg-white h-full overflow-hidden">
           <DialogHeader className="p-4 md:px-8 md:pt-8 md:pb-2">
             <DialogTitle className="text-xl md:text-2xl font-bold text-slate-800">
-              {activeStep === 1 && 'Dati di base'}
+              {activeStep === 1 && 'Dati generali'}
               {activeStep === 2 && 'Selezione Sottocompetenze'}
-              {activeStep === 3 && 'Assegnazione Studenti'}
+              {activeStep === 3 && 'Assegnazione Utenti'}
               {activeStep === 4 && 'Assegnazione Valutatori'}
               {activeStep === 5 && 'Riepilogo'}
             </DialogTitle>
@@ -495,15 +469,14 @@ export function CreateTestModal({
             </div>
           ) : (
             <div className="flex-1 overflow-y-auto px-4 md:px-8 pb-4">
-              {/* STEP 1: Dati Base */}
+              {/* STEP 1: Dati Generali */}
               {activeStep === 1 && (
                 <div className="space-y-6 flex flex-col h-full">
                   <div className="max-w-2xl">
                     <Field>
                       <FieldLabel
                         htmlFor="assessment-situation"
-                        className="text-sm font-semibold text-
-  slate-800"
+                        className="text-sm font-semibold text-slate-800"
                       >
                         Descrizione test
                       </FieldLabel>
@@ -518,135 +491,9 @@ export function CreateTestModal({
                         placeholder="es. Valutazione delle competenze in..."
                         value={assessmentSituation}
                         onChange={(e) => setAssessmentSituation(e.target.value)}
-                        className="bg-white border-slate-300 min-h-[120px] resize-y"
+                        className="bg-white border-slate-300 min-h-30 resize-y"
                       />
                     </Field>
-                  </div>
-
-                  <div className="space-y-4 flex flex-col flex-1">
-                    <div className="flex items-center justify-between gap-4">
-                      <Label className="text-sm font-semibold text-slate-800">
-                        Seleziona la competenza principale
-                      </Label>
-                      <div className="relative w-full md:w-72">
-                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <Input
-                          type="text"
-                          placeholder="Cerca competenza..."
-                          value={compSearch}
-                          onChange={(e) => {
-                            setCompSearch(e.target.value);
-                            setCompPage(1);
-                          }}
-                          className="pl-9 h-9"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="bg-white flex flex-col flex-1 border rounded-md overflow-hidden">
-                      <Table>
-                        <TableHeader>
-                          <TableRow className="hover:bg-transparent">
-                            <TableHead className="w-12 text-center py-3"></TableHead>
-                            <TableHead className="font-semibold text-slate-700 py-3">
-                              Titolo
-                            </TableHead>
-                            <TableHead className="w-20 text-center font-semibold text-slate-700 py-3">
-                              Peso
-                            </TableHead>
-                            <TableHead className="w-20 text-center font-semibold text-slate-700 py-3">
-                              Soglia
-                            </TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {paginatedCompetencies.length === 0 ? (
-                            <TableRow>
-                              <TableCell colSpan={4} className="h-32 text-center text-slate-400">
-                                Nessuna competenza trovata
-                              </TableCell>
-                            </TableRow>
-                          ) : (
-                            paginatedCompetencies.map((comp) => {
-                              const isSelected = selectedCompetencyId === String(comp.id);
-                              return (
-                                <TableRow
-                                  key={comp.id}
-                                  data-state={isSelected ? 'selected' : undefined}
-                                  className={`${
-                                    initialData
-                                      ? 'cursor-not-allowed opacity-70'
-                                      : 'cursor-pointer group hover:bg-transparent'
-                                  }`}
-                                  onClick={() =>
-                                    !initialData && handleCompetencyChange(String(comp.id))
-                                  }
-                                >
-                                  <TableCell
-                                    className="text-center py-3"
-                                    onClick={(e) => e.stopPropagation()}
-                                  >
-                                    <input
-                                      type="radio"
-                                      name="competencySelection"
-                                      className={`h-4 w-4 rounded-full border-slate-300 text-primary focus:ring-primary ${
-                                        initialData ? 'cursor-not-allowed' : 'cursor-pointer'
-                                      }`}
-                                      checked={isSelected}
-                                      onChange={() =>
-                                        !initialData && handleCompetencyChange(String(comp.id))
-                                      }
-                                      disabled={Boolean(initialData)}
-                                    />
-                                  </TableCell>
-                                  <TableCell className="font-medium text-slate-900 py-3">
-                                    {comp.title}
-                                  </TableCell>
-                                  <TableCell className="text-center text-slate-600 py-3">
-                                    {comp.weight}
-                                  </TableCell>
-                                  <TableCell className="text-center text-slate-600 py-3">
-                                    {comp.threshold}
-                                  </TableCell>
-                                </TableRow>
-                              );
-                            })
-                          )}
-                        </TableBody>
-                      </Table>
-                    </div>
-
-                    {/* Paginazione Competenze */}
-                    {filteredCompetencies.length > 0 && (
-                      <div className="flex items-center justify-between text-sm text-slate-500 pt-2 border-t border-slate-100">
-                        <span>
-                          Pagina {compPage} di {totalCompPages} - {filteredCompetencies.length}{' '}
-                          elementi totali
-                        </span>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            disabled={compPage <= 1}
-                            onClick={() => setCompPage((p) => Math.max(1, p - 1))}
-                            className="h-8 w-8"
-                          >
-                            <ChevronLeft className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            disabled={compPage >= totalCompPages}
-                            onClick={() => setCompPage((p) => Math.min(totalCompPages, p + 1))}
-                            className="h-8 w-8"
-                          >
-                            <ChevronRight className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </div>
               )}
@@ -691,6 +538,9 @@ export function CreateTestModal({
                           <TableHead className="font-semibold text-slate-700 py-3">
                             Titolo
                           </TableHead>
+                          <TableHead className="font-semibold text-slate-700 py-3">
+                            Competenza
+                          </TableHead>
                           <TableHead className="font-semibold text-slate-700 py-3 hidden md:table-cell">
                             Input
                           </TableHead>
@@ -709,13 +559,7 @@ export function CreateTestModal({
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {!selectedCompetencyId ? (
-                          <TableRow>
-                            <TableCell colSpan={7} className="h-32 text-center text-slate-400">
-                              Seleziona prima una competenza nello Step 1
-                            </TableCell>
-                          </TableRow>
-                        ) : paginatedSubcompetencies.length === 0 ? (
+                        {paginatedSubcompetencies.length === 0 ? (
                           <TableRow>
                             <TableCell colSpan={7} className="h-32 text-center text-slate-400">
                               Nessuna sottocompetenza trovata
@@ -745,20 +589,24 @@ export function CreateTestModal({
                                 <TableCell className="font-medium text-slate-900 py-3">
                                   {sub.title}
                                 </TableCell>
+                                <TableCell className="text-slate-600 py-3">
+                                  {competencies.find((c) => c.id === sub.competency_id)?.title ||
+                                    '-'}
+                                </TableCell>
                                 <TableCell
-                                  className="text-slate-600 py-3 hidden md:table-cell max-w-[150px] truncate"
+                                  className="text-slate-600 py-3 hidden md:table-cell max-w-37.5 truncate"
                                   title={sub.input}
                                 >
                                   {sub.input || '-'}
                                 </TableCell>
                                 <TableCell
-                                  className="text-slate-600 py-3 hidden md:table-cell max-w-[150px] truncate"
+                                  className="text-slate-600 py-3 hidden md:table-cell max-w-37.5 truncate"
                                   title={sub.action}
                                 >
                                   {sub.action || '-'}
                                 </TableCell>
                                 <TableCell
-                                  className="text-slate-600 py-3 hidden lg:table-cell max-w-[150px] truncate"
+                                  className="text-slate-600 py-3 hidden lg:table-cell max-w-37.5 truncate"
                                   title={sub.output}
                                 >
                                   {sub.output || '-'}
@@ -778,7 +626,7 @@ export function CreateTestModal({
                   </div>
 
                   {/* Paginazione */}
-                  {selectedCompetencyId && filteredSubcompetencies.length > 0 && (
+                  {filteredSubcompetencies.length > 0 && (
                     <div className="flex items-center justify-between text-sm text-slate-500 pt-2 border-t border-slate-100">
                       <span>
                         Pagina {subPage} di {totalSubPages} - {filteredSubcompetencies.length}{' '}
@@ -819,7 +667,7 @@ export function CreateTestModal({
                       <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                       <Input
                         type="text"
-                        placeholder="Cerca studente..."
+                        placeholder="Cerca utente..."
                         value={userSearch}
                         onChange={(e) => {
                           setUserSearch(e.target.value);
@@ -1042,10 +890,6 @@ export function CreateTestModal({
               {activeStep === 5 && (
                 <TestSummaryView
                   assessmentSituation={assessmentSituation}
-                  competencyTitle={
-                    competencies.find((c) => String(c.id) === String(selectedCompetencyId))
-                      ?.title || '-'
-                  }
                   subcompetencies={subCompetencies.filter((s) =>
                     selectedSubcompetencyIds.includes(s.id),
                   )}
@@ -1084,7 +928,10 @@ export function CreateTestModal({
                   type="button"
                   onClick={() => setActiveStep(activeStep + 1)}
                   disabled={
-                    (activeStep === 1 && !isStep1Valid) || (activeStep === 2 && !isStep2Valid)
+                    (activeStep === 1 && !isStep1Valid) ||
+                    (activeStep === 2 && !isStep2Valid) ||
+                    (activeStep === 3 && !isStep3Valid) ||
+                    (activeStep === 4 && !isStep4Valid)
                   }
                   className="px-6 md:px-8"
                 >

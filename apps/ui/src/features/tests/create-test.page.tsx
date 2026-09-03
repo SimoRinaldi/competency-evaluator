@@ -55,7 +55,7 @@ export function CreateTestPage() {
 
   // Stati form
   const [assessmentSituation, setAssessmentSituation] = useState(
-    'Valutazione delle competenze teoriche e pratiche'
+    'Valutazione delle competenze teoriche e pratiche',
   );
   const [selectedCompetencyId, setSelectedCompetencyId] = useState<string>('');
   const [selectedSubcompetencyIds, setSelectedSubcompetencyIds] = useState<number[]>([]);
@@ -112,17 +112,13 @@ export function CreateTestPage() {
   // Sottocompetenze filtrate
   const allSubcompetenciesForCompetency = useMemo(() => {
     if (!selectedCompetencyId) return [];
-    return subCompetencies.filter(
-      (sub) => sub.competency_id === Number(selectedCompetencyId)
-    );
+    return subCompetencies.filter((sub) => sub.competency_id === Number(selectedCompetencyId));
   }, [selectedCompetencyId, subCompetencies]);
 
   const filteredSubcompetencies = useMemo(() => {
     const q = subSearch.trim().toLowerCase();
     if (!q) return allSubcompetenciesForCompetency;
-    return allSubcompetenciesForCompetency.filter((sub) =>
-      sub.title.toLowerCase().includes(q)
-    );
+    return allSubcompetenciesForCompetency.filter((sub) => sub.title.toLowerCase().includes(q));
   }, [allSubcompetenciesForCompetency, subSearch]);
 
   const totalSubPages = Math.ceil(filteredSubcompetencies.length / PAGE_SIZE) || 1;
@@ -136,7 +132,7 @@ export function CreateTestPage() {
     const q = userSearch.trim().toLowerCase();
     if (!q) return evaluatedUsers;
     return evaluatedUsers.filter(
-      (eu) => eu.user?.name.toLowerCase().includes(q) || eu.user?.email.toLowerCase().includes(q)
+      (eu) => eu.user?.name.toLowerCase().includes(q) || eu.user?.email.toLowerCase().includes(q),
     );
   }, [evaluatedUsers, userSearch]);
 
@@ -151,7 +147,7 @@ export function CreateTestPage() {
     const q = evaluatorSearch.trim().toLowerCase();
     if (!q) return testEvaluators;
     return testEvaluators.filter(
-      (te) => te.user?.name.toLowerCase().includes(q) || te.user?.email.toLowerCase().includes(q)
+      (te) => te.user?.name.toLowerCase().includes(q) || te.user?.email.toLowerCase().includes(q),
     );
   }, [testEvaluators, evaluatorSearch]);
 
@@ -172,7 +168,7 @@ export function CreateTestPage() {
   // Toggle Sottocompetenza
   const toggleSub = (id: number) => {
     setSelectedSubcompetencyIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
   };
 
@@ -189,7 +185,7 @@ export function CreateTestPage() {
   // Toggle Utente Valutato
   const toggleEvaluatedUser = (id: number) => {
     setSelectedEvaluatedUserIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
   };
 
@@ -206,7 +202,7 @@ export function CreateTestPage() {
   // Toggle Valutatore
   const toggleTestEvaluator = (id: number) => {
     setSelectedTestEvaluatorIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
   };
 
@@ -271,7 +267,6 @@ export function CreateTestPage() {
     <div className="min-h-screen bg-slate-50 flex justify-center items-start py-10 px-4">
       {/* Contenitore Principale con Layout a 2 Colonne */}
       <div className="flex w-full max-w-6xl bg-white rounded-xl shadow-xl overflow-hidden border border-slate-200">
-        
         {/* COLONNA SINISTRA: SIDEBAR GUIDATA */}
         <div className="w-72 shrink-0 p-8 border-r border-slate-200 bg-slate-50/30">
           <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-8">
@@ -353,7 +348,7 @@ export function CreateTestPage() {
                       ? `${selectedSubcompetencyIds.length} selezionat${
                           selectedSubcompetencyIds.length === 1 ? 'a' : 'e'
                         }`
-                      : 'Selezione prove'}
+                      : 'Selezione sottocompetenze'}
                   </div>
                 </div>
               </button>
@@ -477,7 +472,6 @@ export function CreateTestPage() {
 
         {/* COLONNA DESTRA: AREA PRINCIPALE */}
         <div className="flex-1 p-10 bg-white min-h-[560px] flex flex-col justify-between">
-          
           {/* VISTA 1: SCELTA COMPETENZA */}
           {activeMenu === 1 && (
             <div className="space-y-6 animate-in fade-in duration-200">
@@ -486,7 +480,8 @@ export function CreateTestPage() {
                   Dati del Test e Competenza
                 </h2>
                 <p className="text-slate-500 text-sm mt-1">
-                  Seleziona la competenza di riferimento per cui strutturare il test e descrivi la Descrizione test.
+                  Seleziona la competenza di riferimento per cui strutturare il test e descrivi la
+                  Descrizione test.
                 </p>
               </div>
 
@@ -508,10 +503,7 @@ export function CreateTestPage() {
                   <Label>
                     Seleziona la Competenza <span className="text-red-500">*</span>
                   </Label>
-                  <Select
-                    value={selectedCompetencyId}
-                    onValueChange={handleCompetencyChange}
-                  >
+                  <Select value={selectedCompetencyId} onValueChange={handleCompetencyChange}>
                     <SelectTrigger className="w-full h-11 bg-white border-slate-300 rounded-md shadow-sm">
                       <SelectValue placeholder="-- Scegli una competenza dall'elenco --" />
                     </SelectTrigger>
@@ -596,15 +588,21 @@ export function CreateTestPage() {
                           checked={
                             paginatedSubcompetencies.length > 0 &&
                             paginatedSubcompetencies.every((s) =>
-                              selectedSubcompetencyIds.includes(s.id)
+                              selectedSubcompetencyIds.includes(s.id),
                             )
                           }
                           onChange={toggleAllVisibleSubs}
                         />
                       </TableHead>
-                      <TableHead className="font-semibold text-slate-700">Titolo Sottocompetenza</TableHead>
-                      <TableHead className="w-20 text-center font-semibold text-slate-700">Peso</TableHead>
-                      <TableHead className="w-20 text-center font-semibold text-slate-700">Soglia</TableHead>
+                      <TableHead className="font-semibold text-slate-700">
+                        Titolo Sottocompetenza
+                      </TableHead>
+                      <TableHead className="w-20 text-center font-semibold text-slate-700">
+                        Peso
+                      </TableHead>
+                      <TableHead className="w-20 text-center font-semibold text-slate-700">
+                        Soglia
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -651,10 +649,13 @@ export function CreateTestPage() {
                 {filteredSubcompetencies.length > 0 && (
                   <div className="flex items-center justify-between px-4 py-2 bg-slate-50 border-t border-slate-200 text-xs text-slate-500">
                     <span>
-                      {selectedSubcompetencyIds.length} selezionate su {filteredSubcompetencies.length}
+                      {selectedSubcompetencyIds.length} selezionate su{' '}
+                      {filteredSubcompetencies.length}
                     </span>
                     <div className="flex items-center gap-2">
-                      <span>Pagina {subPage} di {totalSubPages}</span>
+                      <span>
+                        Pagina {subPage} di {totalSubPages}
+                      </span>
                       <Button
                         type="button"
                         variant="outline"
@@ -739,7 +740,9 @@ export function CreateTestPage() {
                           className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer"
                           checked={
                             paginatedEvaluatedUsers.length > 0 &&
-                            paginatedEvaluatedUsers.every((eu) => selectedEvaluatedUserIds.includes(eu.id))
+                            paginatedEvaluatedUsers.every((eu) =>
+                              selectedEvaluatedUserIds.includes(eu.id),
+                            )
                           }
                           onChange={toggleAllVisibleEvaluatedUsers}
                         />
@@ -789,10 +792,13 @@ export function CreateTestPage() {
                 {filteredEvaluatedUsers.length > 0 && (
                   <div className="flex items-center justify-between px-4 py-2 bg-slate-50 border-t border-slate-200 text-xs text-slate-500">
                     <span>
-                      {selectedEvaluatedUserIds.length} selezionati su {filteredEvaluatedUsers.length}
+                      {selectedEvaluatedUserIds.length} selezionati su{' '}
+                      {filteredEvaluatedUsers.length}
                     </span>
                     <div className="flex items-center gap-2">
-                      <span>Pagina {userPage} di {totalUserPages}</span>
+                      <span>
+                        Pagina {userPage} di {totalUserPages}
+                      </span>
                       <Button
                         type="button"
                         variant="outline"
@@ -877,12 +883,16 @@ export function CreateTestPage() {
                           className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer"
                           checked={
                             paginatedTestEvaluators.length > 0 &&
-                            paginatedTestEvaluators.every((te) => selectedTestEvaluatorIds.includes(te.id))
+                            paginatedTestEvaluators.every((te) =>
+                              selectedTestEvaluatorIds.includes(te.id),
+                            )
                           }
                           onChange={toggleAllVisibleTestEvaluators}
                         />
                       </TableHead>
-                      <TableHead className="font-semibold text-slate-700">Nome Valutatore</TableHead>
+                      <TableHead className="font-semibold text-slate-700">
+                        Nome Valutatore
+                      </TableHead>
                       <TableHead className="font-semibold text-slate-700">Email</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -927,10 +937,13 @@ export function CreateTestPage() {
                 {filteredTestEvaluators.length > 0 && (
                   <div className="flex items-center justify-between px-4 py-2 bg-slate-50 border-t border-slate-200 text-xs text-slate-500">
                     <span>
-                      {selectedTestEvaluatorIds.length} selezionati su {filteredTestEvaluators.length}
+                      {selectedTestEvaluatorIds.length} selezionati su{' '}
+                      {filteredTestEvaluators.length}
                     </span>
                     <div className="flex items-center gap-2">
-                      <span>Pagina {evaluatorPage} di {totalEvaluatorPages}</span>
+                      <span>
+                        Pagina {evaluatorPage} di {totalEvaluatorPages}
+                      </span>
                       <Button
                         type="button"
                         variant="outline"
@@ -946,7 +959,9 @@ export function CreateTestPage() {
                         variant="outline"
                         size="sm"
                         disabled={evaluatorPage >= totalEvaluatorPages}
-                        onClick={() => setEvaluatorPage((p) => Math.min(totalEvaluatorPages, p + 1))}
+                        onClick={() =>
+                          setEvaluatorPage((p) => Math.min(totalEvaluatorPages, p + 1))
+                        }
                         className="h-7 w-7 p-0"
                       >
                         <ChevronRight className="h-4 w-4" />
@@ -981,9 +996,7 @@ export function CreateTestPage() {
           {activeMenu === 5 && (
             <div className="space-y-6 animate-in fade-in duration-200">
               <div>
-                <h2 className="text-2xl font-bold tracking-tight text-slate-900">
-                  Riepilogo Test
-                </h2>
+                <h2 className="text-2xl font-bold tracking-tight text-slate-900">Riepilogo Test</h2>
                 <p className="text-slate-500 text-sm mt-1">
                   Verifica tutte le informazioni configurate prima di salvare il test.
                 </p>
@@ -992,11 +1005,10 @@ export function CreateTestPage() {
               {submitSuccess ? (
                 <div className="p-8 text-center bg-emerald-50 border border-emerald-200 rounded-xl space-y-4">
                   <CheckCircle2 className="h-12 w-12 text-emerald-600 mx-auto" />
-                  <h3 className="text-lg font-bold text-emerald-900">
-                    Test Creato con Successo!
-                  </h3>
+                  <h3 className="text-lg font-bold text-emerald-900">Test Creato con Successo!</h3>
                   <p className="text-sm text-emerald-700 max-w-md mx-auto">
-                    Il test è stato registrato nel database con le relative associazioni di sotto-competenze, partecipanti e valutatori.
+                    Il test è stato registrato nel database con le relative associazioni di
+                    sotto-competenze, partecipanti e valutatori.
                   </p>
                   <div className="pt-2">
                     <Button
@@ -1020,42 +1032,79 @@ export function CreateTestPage() {
                     <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-1">
                       <div className="flex justify-between items-center text-xs text-slate-400 font-bold uppercase tracking-wider">
                         <span>Situazione & Competenza</span>
-                        <button onClick={() => setActiveMenu(1)} className="text-sky-600 hover:underline">Modifica</button>
+                        <button
+                          onClick={() => setActiveMenu(1)}
+                          className="text-sky-600 hover:underline"
+                        >
+                          Modifica
+                        </button>
                       </div>
-                      <p className="font-semibold text-slate-900 text-sm">{selectedCompetency?.title}</p>
+                      <p className="font-semibold text-slate-900 text-sm">
+                        {selectedCompetency?.title}
+                      </p>
                       <p className="text-xs text-slate-500">"{assessmentSituation}"</p>
                     </div>
 
                     <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-1">
                       <div className="flex justify-between items-center text-xs text-slate-400 font-bold uppercase tracking-wider">
                         <span>Sottocompetenze ({selectedSubcompetencyIds.length})</span>
-                        <button onClick={() => setActiveMenu(2)} className="text-sky-600 hover:underline">Modifica</button>
+                        <button
+                          onClick={() => setActiveMenu(2)}
+                          className="text-sky-600 hover:underline"
+                        >
+                          Modifica
+                        </button>
                       </div>
-                      <p className="font-semibold text-slate-900 text-sm">{selectedSubcompetencyIds.length} selezionate</p>
+                      <p className="font-semibold text-slate-900 text-sm">
+                        {selectedSubcompetencyIds.length} selezionate
+                      </p>
                       <p className="text-xs text-slate-500 truncate">
-                        {subCompetencies.filter((s) => selectedSubcompetencyIds.includes(s.id)).map((s) => s.title).join(', ')}
+                        {subCompetencies
+                          .filter((s) => selectedSubcompetencyIds.includes(s.id))
+                          .map((s) => s.title)
+                          .join(', ')}
                       </p>
                     </div>
 
                     <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-1">
                       <div className="flex justify-between items-center text-xs text-slate-400 font-bold uppercase tracking-wider">
                         <span>Utenti ({selectedEvaluatedUserIds.length})</span>
-                        <button onClick={() => setActiveMenu(3)} className="text-sky-600 hover:underline">Modifica</button>
+                        <button
+                          onClick={() => setActiveMenu(3)}
+                          className="text-sky-600 hover:underline"
+                        >
+                          Modifica
+                        </button>
                       </div>
-                      <p className="font-semibold text-slate-900 text-sm">{selectedEvaluatedUserIds.length} partecipanti</p>
+                      <p className="font-semibold text-slate-900 text-sm">
+                        {selectedEvaluatedUserIds.length} partecipanti
+                      </p>
                       <p className="text-xs text-slate-500 truncate">
-                        {evaluatedUsers.filter((eu) => selectedEvaluatedUserIds.includes(eu.id)).map((eu) => eu.user?.name ?? '-').join(', ')}
+                        {evaluatedUsers
+                          .filter((eu) => selectedEvaluatedUserIds.includes(eu.id))
+                          .map((eu) => eu.user?.name ?? '-')
+                          .join(', ')}
                       </p>
                     </div>
 
                     <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-1">
                       <div className="flex justify-between items-center text-xs text-slate-400 font-bold uppercase tracking-wider">
                         <span>Valutatori ({selectedTestEvaluatorIds.length})</span>
-                        <button onClick={() => setActiveMenu(4)} className="text-sky-600 hover:underline">Modifica</button>
+                        <button
+                          onClick={() => setActiveMenu(4)}
+                          className="text-sky-600 hover:underline"
+                        >
+                          Modifica
+                        </button>
                       </div>
-                      <p className="font-semibold text-slate-900 text-sm">{selectedTestEvaluatorIds.length} valutatori</p>
+                      <p className="font-semibold text-slate-900 text-sm">
+                        {selectedTestEvaluatorIds.length} valutatori
+                      </p>
                       <p className="text-xs text-slate-500 truncate">
-                        {testEvaluators.filter((te) => selectedTestEvaluatorIds.includes(te.id)).map((te) => te.user?.name ?? '-').join(', ')}
+                        {testEvaluators
+                          .filter((te) => selectedTestEvaluatorIds.includes(te.id))
+                          .map((te) => te.user?.name ?? '-')
+                          .join(', ')}
                       </p>
                     </div>
                   </div>
