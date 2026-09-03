@@ -1,10 +1,9 @@
 import { Controller, UseGuards, Post, Request, Body, ValidationPipe } from '@nestjs/common';
-import { ApiTags, ApiBody } from '@nestjs/swagger';
+import { ApiTags, ApiBody, ApiOperation } from '@nestjs/swagger';
 import { ServerAuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { AuthenticatedUser } from './interfaces/authenticated-user.interface';
 import { LocalAuthGuard } from './guards/local-auth.guard';
-import { UserRole } from '@server/users';
 
 type RequestWithUser = Request & {
   user: AuthenticatedUser;
@@ -21,8 +20,8 @@ export class ServerAuthController {
     schema: {
       type: 'object',
       properties: {
-        email: { type: 'string', example: 'devis.bianchini@unibs.it' },
-        password: { type: 'string', example: 'Password1!' },
+        email: { type: 'string', example: 'nome.cognome@coeva.local' },
+        password: { type: 'string', example: 'latuapassword' },
       },
       required: ['email', 'password'],
     },
@@ -43,6 +42,7 @@ export class ServerAuthController {
       required: ['name', 'email', 'password'],
     },
   })
+  @ApiOperation({ summary: 'Registra nel sistema un nuovo utente con ruolo USER' })
   register(@Body(ValidationPipe) dto: RegisterDto) {
     return this.serverAuthService.register(dto);
   }
