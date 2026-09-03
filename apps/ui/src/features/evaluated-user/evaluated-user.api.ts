@@ -22,7 +22,7 @@ export async function getTestEvaluators(testId: string | number) {
 
 export async function submitTestExecution(testId: number, userId: number, outputs: { name: string, description: string, url: string, version: string }[], existingExecutionId?: number) {
   let executionId = existingExecutionId;
-  
+
   if (!executionId) {
     // 1. Crea la test execution se non esiste
     const executionRes = await fetch(`${API_URL}/test_executions`, {
@@ -67,6 +67,30 @@ export async function getCompetencyHistoricalScores(userId: string | number): Pr
 
 export async function getSubCompetencyHistoricalScores(userId: string | number): Promise<any[]> {
   const response = await fetch(`${API_URL}/subcompetency_historical_scores/by-user/${userId}`, { headers: getAuthHeaders() });
+  if (!response.ok) return [];
+  return response.json();
+}
+
+export async function getAcquiredCompetencies(userId: number) {
+  const response = await fetch(`${API_URL}/historical_scores/competencies/acquired/${userId}`, { headers: getAuthHeaders() });
+  if (!response.ok) return [];
+  return response.json();
+}
+
+export async function getUnacquiredCompetencies(userId: number) {
+  const response = await fetch(`${API_URL}/historical_scores/competencies/unacquired/${userId}`, { headers: getAuthHeaders() });
+  if (!response.ok) return [];
+  return response.json();
+}
+
+export async function getAcquiredSubcompetencies(userId: number, competencyId: number) {
+  const response = await fetch(`${API_URL}/historical_scores/subcompetencies/acquired/${userId}/${competencyId}`, { headers: getAuthHeaders() });
+  if (!response.ok) return [];
+  return response.json();
+}
+
+export async function getUnacquiredSubcompetencies(userId: number, competencyId: number) {
+  const response = await fetch(`${API_URL}/historical_scores/subcompetencies/unacquired/${userId}/${competencyId}`, { headers: getAuthHeaders() });
   if (!response.ok) return [];
   return response.json();
 }
