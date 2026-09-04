@@ -74,8 +74,8 @@ export class TestDesignerService {
       throw new NotFoundException(`Test Designer con ID ${id} non trovato.`);
     }
 
-    const isDeleted = await this.repository.deleteOne(id);
-    if (!isDeleted) {
+    const is_deleted = await this.repository.deleteOne(id);
+    if (!is_deleted) {
       throw new NotFoundException(`Errore durante l'eliminazione del Test Designer con ID ${id}.`);
     }
   }

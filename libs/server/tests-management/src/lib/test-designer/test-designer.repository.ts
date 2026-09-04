@@ -9,38 +9,35 @@ import { UpdateTestDesignerDto } from './dto/update-test-designer.dto';
 export class TestDesignerRepository {
   constructor(
     @InjectRepository(TestDesignerEntity)
-    private readonly repository: Repository<TestDesignerEntity>
+    private readonly repository: Repository<TestDesignerEntity>,
   ) {}
 
-  async createOne(dto: CreateTestDesignerDto): Promise<TestDesignerEntity> {
+  createOne(dto: CreateTestDesignerDto): Promise<TestDesignerEntity> {
     const designer = this.repository.create({ user_id: dto.user_id });
     return this.repository.save(designer);
   }
 
-  async findAll(): Promise<TestDesignerEntity[]> {
+  findAll(): Promise<TestDesignerEntity[]> {
     return this.repository.find({
       relations: ['user', 'tests'],
     });
   }
 
-  async findById(id: number): Promise<TestDesignerEntity | null> {
+  findById(id: number): Promise<TestDesignerEntity | null> {
     return this.repository.findOne({
       where: { id },
       relations: ['user', 'tests'],
     });
   }
 
-  async findByUserId(user_id: number): Promise<TestDesignerEntity | null> {
+  findByUserId(user_id: number): Promise<TestDesignerEntity | null> {
     return this.repository.findOne({
       where: { user_id },
       relations: ['user', 'tests'],
     });
   }
 
-  async updateOne(
-    designer: TestDesignerEntity,
-    dto: UpdateTestDesignerDto
-  ): Promise<TestDesignerEntity> {
+  updateOne(designer: TestDesignerEntity, dto: UpdateTestDesignerDto): Promise<TestDesignerEntity> {
     if (dto.user_id !== undefined) designer.user_id = dto.user_id;
     return this.repository.save(designer);
   }

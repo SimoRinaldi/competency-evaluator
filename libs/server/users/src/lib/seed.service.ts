@@ -15,8 +15,6 @@ import * as bcrypt from 'bcrypt';
 export class SeedService implements OnApplicationBootstrap {
   constructor(private readonly usersRepository: UsersRepository) {}
 
-  // Hook chiamato da NestJS dopo che tutti i moduli
-  // (compreso DatabaseModule) sono stati inizializzati
   async onApplicationBootstrap(): Promise<void> {
     await this.seedAdminUser();
   }
