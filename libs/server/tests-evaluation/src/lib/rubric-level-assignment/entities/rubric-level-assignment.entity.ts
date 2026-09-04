@@ -1,10 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import type { Relation } from 'typeorm';
 import { TestEvaluatorEntity } from '../../test-evaluator/entities/test-evaluator.entity';
 import { IndicatorEntity } from '@server/competencies-management';
@@ -31,7 +25,7 @@ export class RubricLevelAssignmentEntity {
   @JoinColumn({ name: 'indicator_id' })
   indicator?: Relation<IndicatorEntity>;
 
-  @ManyToOne(() => TestExecutionEntity, { onDelete: 'CASCADE' })
+  @ManyToOne(() => TestExecutionEntity)
   @JoinColumn({ name: 'test_execution_id' })
   test_execution?: Relation<TestExecutionEntity>;
 

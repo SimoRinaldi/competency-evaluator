@@ -62,7 +62,7 @@ export function TestSummaryView({
             <TableHeader>
               <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
                 <TableHead>Titolo</TableHead>
-                <TableHead>Soglia %</TableHead>
+                <TableHead>Soglia</TableHead>
                 <TableHead>Peso</TableHead>
               </TableRow>
             </TableHeader>
@@ -77,7 +77,7 @@ export function TestSummaryView({
                 subcompetencies.map((sub) => (
                   <TableRow key={sub.id}>
                     <TableCell>{sub.title}</TableCell>
-                    <TableCell>{sub.threshold}%</TableCell>
+                    <TableCell>{sub.threshold}</TableCell>
                     <TableCell>{sub.weight}</TableCell>
                   </TableRow>
                 ))

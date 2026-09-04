@@ -173,11 +173,31 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
     try {
       await deleteTest(deleteTargetTest.id);
       await loadTests();
+      toast.success('Test eliminato con successo');
     } catch (error) {
       console.error("Errore durante l'eliminazione del test:", error);
+      toast.error("Errore durante l'eliminazione  del test");
     } finally {
       setIsDeletingId(null);
       setDeleteTargetTest(null);
+    }
+  };
+
+  const handleDeleteClick = async (test: ApiTest) => {
+    try {
+      // controllo se il test è già iniziato
+      const executions = await fetchTestExecutionsByTestId(test.id);
+      const isStarted = executions.some((ex) => ex.test_outputs && ex.test_outputs.length > 0);
+
+      if (isStarted) {
+        toast.error('Impossibile eliminare: il test è in corso');
+        return;
+      }
+
+      // se il test non è iniziato, procede all'eliminazione
+      setDeleteTargetTest(test);
+    } catch (err) {
+      toast.error("Errore durante la verifica per l'eliminazione del test");
     }
   };
 
@@ -333,7 +353,7 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
               size="icon"
               className="h-8 w-8 text-slate-500 hover:text-red-600 cursor-pointer"
               title="Elimina"
-              onClick={() => setDeleteTargetTest(row.original)}
+              onClick={() => handleDeleteClick(row.original)}
               disabled={isDeletingId === row.original.id}
             >
               {isDeletingId === row.original.id ? (
@@ -532,15 +552,8 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
                   <TriangleAlert className="h-5 w-5 text-destructive" />
                   Conferma Eliminazione
                 </AlertDialogTitle>
-                <AlertDialogDescription className="text-slate-600">
-                  Sei sicuro di voler eliminare il test{' '}
-                  <span className="font-semibold text-slate-900">
-                    "{deleteTargetTest?.assessment_situation}"
-                  </span>{' '}
-                  (ID: #{deleteTargetTest?.id})?
-                  <br className="my-1" />
-                  Questa operazione è irreversibile e cancellerà definitivamente tutti i dati e le
-                  assegnazioni associate.
+                <AlertDialogDescription className="text-slate-600 space-y-2 mt-2">
+                  <p>Sei sicuro di voler eliminare questo test?</p>
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -551,8 +564,7 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
                   onClick={async (e) => {
                     e.preventDefault();
                     if (deleteTargetTest) {
-                      await handleDeleteTest(deleteTargetTest.id);
-                      setDeleteTargetTest(null);
+                      await handleDeleteTest();
                     }
                   }}
                   className="flex items-center gap-2"
