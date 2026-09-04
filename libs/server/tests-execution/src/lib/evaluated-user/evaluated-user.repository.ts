@@ -9,7 +9,7 @@ import { UpdateEvaluatedUserDto } from './dto/update-evaluated-user.dto';
 export class EvaluatedUserRepository {
   constructor(
     @InjectRepository(EvaluatedUserEntity)
-    private readonly repository: Repository<EvaluatedUserEntity>
+    private readonly repository: Repository<EvaluatedUserEntity>,
   ) {}
 
   async createOne(dto: CreateEvaluatedUserDto): Promise<EvaluatedUserEntity> {
@@ -38,11 +38,11 @@ export class EvaluatedUserRepository {
   }
 
   async updateOne(
-    evaluatedUser: EvaluatedUserEntity,
-    dto: UpdateEvaluatedUserDto
+    evaluated_user: EvaluatedUserEntity,
+    dto: UpdateEvaluatedUserDto,
   ): Promise<EvaluatedUserEntity> {
-    if (dto.user_id !== undefined) evaluatedUser.user_id = dto.user_id;
-    return this.repository.save(evaluatedUser);
+    if (dto.user_id !== undefined) evaluated_user.user_id = dto.user_id;
+    return this.repository.save(evaluated_user);
   }
 
   async deleteOne(id: number): Promise<boolean> {

@@ -11,25 +11,21 @@ export class TestExecutionService {
   constructor(
     private readonly testExecutionsRepository: TestExecutionRepository,
     private readonly testsRepository: TestRepository,
-    private readonly evaluatedUsersRepository: EvaluatedUserRepository
+    private readonly evaluatedUsersRepository: EvaluatedUserRepository,
   ) {}
 
   async create(dto: CreateTestExecutionDto): Promise<TestExecutionEntity> {
     const test = await this.testsRepository.findById(dto.test_id);
-    if (!test) {
-      throw new NotFoundException(`Test con ID ${dto.test_id} non trovato.`);
+    if (!test) throw new NotFoundException(`Test con ID ${dto.test_id} non trovato.`);
+
+    let evaluated_user = await this.evaluatedUsersRepository.findByUserId(dto.user_id);
+    if (!evaluated_user) {
+      // crea l'EvaluatedUser se non esiste
+      evaluated_user = await this.evaluatedUsersRepository.createOne({ user_id: dto.user_id });
     }
 
-    let evaluatedUser = await this.evaluatedUsersRepository.findByUserId(
-      dto.user_id
-    );
-    if (!evaluatedUser) {
-      // Auto-create EvaluatedUser if it doesn't exist yet
-      evaluatedUser = await this.evaluatedUsersRepository.createOne({ user_id: dto.user_id });
-    }
-
-    const realDto = { ...dto, user_id: evaluatedUser.id };
-    return this.testExecutionsRepository.createOne(realDto);
+    const real_dto = { ...dto, user_id: evaluated_user.id };
+    return this.testExecutionsRepository.createOne(real_dto);
   }
 
   async findAll(): Promise<TestExecutionEntity[]> {
@@ -64,52 +60,35 @@ export class TestExecutionService {
     return this.testExecutionsRepository.findByTestId(testId);
   }
 
-  async update(
-    id: number,
-    dto: UpdateTestExecutionDto
-  ): Promise<TestExecutionEntity> {
-    const testExecution = await this.testExecutionsRepository.findById(id);
-    if (!testExecution) {
-      throw new NotFoundException(`Test execution con ID ${id} non trovata.`);
-    }
+  async update(id: number, dto: UpdateTestExecutionDto): Promise<TestExecutionEntity> {
+    const test_execution = await this.testExecutionsRepository.findById(id);
+    if (!test_execution) throw new NotFoundException(`Test execution con ID ${id} non trovata.`);
 
-    if (dto.test_id !== undefined && dto.test_id !== testExecution.test_id) {
+    if (dto.test_id !== undefined && dto.test_id !== test_execution.test_id) {
       const test = await this.testsRepository.findById(dto.test_id);
-      if (!test) {
-        throw new NotFoundException(`Test con ID ${dto.test_id} non trovato.`);
-      }
+      if (!test) throw new NotFoundException(`Test con ID ${dto.test_id} non trovato.`);
     }
 
-    if (dto.user_id !== undefined && dto.user_id !== testExecution.user_id) {
-      const evaluatedUser = await this.evaluatedUsersRepository.findById(
-        dto.user_id
-      );
-      if (!evaluatedUser) {
-        throw new NotFoundException(
-          `Evaluated user con ID ${dto.user_id} non trovato.`
-        );
-      }
+    if (dto.user_id !== undefined && dto.user_id !== test_execution.user_id) {
+      const evaluated_user = await this.evaluatedUsersRepository.findById(dto.user_id);
+      if (!evaluated_user)
+        throw new NotFoundException(`Evaluated user con ID ${dto.user_id} non trovato.`);
     }
 
-    return this.testExecutionsRepository.updateOne(testExecution, dto);
+    return this.testExecutionsRepository.updateOne(test_execution, dto);
   }
 
   async remove(id: number): Promise<void> {
-    const testExecution = await this.testExecutionsRepository.findById(id);
-    if (!testExecution) {
+    const test_execution = await this.testExecutionsRepository.findById(id);
+    if (!test_execution) {
       throw new NotFoundException(`Test execution con ID ${id} non trovata.`);
     }
 
-    const isDeleted = await this.testExecutionsRepository.deleteOne(id);
-    if (!isDeleted) {
+    const is_deleted = await this.testExecutionsRepository.deleteOne(id);
+    if (!is_deleted) {
       throw new NotFoundException(
-        `Errore durante l'eliminazione. La test execution con ID ${id} potrebbe essere già stata rimossa.`
+        `Errore durante l'eliminazione. La test execution con ID ${id} potrebbe essere già stata rimossa.`,
       );
     }
   }
 }
-
-export {
-  TestExecutionService as ServerTestsExecutionService,
-  TestExecutionService as ServerTestExecutionsService,
-};

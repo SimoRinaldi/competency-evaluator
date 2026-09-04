@@ -1,8 +1,4 @@
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { TestEvaluatorRepository } from './test-evaluator.repository';
 import { CreateTestEvaluatorDto } from './dto/create-test-evaluator.dto';
@@ -14,7 +10,7 @@ import { UserEntity, UserRole, UsersService } from '@server/users';
 export class TestEvaluatorService {
   constructor(
     private readonly repository: TestEvaluatorRepository,
-    private readonly usersService: UsersService
+    private readonly usersService: UsersService,
   ) {}
 
   @OnEvent('user.created')
@@ -30,7 +26,7 @@ export class TestEvaluatorService {
     const existing = await this.repository.findByUserId(dto.user_id);
     if (existing) {
       throw new ConflictException(
-        `L'utente con ID ${dto.user_id} è già registrato come Test Evaluator.`
+        `L'utente con ID ${dto.user_id} è già registrato come Test Evaluator.`,
       );
     }
 
@@ -57,10 +53,7 @@ export class TestEvaluatorService {
     return this.repository.findByUserId(userId);
   }
 
-  async update(
-    id: number,
-    dto: UpdateTestEvaluatorDto
-  ): Promise<TestEvaluatorEntity> {
+  async update(id: number, dto: UpdateTestEvaluatorDto): Promise<TestEvaluatorEntity> {
     const evaluator = await this.repository.findById(id);
     if (!evaluator) {
       throw new NotFoundException(`Test Evaluator con ID ${id} non trovato.`);
@@ -71,7 +64,7 @@ export class TestEvaluatorService {
       const existing = await this.repository.findByUserId(dto.user_id);
       if (existing) {
         throw new ConflictException(
-          `L'utente con ID ${dto.user_id} è già registrato come Test Evaluator.`
+          `L'utente con ID ${dto.user_id} è già registrato come Test Evaluator.`,
         );
       }
     }
@@ -85,11 +78,9 @@ export class TestEvaluatorService {
       throw new NotFoundException(`Test Evaluator con ID ${id} non trovato.`);
     }
 
-    const isDeleted = await this.repository.deleteOne(id);
-    if (!isDeleted) {
-      throw new NotFoundException(
-        `Errore durante l'eliminazione del Test Evaluator con ID ${id}.`
-      );
+    const is_deleted = await this.repository.deleteOne(id);
+    if (!is_deleted) {
+      throw new NotFoundException(`Errore durante l'eliminazione del Test Evaluator con ID ${id}.`);
     }
   }
 }

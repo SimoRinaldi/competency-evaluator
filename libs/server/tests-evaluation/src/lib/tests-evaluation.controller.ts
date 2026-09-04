@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Post,
-  Body,
-  UseGuards,
-  ValidationPipe,
-  Req,
-} from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, ValidationPipe, Req } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { JwtAuthGuard, Roles, RolesGuard } from '@server/security';
 import { UserRole } from '@server/users';
@@ -15,9 +8,7 @@ import { SubmitEvaluationDto } from './dto/submit-evaluation.dto';
 @ApiTags('Tests Evaluation APIs')
 @Controller('tests_evaluation')
 export class TestsEvaluationController {
-  constructor(
-    private readonly testsEvaluationService: TestsEvaluationService
-  ) {}
+  constructor(private readonly testsEvaluationService: TestsEvaluationService) {}
 
   @Post('evaluate')
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -33,9 +24,9 @@ export class TestsEvaluationController {
   })
   async evaluate(
     @Body(ValidationPipe) dto: SubmitEvaluationDto,
-    @Req() req: { user?: { id?: number } }
+    @Req() req: { user?: { id?: number } },
   ) {
-    const currentUserId = req?.user?.id;
-    return this.testsEvaluationService.submitEvaluation(dto, currentUserId);
+    const cureent_user_id = req?.user?.id;
+    return this.testsEvaluationService.submitEvaluation(dto, cureent_user_id);
   }
 }

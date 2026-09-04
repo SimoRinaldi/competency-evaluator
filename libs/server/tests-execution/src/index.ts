@@ -1,11 +1,11 @@
 export * from './lib/tests-execution.module';
 
-// Entità per relazioni TypeORM
+// entità
 export * from './lib/test-execution/entities/test-execution.entity';
 export * from './lib/test-output/entities/test-output.entity';
 export * from './lib/evaluated-user/entities/evaluated-user.entity';
 
-// Servizi e sub-moduli esportati
+// services, modules, repositories
 export * from './lib/test-execution/test-execution.service';
 export * from './lib/test-execution/test-execution.module';
 export * from './lib/test-execution/test-execution.repository';

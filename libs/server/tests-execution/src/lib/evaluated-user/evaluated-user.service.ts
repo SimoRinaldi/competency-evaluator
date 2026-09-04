@@ -1,9 +1,5 @@
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import {OnEvent} from '@nestjs/event-emitter'
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
 import { EvaluatedUserRepository } from './evaluated-user.repository';
 import { CreateEvaluatedUserDto } from './dto/create-evaluated-user.dto';
 import { UpdateEvaluatedUserDto } from './dto/update-evaluated-user.dto';
@@ -14,7 +10,7 @@ import { UserEntity, UserRole, UsersService } from '@server/users';
 export class EvaluatedUserService {
   constructor(
     private readonly repository: EvaluatedUserRepository,
-    private readonly usersService: UsersService
+    private readonly usersService: UsersService,
   ) {}
 
   @OnEvent('user.created')
@@ -30,7 +26,7 @@ export class EvaluatedUserService {
     const existing = await this.repository.findByUserId(dto.user_id);
     if (existing) {
       throw new ConflictException(
-        `L'utente con ID ${dto.user_id} è già registrato come Evaluated User.`
+        `L'utente con ID ${dto.user_id} è già registrato come Evaluated User.`,
       );
     }
 
@@ -53,10 +49,7 @@ export class EvaluatedUserService {
     return this.repository.findByUserId(userId);
   }
 
-  async update(
-    id: number,
-    dto: UpdateEvaluatedUserDto
-  ): Promise<EvaluatedUserEntity> {
+  async update(id: number, dto: UpdateEvaluatedUserDto): Promise<EvaluatedUserEntity> {
     const user = await this.repository.findById(id);
     if (!user) {
       throw new NotFoundException(`Evaluated User con ID ${id} non trovato.`);
@@ -67,7 +60,7 @@ export class EvaluatedUserService {
       const existing = await this.repository.findByUserId(dto.user_id);
       if (existing) {
         throw new ConflictException(
-          `L'utente con ID ${dto.user_id} è già registrato come Evaluated User.`
+          `L'utente con ID ${dto.user_id} è già registrato come Evaluated User.`,
         );
       }
     }
@@ -81,10 +74,10 @@ export class EvaluatedUserService {
       throw new NotFoundException(`Evaluated User con ID ${id} non trovato.`);
     }
 
-    const isDeleted = await this.repository.deleteOne(id);
-    if (!isDeleted) {
+    const is_deleted = await this.repository.deleteOne(id);
+    if (!is_deleted) {
       throw new NotFoundException(
-        `Errore durante l'eliminazione dell'Evaluated User con ID ${id}.`
+        `Errore durante l'eliminazione dell'Evaluated User con ID ${id}.`,
       );
     }
   }

@@ -9,18 +9,18 @@ import { UpdateTestExecutionDto } from './dto/update-test-execution.dto';
 export class TestExecutionRepository {
   constructor(
     @InjectRepository(TestExecutionEntity)
-    private readonly repository: Repository<TestExecutionEntity>
+    private readonly repository: Repository<TestExecutionEntity>,
   ) {}
 
   async createOne(dto: CreateTestExecutionDto): Promise<TestExecutionEntity> {
-    const testExecution = this.repository.create({
+    const test_execution = this.repository.create({
       test_id: dto.test_id,
       user_id: dto.user_id,
       test_score: dto.test_score ?? null,
       max_score: dto.max_score ?? null,
     });
 
-    return this.repository.save(testExecution);
+    return this.repository.save(test_execution);
   }
 
   async findAll(): Promise<TestExecutionEntity[]> {
@@ -33,14 +33,17 @@ export class TestExecutionRepository {
   async findById(id: number): Promise<TestExecutionEntity | null> {
     return this.repository.findOne({
       where: { id },
-      relations: ['test', 'test.subcompetencies', 'evaluated_user', 'evaluated_user.user', 'test_outputs'],
+      relations: [
+        'test',
+        'test.subcompetencies',
+        'evaluated_user',
+        'evaluated_user.user',
+        'test_outputs',
+      ],
     });
   }
 
-  async findByUserAndTest(
-    user_id: number,
-    test_id: number
-  ): Promise<TestExecutionEntity | null> {
+  async findByUserAndTest(user_id: number, test_id: number): Promise<TestExecutionEntity | null> {
     return this.repository.findOneBy({
       user_id,
       test_id,
@@ -64,16 +67,15 @@ export class TestExecutionRepository {
   }
 
   async updateOne(
-    testExecution: TestExecutionEntity,
-    dto: UpdateTestExecutionDto
+    test_execution: TestExecutionEntity,
+    dto: UpdateTestExecutionDto,
   ): Promise<TestExecutionEntity> {
-    if (dto.test_id !== undefined) testExecution.test_id = dto.test_id;
-    if (dto.user_id !== undefined) testExecution.user_id = dto.user_id;
-    if (dto.test_score !== undefined)
-      testExecution.test_score = dto.test_score;
-    if (dto.max_score !== undefined) testExecution.max_score = dto.max_score;
+    if (dto.test_id !== undefined) test_execution.test_id = dto.test_id;
+    if (dto.user_id !== undefined) test_execution.user_id = dto.user_id;
+    if (dto.test_score !== undefined) test_execution.test_score = dto.test_score;
+    if (dto.max_score !== undefined) test_execution.max_score = dto.max_score;
 
-    return this.repository.save(testExecution);
+    return this.repository.save(test_execution);
   }
 
   async deleteOne(id: number): Promise<boolean> {
@@ -81,5 +83,3 @@ export class TestExecutionRepository {
     return (result.affected ?? 0) > 0;
   }
 }
-
-export { TestExecutionRepository as ServerTestExecutionsRepository };

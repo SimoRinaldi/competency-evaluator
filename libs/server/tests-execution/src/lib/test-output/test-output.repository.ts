@@ -9,16 +9,16 @@ import { UpdateTestOutputDto } from './dto/update-test-output.dto';
 export class TestOutputRepository {
   constructor(
     @InjectRepository(TestOutputEntity)
-    private readonly repository: Repository<TestOutputEntity>
+    private readonly repository: Repository<TestOutputEntity>,
   ) {}
 
   async createOne(dto: CreateTestOutputDto): Promise<TestOutputEntity> {
     const testOutput = this.repository.create({
       name: dto.name,
-      description: dto.description ?? null,
-      url: dto.url ?? null,
+      description: dto.description,
+      url: dto.url,
       test_execution_id: dto.test_execution_id,
-      version: dto.version ?? null,
+      version: dto.version,
     });
 
     return this.repository.save(testOutput);
@@ -38,9 +38,7 @@ export class TestOutputRepository {
     });
   }
 
-  async findByTestExecutionId(
-    test_execution_id: number
-  ): Promise<TestOutputEntity[]> {
+  async findByTestExecutionId(test_execution_id: number): Promise<TestOutputEntity[]> {
     return this.repository.find({
       where: { test_execution_id },
       order: { id: 'ASC' },
@@ -50,13 +48,12 @@ export class TestOutputRepository {
 
   async updateOne(
     testOutput: TestOutputEntity,
-    dto: UpdateTestOutputDto
+    dto: UpdateTestOutputDto,
   ): Promise<TestOutputEntity> {
     if (dto.name !== undefined) testOutput.name = dto.name;
     if (dto.description !== undefined) testOutput.description = dto.description;
     if (dto.url !== undefined) testOutput.url = dto.url;
-    if (dto.test_execution_id !== undefined)
-      testOutput.test_execution_id = dto.test_execution_id;
+    if (dto.test_execution_id !== undefined) testOutput.test_execution_id = dto.test_execution_id;
     if (dto.version !== undefined) testOutput.version = dto.version;
 
     return this.repository.save(testOutput);
