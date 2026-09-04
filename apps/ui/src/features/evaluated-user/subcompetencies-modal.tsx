@@ -64,7 +64,10 @@ export function SubcompetenciesModal({
                     Stato
                   </TableHead>
                   <TableHead className="text-center font-medium text-slate-500 py-3">
-                    Punteggio
+                    Soglia
+                  </TableHead>
+                  <TableHead className="text-center font-medium text-slate-500 py-3">
+                    Punteggio / Max
                   </TableHead>
                   <TableHead className="text-center font-medium text-slate-500 py-3">
                     Punteggio %
@@ -74,7 +77,7 @@ export function SubcompetenciesModal({
               <TableBody>
                 {subcompetencies.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="h-24 text-center text-slate-500 text-sm">
+                    <TableCell colSpan={5} className="h-24 text-center text-slate-500 text-sm">
                       Nessuna sotto-competenza disponibile.
                     </TableCell>
                   </TableRow>
@@ -84,6 +87,11 @@ export function SubcompetenciesModal({
                       sc.score_percentage !== null
                         ? parseFloat(sc.score_percentage) || 0
                         : null;
+                    const maxScore =
+                      sc.score_absolute !== null && scorePercent !== null && scorePercent > 0
+                        ? Math.round((sc.score_absolute / scorePercent) * 100)
+                        : null;
+
                     return (
                       <TableRow key={sc.subcompetency_id ?? sc.id} className="hover:bg-slate-50">
                         <TableCell className="text-sm font-medium text-slate-900">
@@ -91,20 +99,24 @@ export function SubcompetenciesModal({
                         </TableCell>
                         <TableCell className="text-center text-sm">
                           <span
-                            className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                            className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${
                               sc.acquired
-                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                : 'bg-amber-50 text-amber-700 border border-amber-200'
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200/80'
+                                : 'bg-slate-100 text-slate-700 border-slate-200'
                             }`}
                           >
                             {sc.acquired ? 'Acquisita' : 'Non acquisita'}
                           </span>
                         </TableCell>
-                        <TableCell className="text-center text-sm text-slate-700">
-                          {sc.score_absolute !== null ? sc.score_absolute : '-'} / {sc.threshold}
+                        <TableCell className="text-center text-sm text-slate-700 font-mono">
+                          {sc.threshold} pt
                         </TableCell>
-                        <TableCell className="text-center text-sm text-slate-900 font-semibold">
-                          {scorePercent !== null ? `${scorePercent.toFixed(0)}%` : '-'}
+                        <TableCell className="text-center text-sm text-slate-700 font-mono">
+                          {sc.score_absolute !== null ? sc.score_absolute : '—'} /{' '}
+                          {maxScore !== null ? `${maxScore} pt` : '—'}
+                        </TableCell>
+                        <TableCell className="text-center text-sm text-slate-900 font-semibold font-mono">
+                          {scorePercent !== null ? `${scorePercent.toFixed(0)}%` : '—'}
                         </TableCell>
                       </TableRow>
                     );

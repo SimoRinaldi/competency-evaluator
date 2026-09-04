@@ -140,7 +140,7 @@ export function HistoricalScoresPage() {
                 key={cs.competency_id ?? cs.id}
                 competency={cs}
                 onViewSubcompetencies={handleOpenSubcompetencies}
-                barColor="#f59e0b"
+                dimmed
               />
             ))}
           </div>
