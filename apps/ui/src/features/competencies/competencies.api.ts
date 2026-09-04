@@ -54,6 +54,14 @@ export async function deleteRubric(id: string | number) {
   return response.json();
 }
 
+export async function checkRubricAssociations(id: string | number) {
+  const response = await fetch(`${API_URL}/rubrics/${id}/check-associations`, {
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) throw new Error("Errore durante il controllo delle associazioni");
+  return response.json();
+}
+
 export async function getRubricById(id: string | number) {
   const response = await fetch(`${API_URL}/rubrics/${id}`, {
     headers: getAuthHeaders(),

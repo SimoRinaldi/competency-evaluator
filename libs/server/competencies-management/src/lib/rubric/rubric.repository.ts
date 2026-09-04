@@ -10,15 +10,15 @@ import { UpdateRubricSetDto } from './dto/update-rubric.dto';
 export class RubricRepository {
   constructor(
     @InjectRepository(RubricSetEntity)
-    private readonly repository: Repository<RubricSetEntity>
+    private readonly repository: Repository<RubricSetEntity>,
   ) {}
 
   async createOne(dto: CreateRubricSetDto): Promise<RubricSetEntity> {
-    const newSet = this.repository.create({
+    const new_rubric_set = this.repository.create({
       yes_no: dto.yes_no,
       levels: dto.levels as RubricLevelEntity[],
     });
-    return this.repository.save(newSet);
+    return this.repository.save(new_rubric_set);
   }
 
   async findAll(): Promise<RubricSetEntity[]> {
@@ -35,27 +35,32 @@ export class RubricRepository {
     });
   }
 
-  async updateOne(
-    id: number,
-    dto: UpdateRubricSetDto
-  ): Promise<RubricSetEntity | null> {
-    const set = await this.findById(id);
-    if (!set) {
+  async updateOne(id: number, dto: UpdateRubricSetDto): Promise<RubricSetEntity | null> {
+    const rubric_set = await this.findById(id);
+    if (!rubric_set) {
       return null;
     }
 
     if (dto.yes_no !== undefined) {
-      set.yes_no = dto.yes_no;
+      rubric_set.yes_no = dto.yes_no;
     }
     if (dto.levels !== undefined) {
-      set.levels = dto.levels as RubricLevelEntity[];
+      rubric_set.levels = dto.levels as RubricLevelEntity[];
     }
 
-    return this.repository.save(set);
+    return this.repository.save(rubric_set);
   }
 
   async deleteOne(id: number): Promise<boolean> {
     const result = await this.repository.delete(id);
     return (result.affected ?? 0) > 0;
+  }
+
+  async isAssociatedWithIndicators(id: number): Promise<boolean> {
+    const rubric_set = await this.repository.findOne({
+      where: { id },
+      relations: ['indicators'],
+    });
+    return (rubric_set?.indicators?.length ?? 0) > 0;
   }
 }

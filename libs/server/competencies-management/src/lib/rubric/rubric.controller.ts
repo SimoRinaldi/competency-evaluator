@@ -60,7 +60,7 @@ export class RubricController {
   @ApiParam({ name: 'id', type: 'number' })
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body(ValidationPipe) updateRubricSetDto: UpdateRubricSetDto
+    @Body(ValidationPipe) updateRubricSetDto: UpdateRubricSetDto,
   ) {
     return this.rubricService.update(id, updateRubricSetDto);
   }
@@ -74,6 +74,13 @@ export class RubricController {
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.rubricService.remove(id);
   }
-}
 
-export { RubricController as RubricsController };
+  @Get(':id/check-associations')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Verifica se la rubrica è associata ad almeno un indicatore' })
+  @ApiParam({ name: 'id', type: 'number' })
+  checkAssociations(@Param('id', ParseIntPipe) id: number) {
+    return this.rubricService.checkAssociations(id);
+  }
+}
