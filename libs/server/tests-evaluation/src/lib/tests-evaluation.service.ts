@@ -345,4 +345,33 @@ export class TestsEvaluationService {
       max_score: max_score.toFixed(2),
     });
   }
+
+  async getEvaluatorStatus(testId: number, userId: number) {
+    const evaluator = await this.testEvaluatorService.findByUserId(userId);
+    if (!evaluator) throw new NotFoundException('Evaluator profile not found');
+    
+    const executions = await this.testExecutionService.findByTest(testId);
+    
+    const result = [];
+    for (const exec of executions) {
+      const hasEvaluated = await this.rubricLevelAssignmentsService.hasEvaluated(exec.id, evaluator.id);
+      result.push({
+        execution_id: exec.id,
+        is_evaluated_by_me: hasEvaluated
+      });
+    }
+    return result;
+  }
+
+  async getEvaluationsForExecution(executionId: number, userId: number) {
+    const evaluator = await this.testEvaluatorService.findByUserId(userId);
+    if (!evaluator) throw new NotFoundException('Evaluator profile not found');
+
+    const assignments = await this.rubricLevelAssignmentsService.getEvaluations(executionId, evaluator.id);
+    const evaluations: Record<number, number> = {};
+    for (const a of assignments) {
+      evaluations[a.indicator_id] = a.rubric_rank;
+    }
+    return evaluations;
+  }
 }

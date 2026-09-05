@@ -32,6 +32,7 @@ import {
   getTestExecutionById, 
   submitEvaluation, 
   updateTestExecution,
+  getEvaluationsForExecution,
   FullTest, 
   TestExecution 
 } from './evaluator.api';
@@ -61,7 +62,7 @@ export function UserEvaluationModal({
 
   const [evaluations, setEvaluations] = useState<Record<number, number>>({});
   const [showConfirm, setShowConfirm] = useState(false);
-  
+  const [hasAlreadyEvaluated, setHasAlreadyEvaluated] = useState(false);
   const [activeStep, setActiveStep] = useState<string>("info");
 
   useEffect(() => {
@@ -74,6 +75,7 @@ export function UserEvaluationModal({
       setError(null);
       setSaving(false);
       setEvaluations({});
+      setHasAlreadyEvaluated(false);
       setShowConfirm(false);
       setActiveStep("info");
     }
@@ -87,11 +89,16 @@ export function UserEvaluationModal({
       const profile = await getEvaluatorProfile(user.id);
       setEvaluatorId(profile.id);
 
-      const currentTest = await getFullTest(String(tId));
+      const [currentTest, currentExecution, previousEvaluations] = await Promise.all([
+        getFullTest(String(tId)),
+        getTestExecutionById(String(eId)),
+        getEvaluationsForExecution(String(eId)).catch(() => ({}))
+      ]);
+      
       setTest(currentTest);
-
-      const currentExecution = await getTestExecutionById(String(eId));
       setExecution(currentExecution);
+      setEvaluations(previousEvaluations);
+      setHasAlreadyEvaluated(Object.keys(previousEvaluations).length > 0);
     } catch (err: any) {
       setError(err?.message || "Impossibile caricare i dati di valutazione.");
     } finally {
@@ -100,6 +107,7 @@ export function UserEvaluationModal({
   }
 
   const handleSelectLevel = (indicatorId: number, rank: number) => {
+    if (hasAlreadyEvaluated) return;
     setEvaluations(prev => ({
       ...prev,
       [indicatorId]: rank
@@ -111,6 +119,7 @@ export function UserEvaluationModal({
   const isComplete = totalIndicators > 0 && evaluatedCount === totalIndicators;
 
   const handleValidation = () => {
+    if (hasAlreadyEvaluated) return;
     if (!isComplete) {
       setError("Devi compilare tutte le valutazioni per ogni indicatore.");
       return;
@@ -120,7 +129,7 @@ export function UserEvaluationModal({
   };
 
   const executeSubmit = async () => {
-    if (!evaluatorId || !test || !executionId) return;
+    if (!evaluatorId || !test || !executionId || hasAlreadyEvaluated) return;
     setSaving(true);
     setShowConfirm(false);
     setError(null);
@@ -150,6 +159,7 @@ export function UserEvaluationModal({
   };
 
   const isEvaluated = execution?.test_score !== null && execution?.test_score !== undefined;
+  const isReadOnly = hasAlreadyEvaluated || isEvaluated;
 
   const steps = useMemo(() => {
     const list = [{ id: "info", label: "Dati Valutazione" }];
@@ -334,7 +344,7 @@ export function UserEvaluationModal({
                                       <RadioGroup 
                                         value={String(evaluations[indicator.id] || "")} 
                                         onValueChange={(val) => handleSelectLevel(indicator.id, Number(val))}
-                                        disabled={isEvaluated}
+                                        disabled={isReadOnly}
                                         className="flex flex-col gap-1.5 px-1"
                                       >
                                         {indicator.rubric_set?.levels?.map((level) => {
@@ -346,7 +356,7 @@ export function UserEvaluationModal({
                                               className={`px-4 py-3 rounded-xl border transition-all cursor-pointer ${
                                                 isSelected
                                                   ? "border-primary bg-primary/10 ring-1 ring-primary shadow-sm"
-                                                  : isEvaluated 
+                                                  : isReadOnly 
                                                     ? "border-slate-200 opacity-60 cursor-not-allowed" 
                                                     : "border-slate-200 hover:border-primary/50 hover:bg-slate-50"
                                               }`}
@@ -409,7 +419,7 @@ export function UserEvaluationModal({
                       Avanti <ChevronRight className="ml-2 h-4 w-4" />
                     </Button>
                   ) : (
-                    !isEvaluated && (
+                    !isReadOnly && (
                       <Button
                         type="button"
                         disabled={saving || loading || !isComplete}
@@ -419,7 +429,7 @@ export function UserEvaluationModal({
                         {saving ? (
                           <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Salvataggio...</>
                         ) : (
-                          <><Check className="mr-2 h-4 w-4" /> Conferma Valutazione</>
+                          "Conferma Valutazione"
                         )}
                       </Button>
                     )
@@ -445,8 +455,8 @@ export function UserEvaluationModal({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={saving}>Torna indietro</AlertDialogCancel>
-            <AlertDialogAction onClick={executeSubmit} disabled={saving} className="bg-primary hover:bg-primary/90">
-              {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Send className="h-4 w-4 mr-2" />}
+            <AlertDialogAction onClick={executeSubmit} disabled={saving} className="bg-primary hover:bg-primary/90 text-primary-foreground">
+              {saving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
               Salva Definitivamente
             </AlertDialogAction>
           </AlertDialogFooter>

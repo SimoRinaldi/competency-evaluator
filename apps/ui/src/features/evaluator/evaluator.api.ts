@@ -96,3 +96,15 @@ export async function updateTestExecution(id: number | string, data: { test_scor
   if (!response.ok) throw new Error('Errore aggiornamento test execution');
   return response.json();
 }
+
+export async function getEvaluatorStatus(testId: string | number): Promise<Array<{ execution_id: number; is_evaluated_by_me: boolean }>> {
+  const response = await fetch(`${API_URL}/tests_evaluation/evaluator-status/${testId}`, { headers: getAuthHeaders() });
+  if (!response.ok) throw new Error('Errore caricamento stato valutatore');
+  return response.json();
+}
+
+export async function getEvaluationsForExecution(executionId: string | number): Promise<Record<number, number>> {
+  const response = await fetch(`${API_URL}/tests_evaluation/evaluations/${executionId}`, { headers: getAuthHeaders() });
+  if (!response.ok) throw new Error('Errore caricamento valutazioni precedenti');
+  return response.json();
+}

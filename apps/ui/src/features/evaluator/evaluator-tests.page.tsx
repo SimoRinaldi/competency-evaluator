@@ -64,10 +64,8 @@ export function EvaluatorTestsPage({ filter }: { filter: 'pending' | 'completed'
         evaluatorTests.map(async (test: Test) => {
           try {
             const execs = await getTestExecutions(test.id);
-            // Consideriamo solo le esecuzioni con materiale consegnato
-            const deliveredExecs = execs.filter((e: TestExecution) => e.test_outputs && e.test_outputs.length > 0);
-            const totalCount = deliveredExecs.length;
-            const completedCount = deliveredExecs.filter((e: TestExecution) => e.test_score !== null && e.test_score !== undefined).length;
+            const totalCount = execs.length;
+            const completedCount = execs.filter((e: TestExecution) => e.test_score !== null && e.test_score !== undefined).length;
             const pendingCount = totalCount - completedCount;
             return { ...test, totalCount, completedCount, pendingCount };
           } catch (e) {
@@ -242,11 +240,11 @@ export function EvaluatorTestsPage({ filter }: { filter: 'pending' | 'completed'
                         </span>
                       ) : test.pendingCount > 0 ? (
                         <span className="inline-flex items-center text-xs font-semibold text-amber-600 bg-amber-100 px-2.5 py-1 rounded-full">
-                          {test.pendingCount} da valutare
+                          {test.pendingCount} in sospeso
                         </span>
                       ) : (
                         <span className="inline-flex items-center text-xs font-semibold text-green-600 bg-green-100 px-2.5 py-1 rounded-full">
-                          Tutti valutati ({test.completedCount})
+                          Completato ({test.completedCount})
                         </span>
                       )}
                     </TableCell>
