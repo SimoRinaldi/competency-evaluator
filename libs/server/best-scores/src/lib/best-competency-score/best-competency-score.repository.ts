@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MoreThanOrEqual, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { BestCompetencyScoreEntity } from './entities/best-competency-score.entity';
 import { CreateBestCompetencyScoreDto } from './dto/create-best-competency-score.dto';
 import { UpdateBestCompetencyScoreDto } from './dto/update-best-competency-score.dto';

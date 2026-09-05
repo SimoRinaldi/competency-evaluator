@@ -88,36 +88,34 @@ export async function getBestSubCompetencyScores(userId: string | number): Promi
   return response.json();
 }
 
-export async function getAcquiredCompetencies(userId: number) {
-  const response = await fetch(`${API_URL}/best_scores/competencies/acquired/${userId}`, {
+export interface UserSubCompetencyEvaluation {
+  competency_id: number;
+  subcompetency_id: number;
+  threshold: number;
+  title: string;
+  score_absolute: number | null;
+  score_percentage: string | null;
+  acquired?: boolean;
+}
+
+export interface UserCompetencyEvaluation {
+  competency_id: number;
+  title: string;
+  threshold: number;
+  score_absolute: number | null;
+  score_percentage: string | null;
+  subcompetencies: UserSubCompetencyEvaluation[];
+}
+
+export interface BestScoresResponse {
+  acquired_competencies: UserCompetencyEvaluation[];
+  unacquired_competencies: UserCompetencyEvaluation[];
+}
+
+export async function getBestScores(userId: string | number): Promise<BestScoresResponse> {
+  const response = await fetch(`${API_URL}/best_scores/${userId}`, {
     headers: getAuthHeaders(),
   });
-  if (!response.ok) return [];
-  return response.json();
-}
-
-export async function getUnacquiredCompetencies(userId: number) {
-  const response = await fetch(`${API_URL}/best_scores/competencies/unacquired/${userId}`, {
-    headers: getAuthHeaders(),
-  });
-  if (!response.ok) return [];
-  return response.json();
-}
-
-export async function getAcquiredSubcompetencies(userId: number, competencyId: number) {
-  const response = await fetch(
-    `${API_URL}/best_scores/subcompetencies/acquired/${userId}/${competencyId}`,
-    { headers: getAuthHeaders() },
-  );
-  if (!response.ok) return [];
-  return response.json();
-}
-
-export async function getUnacquiredSubcompetencies(userId: number, competencyId: number) {
-  const response = await fetch(
-    `${API_URL}/best_scores/subcompetencies/unacquired/${userId}/${competencyId}`,
-    { headers: getAuthHeaders() },
-  );
-  if (!response.ok) return [];
+  if (!response.ok) throw new Error('Errore nel caricamento dei punteggi');
   return response.json();
 }

@@ -19,8 +19,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, AlertCircle, Plus, Trash2, Send, FileText, ExternalLink } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Loader2, AlertCircle, Plus, Trash2, Send, FileText } from 'lucide-react';
 import { fetchCurrentUser } from '../auth/auth.api';
 import { getTestDetails, submitTestExecution, getTestEvaluators } from './evaluated-user.api';
 
