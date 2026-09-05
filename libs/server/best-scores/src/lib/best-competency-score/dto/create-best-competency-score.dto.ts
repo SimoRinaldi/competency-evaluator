@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, IsNotEmpty, IsNumberString, IsPositive } from 'class-validator';
 
-export class CreateCompetencyHistoricalScoreDto {
+export class CreateBestCompetencyScoreDto {
   @ApiProperty({
     required: true,
     example: 45,
@@ -9,7 +9,7 @@ export class CreateCompetencyHistoricalScoreDto {
   })
   @IsInt()
   @IsNotEmpty()
-  score_absolute!: number;
+  best_score_absolute!: number;
 
   @ApiProperty({
     required: true,
@@ -18,7 +18,7 @@ export class CreateCompetencyHistoricalScoreDto {
   })
   @IsNumberString()
   @IsNotEmpty()
-  score_percentage!: string;
+  best_score_percentage!: string;
 
   @ApiProperty({
     required: true,

@@ -19,7 +19,7 @@
   "include": ["src/**/*.ts"],
   "references": [
     {
-      "path": "../historical-scores/tsconfig.lib.json"
+      "path": "../best-scores/tsconfig.lib.json"
     },
     {
       "path": "../tests-management/tsconfig.lib.json"

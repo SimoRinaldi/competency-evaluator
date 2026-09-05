@@ -13,16 +13,14 @@ import {
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard, Roles, RolesGuard } from '@server/security';
 import { UserRole } from '@server/users';
-import { CompetencyHistoricalScoreService } from './competency-historical-score.service';
-import { CreateCompetencyHistoricalScoreDto } from './dto/create-competency-historical-score.dto';
-import { UpdateCompetencyHistoricalScoreDto } from './dto/update-competency-historical-score.dto';
+import { BestCompetencyScoreService } from './best-competency-score.service';
+import { CreateBestCompetencyScoreDto } from './dto/create-best-competency-score.dto';
+import { UpdateBestCompetencyScoreDto } from './dto/update-best-competency-score.dto';
 
-@ApiTags('Competency Historical Scores APIs')
-@Controller('competency_historical_scores')
-export class CompetencyHistoricalScoreController {
-  constructor(
-    private readonly service: CompetencyHistoricalScoreService
-  ) {}
+@ApiTags('BestCompetencyScores APIs')
+@Controller('best_competency_score')
+export class BestCompetencyScoreController {
+  constructor(private readonly service: BestCompetencyScoreService) {}
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -30,7 +28,7 @@ export class CompetencyHistoricalScoreController {
   @ApiBearerAuth()
   create(
     @Body(ValidationPipe)
-    dto: CreateCompetencyHistoricalScoreDto
+    dto: CreateBestCompetencyScoreDto,
   ) {
     return this.service.create(dto);
   }
@@ -66,7 +64,7 @@ export class CompetencyHistoricalScoreController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body(ValidationPipe)
-    dto: UpdateCompetencyHistoricalScoreDto
+    dto: UpdateBestCompetencyScoreDto,
   ) {
     return this.service.update(id, dto);
   }
