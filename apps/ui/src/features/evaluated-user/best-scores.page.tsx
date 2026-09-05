@@ -99,6 +99,7 @@ export function BestScoresPage() {
               <CompetencyScoreCard
                 key={cs.competency_id}
                 competency={cs}
+                isAcquired={true}
                 onViewSubcompetencies={handleOpenSubcompetencies}
                 barColor="#0f172a"
               />
@@ -115,6 +116,7 @@ export function BestScoresPage() {
               <CompetencyScoreCard
                 key={cs.competency_id}
                 competency={cs}
+                isAcquired={false}
                 onViewSubcompetencies={handleOpenSubcompetencies}
                 dimmed
               />
