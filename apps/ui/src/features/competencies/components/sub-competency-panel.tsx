@@ -53,6 +53,8 @@ export function SubCompetencyPanel({
     e.preventDefault();
 
     onSave({
+      ...(initialData?.id ? { id: initialData.id } : {}),
+      ...(initialData?.obsId ? { obsId: initialData.obsId } : {}),
       title,
       weight,
       threshold,

@@ -1,5 +1,5 @@
-import { OmitType } from '@nestjs/swagger';
-import { IsArray, ValidateNested, IsOptional, IsInt } from 'class-validator';
+import { ApiPropertyOptional, OmitType } from '@nestjs/swagger';
+import { IsArray, ValidateNested, IsOptional, IsInt, IsPositive } from 'class-validator';
 import { Type } from 'class-transformer';
 
 import { CreateCompetencyDto } from '../competency/dto/create-competency.dto';
@@ -18,6 +18,15 @@ export class CreateSkillChainDto extends CreateSkillDto {}
 export class CreateIndicatorChainDto extends OmitType(CreateIndicatorDto, [
   'observation_object_id',
 ] as const) {
+  @ApiPropertyOptional({
+    description: "ID dell'indicatore (opzionale, utile per update/upsert)",
+    example: 1,
+  })
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  id?: number;
+
   @IsOptional()
   @ValidateNested()
   @Type(() => CreateRubricSetDto)
@@ -25,8 +34,17 @@ export class CreateIndicatorChainDto extends OmitType(CreateIndicatorDto, [
 }
 
 export class CreateObservationObjectChainDto extends OmitType(CreateObservationObjectDto, [
-  'subcompetency_id'
+  'subcompetency_id',
 ] as const) {
+  @ApiPropertyOptional({
+    description: "ID dell'oggetto di osservazione (opzionale, utile per update/upsert)",
+    example: 1,
+  })
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  id?: number;
+
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateIndicatorChainDto)
@@ -34,8 +52,17 @@ export class CreateObservationObjectChainDto extends OmitType(CreateObservationO
 }
 
 export class CreateSubCompetencyChainDto extends OmitType(CreateSubCompetencyDto, [
-  'competency_id'
+  'competency_id',
 ] as const) {
+  @ApiPropertyOptional({
+    description: "ID della sotto-competenza (opzionale, utile per update/upsert)",
+    example: 1,
+  })
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  id?: number;
+
   @ValidateNested()
   @Type(() => CreateObservationObjectChainDto)
   observationObject!: CreateObservationObjectChainDto;
@@ -65,3 +92,4 @@ export class CreateCompetencyChainDto extends CreateCompetencyDto {
   @Type(() => CreateSubCompetencyChainDto)
   subcompetencies!: CreateSubCompetencyChainDto[];
 }
+

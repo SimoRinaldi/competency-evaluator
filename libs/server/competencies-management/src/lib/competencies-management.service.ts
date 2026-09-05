@@ -13,6 +13,7 @@ import {
   CreateSubCompetencyChainDto,
   CreateIndicatorChainDto,
 } from './dto/create-chain.dto';
+import { UpdateCompetencyChainDto } from './dto/update-chain.dto';
 
 import { CompetencyEntity } from './competency/entities/competency.entity';
 import { SubCompetencyEntity } from './subcompetency/entities/subcompetency.entity';
@@ -34,77 +35,48 @@ export class CompetenciesManagementService {
     private readonly rubricService: RubricService,
   ) {}
 
-  // Salva in transazione tutta la catena delle competenze
+  // Salva l'intera catena di competenze dentro una singola transazione (o tutto o niente)
   async handleCreateCompetencyChain(dto: CreateCompetencyChainDto): Promise<CompetencyEntity> {
     if (!dto.subcompetencies || dto.subcompetencies.length === 0) {
       throw new BadRequestException('La competenza deve contenere almeno una sotto-competenza');
     }
 
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
-    // Cache di sessione per evitare duplicati all'interno della stessa richiesta
-    const toolsCache = new Map<string, ToolEntity>();
-    const methodsCache = new Map<string, MethodEntity>();
-    const skillsCache = new Map<string, SkillEntity>();
-    const rubricSetsCache: RubricSetEntity[] = [];
+    const query_runner = this.dataSource.createQueryRunner();
+    await query_runner.connect();
+    await query_runner.startTransaction();
 
     try {
-      const manager = queryRunner.manager;
+      const manager = query_runner.manager;
 
-      // Creo la competenza
+      // 1. Creiamo al volo la competenza principale
       const saved_competency = await this.createCompetencyChain(manager, dto);
 
-      const seenSubTitles = new Set<string>();
+      // 2. Creiamo ricorsivamente tutte le sotto-competenze e i loro figli
+      await this.syncSubCompetenciesChain(manager, saved_competency, dto.subcompetencies);
 
-      for (const subcompetency_dto of dto.subcompetencies) {
-        if (seenSubTitles.has(subcompetency_dto.title)) {
-          throw new BadRequestException(
-            `Titolo sotto-competenza duplicato nella richiesta: "${subcompetency_dto.title}"`,
-          );
-        }
-        seenSubTitles.add(subcompetency_dto.title);
+      // 3. Ricarichiamo l'albero completo pulito per restituirlo al client
+      const result = await manager.findOne(CompetencyEntity, {
+        where: { id: saved_competency.id },
+        relations: {
+          subcompetencies: {
+            observation_object: {
+              indicators: {
+                rubric_set: {
+                  levels: true,
+                },
+              },
+            },
+            tools: true,
+            methods: true,
+            skills: true,
+          },
+        },
+      });
 
-        const tools = await this.createToolsChain(manager, subcompetency_dto, toolsCache);
-        const methods = await this.createMethodsChain(manager, subcompetency_dto, methodsCache);
-        const skills = await this.createSkillsChain(manager, subcompetency_dto, skillsCache);
-
-        const saved_subcompetency = await this.createSubCompetencyChain(
-          manager,
-          subcompetency_dto,
-          saved_competency,
-          tools,
-          methods,
-          skills,
-        );
-
-        // observation object
-        const observation_object_dto = subcompetency_dto.observationObject;
-        const saved_observation_object = await this.createObservationObjectsChain(
-          manager,
-          observation_object_dto,
-          saved_subcompetency,
-        );
-
-        // Rubric e Indicatori
-        saved_observation_object.indicators = await this.createIndicatorsChain(
-          manager,
-          observation_object_dto,
-          saved_observation_object,
-          rubricSetsCache,
-        );
-      }
-
-      // Calcola la soglia della competenza come somma delle soglie delle sotto-competenze
-      const compThreshold = dto.subcompetencies.reduce((sum, sub) => sum + sub.threshold, 0);
-      saved_competency.threshold = compThreshold;
-      await manager.save(saved_competency);
-
-      await queryRunner.commitTransaction();
-      return saved_competency;
+      await query_runner.commitTransaction();
+      return result ?? saved_competency;
     } catch (error) {
-      await queryRunner.rollbackTransaction();
+      await query_runner.rollbackTransaction();
       if (error instanceof HttpException) {
         throw error;
       }
@@ -114,84 +86,97 @@ export class CompetenciesManagementService {
         }`,
       );
     } finally {
-      await queryRunner.release();
+      await query_runner.release();
     }
   }
 
+  // Aggiorna la catena in modo intelligente (diffing/upsert): non distrugge tutto ma aggiorna chi esiste già
   async handleUpdateCompetencyChain(
     id: number,
-    dto: CreateCompetencyChainDto,
+    dto: CreateCompetencyChainDto | UpdateCompetencyChainDto,
   ): Promise<CompetencyEntity> {
-    // Implementazione base: Elimina e ricrea per semplicità, oppure implementa logica fine
-    // NOTA: in un ambiente produttivo l'eliminazione potrebbe violare foreign keys (es. test esistenti).
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
+    const query_runner = this.dataSource.createQueryRunner();
+    await query_runner.connect();
+    await query_runner.startTransaction();
 
     try {
-      const manager = queryRunner.manager;
-      const existingCompetency = await manager.findOne(CompetencyEntity, {
+      const manager = query_runner.manager;
+      const existing_competency = await manager.findOne(CompetencyEntity, {
         where: { id },
-        relations: ['subcompetencies'],
+        relations: {
+          subcompetencies: {
+            observation_object: {
+              indicators: true,
+            },
+            tools: true,
+            methods: true,
+            skills: true,
+          },
+        },
       });
 
-      if (!existingCompetency) {
+      if (!existing_competency) {
         throw new NotFoundException(`Competenza con id ${id} non trovata`);
       }
 
-      // Elimina le subcompetencies esistenti per ricrearle
-      if ((existingCompetency.subcompetencies?.length ?? 0) > 0) {
-        await manager.remove(existingCompetency.subcompetencies);
+      // Se l'utente ha cambiato il titolo, controlliamo che non vada in conflitto con un'altra competenza
+      if (dto.title && dto.title !== existing_competency.title) {
+        const conflict = await manager.findOne(CompetencyEntity, {
+          where: { title: dto.title },
+        });
+        if (conflict && conflict.id !== id) {
+          throw new ConflictException(`Competenza con titolo "${dto.title}" già esistente`);
+        }
+        existing_competency.title = dto.title;
       }
 
-      // Aggiorna dati base della competenza
-      existingCompetency.title = dto.title;
-      existingCompetency.weight = dto.weight;
-      const saved_competency = await manager.save(existingCompetency);
-
-      const toolsCache = new Map<string, ToolEntity>();
-      const methodsCache = new Map<string, MethodEntity>();
-      const skillsCache = new Map<string, SkillEntity>();
-      const rubricSetsCache: RubricSetEntity[] = [];
-
-      for (const subcompetency_dto of dto.subcompetencies) {
-        const tools = await this.createToolsChain(manager, subcompetency_dto, toolsCache);
-        const methods = await this.createMethodsChain(manager, subcompetency_dto, methodsCache);
-        const skills = await this.createSkillsChain(manager, subcompetency_dto, skillsCache);
-
-        const saved_subcompetency = await this.createSubCompetencyChain(
-          manager,
-          subcompetency_dto,
-          saved_competency,
-          tools,
-          methods,
-          skills,
-        );
-
-        const observation_object_dto = subcompetency_dto.observationObject;
-        const saved_observation_object = await this.createObservationObjectsChain(
-          manager,
-          observation_object_dto,
-          saved_subcompetency,
-        );
-
-        saved_observation_object.indicators = await this.createIndicatorsChain(
-          manager,
-          observation_object_dto,
-          saved_observation_object,
-          rubricSetsCache,
-        );
+      if (dto.weight !== undefined) {
+        existing_competency.weight = dto.weight;
       }
 
-      // Ricalcola threshold come somma dei threshold delle subcompetency
-      const totalThreshold = dto.subcompetencies.reduce((sum, sub) => sum + sub.threshold, 0);
-      existingCompetency.threshold = totalThreshold;
-      await manager.save(existingCompetency);
+      // Se nel payload ci sono le sotto-competenze facciamo il diffing/upsert gerarchico
+      if (dto.subcompetencies) {
+        if (dto.subcompetencies.length === 0) {
+          throw new BadRequestException(
+            'La competenza deve contenere almeno una sotto-competenza',
+          );
+        }
+        await this.syncSubCompetenciesChain(
+          manager,
+          existing_competency,
+          dto.subcompetencies as CreateSubCompetencyChainDto[],
+        );
+      } else {
+        // Se abbiamo modificato solo titolo/peso della competenza radice, aggiorniamo solo lei
+        await manager.update(CompetencyEntity, existing_competency.id, {
+          title: existing_competency.title,
+          weight: existing_competency.weight,
+        });
+      }
 
-      await queryRunner.commitTransaction();
-      return saved_competency;
+      // Recuperiamo l'albero aggiornato dal database prima di inviarlo al client
+      const updated_competency = await manager.findOne(CompetencyEntity, {
+        where: { id },
+        relations: {
+          subcompetencies: {
+            observation_object: {
+              indicators: {
+                rubric_set: {
+                  levels: true,
+                },
+              },
+            },
+            tools: true,
+            methods: true,
+            skills: true,
+          },
+        },
+      });
+
+      await query_runner.commitTransaction();
+      return updated_competency ?? existing_competency;
     } catch (error) {
-      await queryRunner.rollbackTransaction();
+      await query_runner.rollbackTransaction();
       if (error instanceof HttpException) {
         throw error;
       }
@@ -201,19 +186,92 @@ export class CompetenciesManagementService {
         }`,
       );
     } finally {
-      await queryRunner.release();
+      await query_runner.release();
     }
   }
 
-  // Crea e salva l'entità principale della competenza
+  // Aggiorna in modo mirato l'oggetto di osservazione e gli indicatori di una singola sotto-competenza
+  async handleUpdateSubCompetencyObservationObject(
+    subcompetency_id: number,
+    dto: CreateObservationObjectChainDto,
+  ): Promise<SubCompetencyEntity> {
+    const query_runner = this.dataSource.createQueryRunner();
+    await query_runner.connect();
+    await query_runner.startTransaction();
+
+    try {
+      const manager = query_runner.manager;
+
+      const subcompetency = await manager.findOne(SubCompetencyEntity, {
+        where: { id: subcompetency_id },
+        relations: {
+          observation_object: {
+            indicators: true,
+          },
+          competency: true,
+        },
+      });
+
+      if (!subcompetency) {
+        throw new NotFoundException(
+          `Sotto-competenza con ID ${subcompetency_id} non trovata`,
+        );
+      }
+
+      //cache per i set di rubriche usati in questa transazione
+      const rubric_sets_cache: RubricSetEntity[] = [];
+
+      // dincronizzo l'oggetto di osservazione e gli indicatori (riutilizzando il metodo modulare di diffing)
+      await this.syncObservationObjectChain(
+        manager,
+        dto,
+        subcompetency,
+        rubric_sets_cache,
+      );
+
+      const updated_sub = await manager.findOne(SubCompetencyEntity, {
+        where: { id: subcompetency_id },
+        relations: {
+          competency: true,
+          tools: true,
+          methods: true,
+          skills: true,
+          observation_object: {
+            indicators: {
+              rubric_set: {
+                levels: true,
+              },
+            },
+          },
+        },
+      });
+
+      await query_runner.commitTransaction();
+      return updated_sub ?? subcompetency;
+    } catch (error) {
+      await query_runner.rollbackTransaction();
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        `Errore durante l'aggiornamento dell'oggetto di osservazione: ${
+          (error as Error).message || 'Operazione annullata.'
+        }`,
+      );
+    } finally {
+      await query_runner.release();
+    }
+  }
+
+  // Crea l'entità principale per la competenza (controllando che il titolo non esista già)
   async createCompetencyChain(
     manager: EntityManager,
     dto: CreateCompetencyChainDto,
   ): Promise<CompetencyEntity> {
-    const existingCompetency = await manager.findOne(CompetencyEntity, {
+    const existing_competency = await manager.findOne(CompetencyEntity, {
       where: { title: dto.title },
     });
-    if (existingCompetency) {
+    if (existing_competency) {
       throw new ConflictException(`Competenza con titolo "${dto.title}" già esistente`);
     }
 
@@ -226,238 +284,406 @@ export class CompetenciesManagementService {
     return await manager.save(competency);
   }
 
-  // Crea la subcompetency collegando tools, methods e skills
-  async createSubCompetencyChain(
+  // Sincronizza le sotto-competenze: aggiorna quelle con ID, crea quelle nuove e cancella quelle omesse
+  async syncSubCompetenciesChain(
     manager: EntityManager,
-    dto: CreateSubCompetencyChainDto,
-    savedCompetency: CompetencyEntity,
-    tools: ToolEntity[],
-    methods: MethodEntity[],
-    skills: SkillEntity[],
-  ): Promise<SubCompetencyEntity> {
-    const existingSub = await manager.findOne(SubCompetencyEntity, {
-      where: { title: dto.title },
-    });
-    if (existingSub) {
-      throw new ConflictException(`Sotto-competenza con titolo "${dto.title}" già esistente`);
-    }
-
-    const subcompetency = manager.create(SubCompetencyEntity, {
-      title: dto.title,
-      weight: dto.weight,
-      input: dto.input,
-      action: dto.action,
-      output: dto.output,
-      threshold: dto.threshold,
-      competency: savedCompetency,
-      tools,
-      methods,
-      skills,
-    });
-    return await manager.save(subcompetency);
-  }
-
-  // Recupera i tools esistenti tramite id o ne cerca/crea di nuovi senza duplicati
-  async createToolsChain(
-    manager: EntityManager,
-    subcompetency_dto: CreateSubCompetencyChainDto,
-    toolsCache: Map<string, ToolEntity>,
-  ): Promise<ToolEntity[]> {
-    const allTools: ToolEntity[] = [];
-    if (subcompetency_dto.tool_ids?.length) {
-      const existingTools = await manager.findBy(ToolEntity, {
-        id: In(subcompetency_dto.tool_ids),
-      });
-      if (existingTools.length !== subcompetency_dto.tool_ids.length) {
-        const foundIds = new Set(existingTools.map((t) => t.id));
-        const missingIds = subcompetency_dto.tool_ids.filter((id) => !foundIds.has(id));
-        throw new NotFoundException(
-          `Strumenti (tools) non trovati per gli ID: ${missingIds.join(', ')}`,
+    competency: CompetencyEntity,
+    subcompetency_dtos: CreateSubCompetencyChainDto[],
+  ): Promise<void> {
+    // Controllo rapido per evitare titoli duplicati all'interno della stessa richiesta
+    const seen_sub_titles = new Set<string>();
+    for (const sub_dto of subcompetency_dtos) {
+      if (seen_sub_titles.has(sub_dto.title)) {
+        throw new BadRequestException(
+          `Titolo sotto-competenza duplicato nella richiesta: "${sub_dto.title}"`,
         );
       }
-      allTools.push(...existingTools);
-      for (const t of existingTools) {
-        toolsCache.set(t.name, t);
-      }
+      seen_sub_titles.add(sub_dto.title);
     }
-    if (subcompetency_dto.tools?.length) {
-      for (const tool_dto of subcompetency_dto.tools) {
-        if (toolsCache.has(tool_dto.name)) {
-          allTools.push(toolsCache.get(tool_dto.name)!);
-          continue;
+
+    // Cache temporanee per non fare mille query identiche a DB nella stessa transazione
+    const tools_cache = new Map<string, ToolEntity>();
+    const methods_cache = new Map<string, MethodEntity>();
+    const skills_cache = new Map<string, SkillEntity>();
+    const rubric_sets_cache: RubricSetEntity[] = [];
+
+    // Carichiamo le sotto-competenze attualmente presenti a DB per questa competenza
+    const existing_subs =
+      competency.subcompetencies ??
+      (await manager.find(SubCompetencyEntity, {
+        where: { competency_id: competency.id },
+        relations: {
+          observation_object: {
+            indicators: true,
+          },
+          tools: true,
+          methods: true,
+          skills: true,
+        },
+      }));
+
+    const existing_sub_map = new Map<number, SubCompetencyEntity>(
+      existing_subs.map((s) => [s.id, s]),
+    );
+    const handled_sub_ids = new Set<number>();
+
+    // Usiamo un oggetto leggero (solo id) per evitare che TypeORM vada in loop ricorsivo durante i save
+    const shallow_competency = { id: competency.id } as CompetencyEntity;
+
+    for (const sub_dto of subcompetency_dtos) {
+      // Risolviamo (o creiamo) gli strumenti, metodi e abilità collegati
+      const tools = await this.createToolsChain(manager, sub_dto, tools_cache);
+      const methods = await this.createMethodsChain(manager, sub_dto, methods_cache);
+      const skills = await this.createSkillsChain(manager, sub_dto, skills_cache);
+
+      let saved_sub: SubCompetencyEntity;
+
+      if (sub_dto.id) {
+        // --- CASO UPDATE: La sotto-competenza ha un ID, quindi la aggiorniamo in-place ---
+        const existing_sub = existing_sub_map.get(sub_dto.id);
+        if (!existing_sub) {
+          throw new NotFoundException(
+            `Sotto-competenza con ID ${sub_dto.id} non trovata per questa competenza`,
+          );
         }
 
-        let tool = await manager.findOne(ToolEntity, { where: { name: tool_dto.name } });
-        if (!tool) {
-          tool = await manager.save(manager.create(ToolEntity, { name: tool_dto.name }));
-        }
-        toolsCache.set(tool_dto.name, tool);
-        allTools.push(tool);
-      }
-    }
-    return allTools;
-  }
-
-  // Recupera i methods esistenti tramite id o ne cerca/crea di nuovi senza duplicati
-  async createMethodsChain(
-    manager: EntityManager,
-    subcompetency_dto: CreateSubCompetencyChainDto,
-    methodsCache: Map<string, MethodEntity>,
-  ): Promise<MethodEntity[]> {
-    const allMethods: MethodEntity[] = [];
-    if (subcompetency_dto.method_ids?.length) {
-      const existingMethods = await manager.findBy(MethodEntity, {
-        id: In(subcompetency_dto.method_ids),
-      });
-      if (existingMethods.length !== subcompetency_dto.method_ids.length) {
-        const foundIds = new Set(existingMethods.map((m) => m.id));
-        const missingIds = subcompetency_dto.method_ids.filter((id) => !foundIds.has(id));
-        throw new NotFoundException(
-          `Metodi (methods) non trovati per gli ID: ${missingIds.join(', ')}`,
-        );
-      }
-      allMethods.push(...existingMethods);
-      for (const m of existingMethods) {
-        methodsCache.set(m.name, m);
-      }
-    }
-    if (subcompetency_dto.methods?.length) {
-      for (const mDto of subcompetency_dto.methods) {
-        if (methodsCache.has(mDto.name)) {
-          allMethods.push(methodsCache.get(mDto.name)!);
-          continue;
+        // Se il titolo è cambiato, verifichiamo che non collida con un'altra sotto-competenza
+        if (sub_dto.title !== existing_sub.title) {
+          const conflict = await manager.findOne(SubCompetencyEntity, {
+            where: { title: sub_dto.title },
+          });
+          if (conflict && conflict.id !== existing_sub.id) {
+            throw new ConflictException(
+              `Sotto-competenza con titolo "${sub_dto.title}" già esistente`,
+            );
+          }
         }
 
-        let method = await manager.findOne(MethodEntity, { where: { name: mDto.name } });
-        if (!method) {
-          method = await manager.save(manager.create(MethodEntity, { name: mDto.name }));
-        }
-        methodsCache.set(mDto.name, method);
-        allMethods.push(method);
-      }
-    }
-    return allMethods;
-  }
+        existing_sub.title = sub_dto.title;
+        existing_sub.weight = sub_dto.weight;
+        existing_sub.input = sub_dto.input;
+        existing_sub.output = sub_dto.output;
+        existing_sub.action = sub_dto.action;
+        existing_sub.threshold = sub_dto.threshold;
+        existing_sub.competency = shallow_competency;
+        existing_sub.competency_id = competency.id;
+        existing_sub.tools = tools;
+        existing_sub.methods = methods;
+        existing_sub.skills = skills;
 
-  // Recupera le skills esistenti tramite id o ne cerca/crea di nuove senza duplicati
-  async createSkillsChain(
-    manager: EntityManager,
-    subcompetency_dto: CreateSubCompetencyChainDto,
-    skillsCache: Map<string, SkillEntity>,
-  ): Promise<SkillEntity[]> {
-    const allSkills: SkillEntity[] = [];
-    if (subcompetency_dto.skill_ids?.length) {
-      const existingSkills = await manager.findBy(SkillEntity, {
-        id: In(subcompetency_dto.skill_ids),
-      });
-      if (existingSkills.length !== subcompetency_dto.skill_ids.length) {
-        const foundIds = new Set(existingSkills.map((s) => s.id));
-        const missingIds = subcompetency_dto.skill_ids.filter((id) => !foundIds.has(id));
-        throw new NotFoundException(
-          `Abilità (skills) non trovate per gli ID: ${missingIds.join(', ')}`,
-        );
-      }
-      allSkills.push(...existingSkills);
-      for (const s of existingSkills) {
-        skillsCache.set(s.name, s);
-      }
-    }
-    if (subcompetency_dto.skills?.length) {
-      for (const sDto of subcompetency_dto.skills) {
-        if (skillsCache.has(sDto.name)) {
-          allSkills.push(skillsCache.get(sDto.name)!);
-          continue;
+        saved_sub = await manager.save(existing_sub);
+      } else {
+        // Creo nuovo
+        const conflict = await manager.findOne(SubCompetencyEntity, {
+          where: { title: sub_dto.title },
+        });
+        if (conflict) {
+          throw new ConflictException(
+            `Sotto-competenza con titolo "${sub_dto.title}" già esistente`,
+          );
         }
 
-        let skill = await manager.findOne(SkillEntity, { where: { name: sDto.name } });
-        if (!skill) {
-          skill = await manager.save(manager.create(SkillEntity, { name: sDto.name }));
-        }
-        skillsCache.set(sDto.name, skill);
-        allSkills.push(skill);
-      }
-    }
-    return allSkills;
-  }
+        const new_sub = manager.create(SubCompetencyEntity, {
+          title: sub_dto.title,
+          weight: sub_dto.weight,
+          input: sub_dto.input,
+          output: sub_dto.output,
+          action: sub_dto.action,
+          threshold: sub_dto.threshold,
+          competency: shallow_competency,
+          competency_id: competency.id,
+          tools,
+          methods,
+          skills,
+        });
 
-  // Crea l'observation object e lo associa alla subcompetency
-  async createObservationObjectsChain(
-    manager: EntityManager,
-    objservation_object_dto: CreateObservationObjectChainDto,
-    saved_subcompetency: SubCompetencyEntity,
-  ): Promise<ObservationObjectEntity> {
-    if (!objservation_object_dto) {
-      throw new BadRequestException('Oggetto di osservazione mancante per la sotto-competenza');
+        saved_sub = await manager.save(new_sub);
+      }
+
+      handled_sub_ids.add(saved_sub.id);
+
+      // Scendiamo di un livello: sincronizziamo l'oggetto di osservazione e i suoi indicatori
+      await this.syncObservationObjectChain(
+        manager,
+        sub_dto.observationObject,
+        saved_sub,
+        rubric_sets_cache,
+      );
     }
-    const obj = manager.create(ObservationObjectEntity, {
-      description: objservation_object_dto.description,
-      subcompetency: saved_subcompetency,
+
+    // Quelle che erano nel DB ma non sono state inviate nel payload vengono rimosse
+    const subs_to_remove = existing_subs.filter((s) => !handled_sub_ids.has(s.id));
+    if (subs_to_remove.length > 0) {
+      await manager.remove(subs_to_remove);
+    }
+
+    // Ricalcoliamo al volo la soglia totale della competenza come somma delle sotto-competenze
+    const comp_threshold = subcompetency_dtos.reduce((sum, sub) => sum + sub.threshold, 0);
+    competency.threshold = comp_threshold;
+    await manager.update(CompetencyEntity, competency.id, {
+      title: competency.title,
+      weight: competency.weight,
+      threshold: comp_threshold,
     });
-    return await manager.save(obj);
   }
 
-  // Crea gli indicatori associando l'observation object e il rubric set
-  async createIndicatorsChain(
+  // Sincronizza l'oggetto di osservazione associato alla sotto-competenza (1 a 1)
+  async syncObservationObjectChain(
     manager: EntityManager,
     observation_object_dto: CreateObservationObjectChainDto,
-    saved_observation_object: ObservationObjectEntity,
-    rubricSetsCache: RubricSetEntity[],
+    subcompetency: SubCompetencyEntity,
+    rubric_sets_cache: RubricSetEntity[],
+  ): Promise<ObservationObjectEntity> {
+    if (!observation_object_dto) {
+      throw new BadRequestException('Oggetto di osservazione mancante per la sotto-competenza');
+    }
+
+    const shallow_sub = { id: subcompetency.id } as SubCompetencyEntity;
+
+    let observation_object =
+      subcompetency.observation_object ??
+      (await manager.findOne(ObservationObjectEntity, {
+        where: { subcompetency_id: subcompetency.id },
+        relations: ['indicators'],
+      }));
+
+    if (observation_object) {
+      observation_object.description = observation_object_dto.description;
+      observation_object.subcompetency = shallow_sub;
+      observation_object.subcompetency_id = subcompetency.id;
+      observation_object = await manager.save(observation_object);
+    } else {
+      observation_object = manager.create(ObservationObjectEntity, {
+        description: observation_object_dto.description,
+        subcompetency: shallow_sub,
+        subcompetency_id: subcompetency.id,
+      });
+      observation_object = await manager.save(observation_object);
+    }
+
+    // Sincronizziamo tutti gli indicatori collegati a questo oggetto di osservazione
+    observation_object.indicators = await this.syncIndicatorsChain(
+      manager,
+      observation_object_dto.indicators,
+      observation_object,
+      rubric_sets_cache,
+    );
+
+    return observation_object;
+  }
+
+  // Sincronizza gli indicatori: aggiorna quelli con ID, inserisce i nuovi e cancella i rimossi
+  async syncIndicatorsChain(
+    manager: EntityManager,
+    indicator_dtos: CreateIndicatorChainDto[],
+    observation_object: ObservationObjectEntity,
+    rubric_sets_cache: RubricSetEntity[],
   ): Promise<IndicatorEntity[]> {
-    if (!observation_object_dto.indicators || observation_object_dto.indicators.length === 0) {
+    if (!indicator_dtos || indicator_dtos.length === 0) {
       throw new BadRequestException(
         "L'oggetto di osservazione deve contenere almeno un indicatore",
       );
     }
 
-    const allIndicators = [];
-    for (const indicator_dto of observation_object_dto.indicators) {
-      const saved_rubric_set = await this.createRubricSetChain(
-        manager,
-        indicator_dto,
-        rubricSetsCache,
-      );
+    const shallow_obs = { id: observation_object.id } as ObservationObjectEntity;
 
-      const indicator = manager.create(IndicatorEntity, {
-        description: indicator_dto.description,
-        weight: indicator_dto.weight,
-        rubric_set: saved_rubric_set,
-        observation_object: saved_observation_object,
-      });
-      allIndicators.push(await manager.save(indicator));
+    const existing_indicators =
+      observation_object.indicators ??
+      (await manager.findBy(IndicatorEntity, {
+        observation_object_id: observation_object.id,
+      }));
+
+    const existing_ind_map = new Map<number, IndicatorEntity>(
+      existing_indicators.map((i) => [i.id, i]),
+    );
+    const handled_ind_ids = new Set<number>();
+    const saved_indicators: IndicatorEntity[] = [];
+
+    for (const ind_dto of indicator_dtos) {
+      // Risolviamo o creiamo la rubrica associata
+      const rubric_set = await this.createRubricSetChain(manager, ind_dto, rubric_sets_cache);
+      const shallow_rubric = { id: rubric_set.id } as RubricSetEntity;
+
+      if (ind_dto.id) {
+        // Modifica indicatore esistente
+        const existing_ind = existing_ind_map.get(ind_dto.id);
+        if (!existing_ind) {
+          throw new NotFoundException(
+            `Indicatore con ID ${ind_dto.id} non trovato per questo oggetto di osservazione`,
+          );
+        }
+
+        existing_ind.description = ind_dto.description;
+        existing_ind.weight = ind_dto.weight;
+        existing_ind.rubric_set = shallow_rubric;
+        existing_ind.rubric_set_id = rubric_set.id;
+        existing_ind.observation_object = shallow_obs;
+        existing_ind.observation_object_id = observation_object.id;
+
+        const saved = await manager.save(existing_ind);
+        handled_ind_ids.add(saved.id);
+        saved_indicators.push(saved);
+      } else {
+        // Creazione nuovo indicatore
+        const new_ind = manager.create(IndicatorEntity, {
+          description: ind_dto.description,
+          weight: ind_dto.weight,
+          rubric_set: shallow_rubric,
+          rubric_set_id: rubric_set.id,
+          observation_object: shallow_obs,
+          observation_object_id: observation_object.id,
+        });
+        const saved = await manager.save(new_ind);
+        handled_ind_ids.add(saved.id);
+        saved_indicators.push(saved);
+      }
     }
-    return allIndicators;
+
+    // Pulizia: eliminiamo gli indicatori che non compaiono più nel payload
+    const inds_to_remove = existing_indicators.filter((i) => !handled_ind_ids.has(i.id));
+    if (inds_to_remove.length > 0) {
+      await manager.remove(inds_to_remove);
+    }
+
+    return saved_indicators;
   }
 
-  // Recupera o crea il rubric set con i relativi livelli (find-or-create)
+  // Funzione generica DRY per risolvere Tools, Metodi o Skills (sia tramite ID esistente che tramite nome)
+  private async resolveEntitiesChain<T extends { id: number; name: string }>(
+    manager: EntityManager,
+    entity_class: new () => T,
+    entity_label: string,
+    ids?: number[],
+    dtos?: { name: string }[],
+    cache?: Map<string, T>,
+  ): Promise<T[]> {
+    const result: T[] = [];
+    const local_cache = cache ?? new Map<string, T>();
+
+    // 1. Se ci hanno passato degli ID numerici, li andiamo a pescare dal DB
+    if (ids?.length) {
+      const existing = (await manager.findBy(entity_class as unknown as { new (): T }, {
+        id: In(ids),
+      } as never)) as unknown as T[];
+
+      if (existing.length !== ids.length) {
+        const found_ids = new Set(existing.map((e) => e.id));
+        const missing_ids = ids.filter((id) => !found_ids.has(id));
+        throw new NotFoundException(
+          `${entity_label} non trovati per gli ID: ${missing_ids.join(', ')}`,
+        );
+      }
+      result.push(...existing);
+      for (const e of existing) {
+        local_cache.set(e.name, e);
+      }
+    }
+
+    // 2. Se ci hanno passato oggetti inline con il nome, facciamo un find-or-create con cache locale
+    if (dtos?.length) {
+      for (const dto of dtos) {
+        const cached = local_cache.get(dto.name);
+        if (cached) {
+          result.push(cached);
+          continue;
+        }
+
+        let entity = (await manager.findOne(entity_class as unknown as { new (): T }, {
+          where: { name: dto.name } as never,
+        })) as unknown as T | null;
+
+        if (!entity) {
+          entity = (await manager.save(
+            manager.create(entity_class as unknown as { new (): T }, { name: dto.name } as never),
+          )) as unknown as T;
+        }
+
+        local_cache.set(dto.name, entity);
+        result.push(entity);
+      }
+    }
+
+    return result;
+  }
+
+  // Wrapper per gestire gli strumenti (Tools)
+  async createToolsChain(
+    manager: EntityManager,
+    subcompetency_dto: CreateSubCompetencyChainDto,
+    tools_cache: Map<string, ToolEntity>,
+  ): Promise<ToolEntity[]> {
+    return this.resolveEntitiesChain(
+      manager,
+      ToolEntity,
+      'Strumenti (tools)',
+      subcompetency_dto.tool_ids,
+      subcompetency_dto.tools,
+      tools_cache,
+    );
+  }
+
+  // Wrapper per gestire i metodi (Methods)
+  async createMethodsChain(
+    manager: EntityManager,
+    subcompetency_dto: CreateSubCompetencyChainDto,
+    methods_cache: Map<string, MethodEntity>,
+  ): Promise<MethodEntity[]> {
+    return this.resolveEntitiesChain(
+      manager,
+      MethodEntity,
+      'Metodi (methods)',
+      subcompetency_dto.method_ids,
+      subcompetency_dto.methods,
+      methods_cache,
+    );
+  }
+
+  // Wrapper per gestire le abilità/conoscenze (Skills)
+  async createSkillsChain(
+    manager: EntityManager,
+    subcompetency_dto: CreateSubCompetencyChainDto,
+    skills_cache: Map<string, SkillEntity>,
+  ): Promise<SkillEntity[]> {
+    return this.resolveEntitiesChain(
+      manager,
+      SkillEntity,
+      'Abilità (skills)',
+      subcompetency_dto.skill_ids,
+      subcompetency_dto.skills,
+      skills_cache,
+    );
+  }
+
+  // Recupera o crea il rubric set corrispondente (cerca prima in cache, poi a DB, altrimenti crea nuovo)
   async createRubricSetChain(
     manager: EntityManager,
     indicator_dto: CreateIndicatorChainDto,
-    rubricSetsCache: RubricSetEntity[],
+    rubric_sets_cache: RubricSetEntity[],
   ): Promise<RubricSetEntity> {
     if (indicator_dto.rubric_set_id) {
-      // Usa esistente
-      const savedRubricSet = await manager.findOne(RubricSetEntity, {
+      // Se l'ID è già fornito, lo carichiamo direttamente
+      const saved_rubric_set = await manager.findOne(RubricSetEntity, {
         where: { id: indicator_dto.rubric_set_id },
         relations: ['levels'],
       });
-      if (!savedRubricSet) {
+      if (!saved_rubric_set) {
         throw new NotFoundException(`RubricSet con ID ${indicator_dto.rubric_set_id} non trovato`);
       }
-      return savedRubricSet;
+      return saved_rubric_set;
     } else if (indicator_dto.rubricSet) {
       const levels = indicator_dto.rubricSet.levels;
       if (!levels || levels.length === 0) {
         throw new BadRequestException('Il set di rubriche deve contenere almeno un livello');
       }
 
-      // 1. Controlla prima nella cache dei rubric set creati/usati in questa transazione
-      const cached = rubricSetsCache.find((set) => {
+      // 1. Controlliamo se un set identico è già stato istanziato in questa transazione
+      const cached = rubric_sets_cache.find((set) => {
         if (!set.levels || set.levels.length !== levels.length) return false;
-        return set.levels.every((existingLevel) =>
+        return set.levels.every((existing_level) =>
           levels.some(
-            (newLevel) =>
-              newLevel.description === existingLevel.description &&
-              newLevel.rank === existingLevel.rank,
+            (new_level) =>
+              new_level.description === existing_level.description &&
+              new_level.rank === existing_level.rank,
           ),
         );
       });
@@ -465,26 +691,28 @@ export class CompetenciesManagementService {
         return cached;
       }
 
-      // 2. Controlla nel DB se esiste già un rubric set corrispondente
-      const existingInDb = await this.rubricService.findMatchingRubricSet(levels);
-      if (existingInDb) {
-        rubricSetsCache.push(existingInDb);
-        return existingInDb;
+      // 2. Verifichiamo se esiste già a database un set con gli stessi identici livelli
+      const existing_in_db = await this.rubricService.findMatchingRubricSet(levels);
+      if (existing_in_db) {
+        rubric_sets_cache.push(existing_in_db);
+        return existing_in_db;
       }
 
-      // 3. Altrimenti crea nuovo
-      const rubricSet = manager.create(RubricSetEntity, { yes_no: indicator_dto.rubricSet.yes_no });
-      const savedRubricSet = await manager.save(rubricSet);
+      // 3. Se non esiste da nessuna parte, ne creiamo uno nuovo con i suoi livelli
+      const rubric_set = manager.create(RubricSetEntity, {
+        yes_no: indicator_dto.rubricSet.yes_no,
+      });
+      const saved_rubric_set = await manager.save(rubric_set);
 
-      const savedLevels = await this.createRubricLevelsChain(
+      const saved_levels = await this.createRubricLevelsChain(
         manager,
         indicator_dto.rubricSet.levels,
-        savedRubricSet,
+        saved_rubric_set,
       );
-      savedRubricSet.levels = savedLevels;
-      rubricSetsCache.push(savedRubricSet);
+      saved_rubric_set.levels = saved_levels;
+      rubric_sets_cache.push(saved_rubric_set);
 
-      return savedRubricSet;
+      return saved_rubric_set;
     } else {
       throw new BadRequestException(
         "È necessario fornire 'rubric_set_id' oppure 'rubricSet' per ciascun indicatore",
@@ -492,23 +720,23 @@ export class CompetenciesManagementService {
     }
   }
 
-  // Crea e salva i singoli livelli associati al rubric set
+  // Salva singolarmente i livelli di una nuova rubrica
   async createRubricLevelsChain(
     manager: EntityManager,
     levels_dto: CreateRubricLevelDto[],
-    savedRubricSet: RubricSetEntity,
+    saved_rubric_set: RubricSetEntity,
   ): Promise<RubricLevelEntity[]> {
-    const savedLevels = [];
-    for (const levelDto of levels_dto) {
+    const saved_levels = [];
+    for (const level_dto of levels_dto) {
       const level = await manager.save(
         manager.create(RubricLevelEntity, {
-          description: levelDto.description,
-          rank: levelDto.rank,
-          rubric_set: savedRubricSet,
+          description: level_dto.description,
+          rank: level_dto.rank,
+          rubric_set: saved_rubric_set,
         }),
       );
-      savedLevels.push(level);
+      saved_levels.push(level);
     }
-    return savedLevels;
+    return saved_levels;
   }
 }

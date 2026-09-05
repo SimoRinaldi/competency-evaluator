@@ -40,8 +40,11 @@ export function EditCompetencyPage({ competencyId: propId }: { competencyId?: st
         if (data.subcompetencies) {
           const mappedSubs = data.subcompetencies.map((sub: any) => ({
             ...sub,
+            id: sub.id,
+            obsId: sub.observation_object?.id,
             obsDescription: sub.observation_object?.description || '',
             indicators: (sub.observation_object?.indicators || []).map((ind: any) => ({
+              id: ind.id,
               description: ind.description,
               weight: ind.weight?.toString(),
               rubricId: `db_${ind.rubric_set_id}`,
@@ -159,6 +162,7 @@ export function EditCompetencyPage({ competencyId: propId }: { competencyId?: st
               .map((s: any) => ({ name: newSkills.find((ns) => ns.tempId === s)?.name }));
 
             return {
+              ...(sub.id ? { id: sub.id } : {}),
               title: sub.title,
               weight: parseInt(sub.weight),
               threshold: parseInt(sub.threshold),
@@ -172,6 +176,7 @@ export function EditCompetencyPage({ competencyId: propId }: { competencyId?: st
               skill_ids,
               skills: skills.filter((s: any) => s.name),
               observationObject: {
+                ...(sub.obsId ? { id: sub.obsId } : {}),
                 description: sub.obsDescription,
                 indicators: sub.indicators.map((ind: any) => {
                   const isTempRubric =
@@ -198,6 +203,7 @@ export function EditCompetencyPage({ competencyId: propId }: { competencyId?: st
                   }
 
                   return {
+                    ...(ind.id ? { id: ind.id } : {}),
                     description: ind.description,
                     weight: parseInt(ind.weight),
                     ...(rubric_set_id ? { rubric_set_id } : { rubricSet }),
