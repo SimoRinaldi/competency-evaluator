@@ -7,7 +7,7 @@ import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { createCompetencyChain } from './competencies.api';
 import { useFeedback } from '../../providers/feedback-provider';
 
-export function CreateCompetencyPage() {
+export function CreateCompetencyPage({ onSuccess }: { onSuccess?: () => void }) {
   const navigate = useNavigate();
   const { showSuccess } = useFeedback();
   // Menu principale: 1 = Competenza, 2 = Sottocompetenze, 3 = Riepilogo
@@ -175,7 +175,11 @@ export function CreateCompetencyPage() {
 
       await createCompetencyChain(payload);
       showSuccess('Competenza creata con successo!');
-      navigate('/competencies');
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        window.location.reload();
+      }
     } catch (err: any) {
       setSubmitError(err.message || 'Errore durante il salvataggio');
     } finally {
@@ -378,6 +382,9 @@ export function CreateCompetencyPage() {
               setNewSkills={setNewSkills}
               onSave={handleSaveSubCompetency}
               onCancel={() => setActiveSubIndex(-1)}
+              onGoToSummary={() => setActiveMenu(3)}
+              showGoToSummary={subCompetencies.length > 0 && activeSubIndex === -1}
+              onGoBack={() => setActiveMenu(1)}
             />
           )}
 

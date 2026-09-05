@@ -23,7 +23,11 @@ export async function createRubric(
     headers: getAuthHeaders(),
     body: JSON.stringify({ yes_no, levels }),
   });
-  if (!response.ok) throw new Error('Errore durante la creazione della rubrica');
+  if (!response.ok) {
+    const errData = await response.json().catch(() => null);
+    const msg = errData?.message || 'Errore durante la creazione della rubrica';
+    throw new Error(Array.isArray(msg) ? msg.join(', ') : msg);
+  }
   return response.json();
 }
 

@@ -63,31 +63,45 @@ const columns: ColumnDef<Competency>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => {
+    cell: ({ row, table }) => {
       const comp = row.original;
-      return (
-        <div className="flex justify-end">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                <span className="sr-only">Modifica</span>
-                <Pencil className="h-4 w-4" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-[95vw] xl:max-w-[1400px] w-full h-[90vh] p-0 flex flex-col md:flex-row overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
-              <EditCompetencyPage competencyId={comp.id.toString()} />
-            </DialogContent>
-          </Dialog>
-        </div>
-      );
+      const refreshData = (table.options.meta as any)?.refreshData;
+      return <CompetencyRowActions comp={comp} refreshData={refreshData} />;
     },
   },
 ];
+
+function CompetencyRowActions({ comp, refreshData }: { comp: Competency, refreshData?: () => void }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="flex justify-end">
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+            <span className="sr-only">Modifica</span>
+            <Pencil className="h-4 w-4" />
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="max-w-[95vw] xl:max-w-[1400px] w-full h-[90vh] p-0 flex flex-col md:flex-row overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
+          <EditCompetencyPage 
+            competencyId={comp.id.toString()} 
+            onSuccess={() => {
+              setOpen(false);
+              if (refreshData) refreshData();
+            }} 
+          />
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
 
 export function AdminDashboardPage() {
   const [data, setData] = useState<Competency[]>([]);
   const [loading, setLoading] = useState(true);
   const [globalFilter, setGlobalFilter] = useState("");
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   async function loadData() {
       setLoading(true);
@@ -114,6 +128,9 @@ export function AdminDashboardPage() {
       globalFilter,
     },
     onGlobalFilterChange: setGlobalFilter,
+    meta: {
+      refreshData: () => loadData(),
+    }
   });
 
   if (!loading && data.length === 0) {
@@ -134,23 +151,17 @@ export function AdminDashboardPage() {
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent className="flex-row justify-center gap-2">
-            <Dialog>
+            <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
               <DialogTrigger asChild>
                 <Button>
                   <Plus className="mr-2 h-4 w-4" /> Nuovo
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-[95vw] xl:max-w-[1400px] w-full h-[90vh] p-0 flex flex-col md:flex-row overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
-                <CreateCompetencyPage />
+                <CreateCompetencyPage onSuccess={() => { setIsCreateOpen(false); loadData(); }} />
               </DialogContent>
             </Dialog>
-            <Button variant="outline">Importa</Button>
           </EmptyContent>
-          <Button variant="link" className="text-muted-foreground" size="sm" asChild>
-            <a href="#">
-              Scopri di più <ArrowUpRight className="ml-1 h-3 w-3" />
-            </a>
-          </Button>
         </Empty>
       </PageContainer>
     );
@@ -178,14 +189,14 @@ export function AdminDashboardPage() {
       </div>
         <div className="flex items-center gap-4">
           
-          <Dialog>
+          <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
             <DialogTrigger asChild>
               <Button>
                 <Plus className="mr-2 h-4 w-4" /> Nuovo
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-[95vw] xl:max-w-[1400px] w-full h-[90vh] p-0 flex flex-col md:flex-row overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
-              <CreateCompetencyPage />
+              <CreateCompetencyPage onSuccess={() => { setIsCreateOpen(false); loadData(); }} />
             </DialogContent>
           </Dialog>
         </div>

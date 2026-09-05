@@ -46,7 +46,7 @@ export function CreateRubricForm({
   return (
     <div className="space-y-6">
       <div className="space-y-4">
-        <label className="text-sm font-semibold text-slate-800">Tipo di scala</label>
+        <label className="text-sm font-semibold text-slate-800">Tipo</label>
         <RadioGroup value={isBinary} onValueChange={setIsBinary} className="grid grid-cols-1 gap-2">
           <FieldLabel htmlFor="standard-plan">
             <Field orientation="horizontal" className="border rounded-md p-3 hover:bg-slate-50 transition-colors cursor-pointer">
@@ -61,7 +61,7 @@ export function CreateRubricForm({
             <Field orientation="horizontal" className="border rounded-md p-3 hover:bg-slate-50 transition-colors cursor-pointer">
               <FieldContent>
                 <FieldTitle>Binario</FieldTitle>
-                <FieldDescription>Sì/No. Indicato per competenze nette.</FieldDescription>
+                <FieldDescription>Definisci solo i livelli 1 e 5</FieldDescription>
               </FieldContent>
               <RadioGroupItem value="true" id="binary-plan" />
             </Field>
