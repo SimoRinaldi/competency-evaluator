@@ -17,11 +17,7 @@ export interface ViewTestModalProps {
   onClose: () => void;
 }
 
-export function ViewTestModal({
-  testId,
-  isOpen,
-  onClose,
-}: ViewTestModalProps) {
+export function ViewTestModal({ testId, isOpen, onClose }: ViewTestModalProps) {
   const [details, setDetails] = useState<ApiTestDetails | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,15 +48,12 @@ export function ViewTestModal({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-[95vw] xl:max-w-[1200px] w-full max-h-[90vh] p-0 flex flex-col overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
-        
         {/* HEADER */}
         <DialogHeader className="p-6 pb-4 border-b border-slate-100 flex flex-row items-center justify-between">
           <div>
-            <DialogTitle className="text-xl font-bold text-slate-900">
-              Dettagli Test
-            </DialogTitle>
+            <DialogTitle className="text-xl font-bold text-slate-900">Dettagli Test</DialogTitle>
             <p className="text-xs text-slate-400 mt-1">
-              Riepilogo completo della configurazione del test {testId ? `#${testId}` : ''}
+              Riepilogo completo della configurazione del test.
             </p>
           </div>
         </DialogHeader>

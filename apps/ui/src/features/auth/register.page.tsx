@@ -1,24 +1,11 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { UserRole } from './auth.api';
 import { useAuth } from './auth-context';
 import { useFeedback } from '../../providers/feedback-provider';
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
 import { Eye, EyeOff } from 'lucide-react';
 
 export function RegisterPage() {
@@ -26,7 +13,6 @@ export function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [role, setRole] = useState<UserRole>('USER');
   const [isLoading, setIsLoading] = useState(false);
   const { register } = useAuth();
   const { showError, showSuccess } = useFeedback();
@@ -37,14 +23,14 @@ export function RegisterPage() {
     setIsLoading(true);
 
     try {
-      await register(name, email, password, role);
-      showSuccess("Registrazione completata", "Ora puoi effettuare l'accesso.");
+      await register(name, email, password, 'USER');
+      showSuccess('Registrazione completata', "Ora puoi effettuare l'accesso.");
       navigate('/login');
     } catch (err: unknown) {
       if (err instanceof Error) {
-        showError(err.message, "Errore di Registrazione");
+        showError(err.message, 'Errore di Registrazione');
       } else {
-        showError('Errore durante la registrazione', "Errore di Registrazione");
+        showError('Errore durante la registrazione', 'Errore di Registrazione');
       }
     } finally {
       setIsLoading(false);
@@ -64,7 +50,6 @@ export function RegisterPage() {
           <CardContent>
             <form onSubmit={handleSubmit}>
               <FieldGroup>
-                
                 <Field>
                   <FieldLabel htmlFor="name">Nome</FieldLabel>
                   <Input
@@ -90,13 +75,13 @@ export function RegisterPage() {
                     disabled={isLoading}
                   />
                 </Field>
-                
+
                 <Field>
                   <FieldLabel htmlFor="password">Password</FieldLabel>
                   <div className="relative">
                     <Input
                       id="password"
-                      type={showPassword ? "text" : "password"}
+                      type={showPassword ? 'text' : 'password'}
                       placeholder="Scegli una password"
                       required
                       value={password}
@@ -112,41 +97,21 @@ export function RegisterPage() {
                       onClick={() => setShowPassword(!showPassword)}
                       tabIndex={-1}
                     >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       <span className="sr-only">Mostra password</span>
                     </Button>
                   </div>
                 </Field>
 
-                <Field>
-                  <FieldLabel htmlFor="role">Ruolo</FieldLabel>
-                  <Select
-                    value={role}
-                    onValueChange={(val) => setRole(val as UserRole)}
-                    disabled={isLoading}
-                  >
-                    <SelectTrigger id="role" className="w-full">
-                      <SelectValue placeholder="Seleziona un ruolo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="USER">Utente</SelectItem>
-                      <SelectItem value="ADMIN">Amministratore</SelectItem>
-                      <SelectItem value="TEST_DESIGNER">Test designer</SelectItem>
-                      <SelectItem value="EVALUATOR">Valutatore</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </Field>
-                
                 <Field className="flex flex-col gap-2 mt-2">
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? 'Registrazione in corso...' : 'Registrati'}
                   </Button>
                   <FieldDescription className="text-center">
-                    Hai già un account? <Link to="/login" className="underline underline-offset-4 hover:text-primary">Accedi qui</Link>
+                    Hai già un account?{' '}
+                    <Link to="/login" className="underline underline-offset-4 hover:text-primary">
+                      Accedi qui
+                    </Link>
                   </FieldDescription>
                 </Field>
               </FieldGroup>

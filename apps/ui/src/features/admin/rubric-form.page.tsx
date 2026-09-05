@@ -1,38 +1,50 @@
-import { useEffect, useState } from "react";
-import { createRubric, getRubricById, updateRubric } from "../competencies/competencies.api";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useEffect, useState } from 'react';
+import { createRubric, getRubricById, updateRubric } from '../competencies/competencies.api';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Plus, Trash } from "lucide-react";
+import { Plus, Trash } from 'lucide-react';
 
 function getPlaceholderForLevel(rank: number, isBinary: boolean) {
   if (isBinary) {
-    return rank === 1 ? "Es: No" : "Es: Sì";
+    return rank === 1 ? 'Es: No' : 'Es: Sì';
   }
   switch (rank) {
-    case 1: return "Es: Inadeguato";
-    case 2: return "Es: Base";
-    case 3: return "Es: Intermedio";
-    case 4: return "Es: Avanzato";
-    case 5: return "Es: Eccellente";
-    default: return "Es: Ottimo";
+    case 1:
+      return 'Es: Inadeguato';
+    case 2:
+      return 'Es: Base';
+    case 3:
+      return 'Es: Intermedio';
+    case 4:
+      return 'Es: Avanzato';
+    case 5:
+      return 'Es: Eccellente';
+    default:
+      return 'Es: Ottimo';
   }
 }
 
-export function RubricFormPage({ rubricId, onSuccess }: { rubricId?: string, onSuccess?: () => void }) {
+export function RubricFormPage({
+  rubricId,
+  onSuccess,
+}: {
+  rubricId?: string;
+  onSuccess?: () => void;
+}) {
   const isEditing = Boolean(rubricId);
 
   const [loading, setLoading] = useState(isEditing);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   const [formData, setFormData] = useState<{
     type?: string;
@@ -50,14 +62,12 @@ export function RubricFormPage({ rubricId, onSuccess }: { rubricId?: string, onS
         try {
           const rubric = await getRubricById(rubricId);
           setFormData({
-            type: rubric.yes_no ? "yes_no" : "standard",
+            type: rubric.yes_no ? 'yes_no' : 'standard',
             yes_no: rubric.yes_no || false,
-            levels: rubric.levels 
-              ? [...rubric.levels].sort((a, b) => a.rank - b.rank) 
-              : [],
+            levels: rubric.levels ? [...rubric.levels].sort((a, b) => a.rank - b.rank) : [],
           });
         } catch (e) {
-          setError("Impossibile caricare la rubrica.");
+          setError('Impossibile caricare la rubrica.');
         } finally {
           setLoading(false);
         }
@@ -67,19 +77,18 @@ export function RubricFormPage({ rubricId, onSuccess }: { rubricId?: string, onS
   }, [rubricId, isEditing]);
 
   const addLevel = () => {
-    const nextRank = formData.levels.length > 0 
-      ? Math.max(...formData.levels.map(l => l.rank)) + 1 
-      : 1;
+    const nextRank =
+      formData.levels.length > 0 ? Math.max(...formData.levels.map((l) => l.rank)) + 1 : 1;
     setFormData({
       ...formData,
-      levels: [...formData.levels, { description: "", rank: nextRank }]
+      levels: [...formData.levels, { description: '', rank: nextRank }],
     });
   };
 
   const removeLevel = (index: number) => {
     setFormData({
       ...formData,
-      levels: formData.levels.filter((_, i) => i !== index)
+      levels: formData.levels.filter((_, i) => i !== index),
     });
   };
 
@@ -92,30 +101,30 @@ export function RubricFormPage({ rubricId, onSuccess }: { rubricId?: string, onS
   const handleYesNoChange = (isYesNo: boolean) => {
     const existing = formData.levels;
     const findOld = (rank: number) => {
-      const old = existing.find(l => l.rank === rank);
+      const old = existing.find((l) => l.rank === rank);
       return old ? { id: (old as any).id } : {};
     };
 
     if (isYesNo) {
       setFormData({
-        type: "yes_no",
+        type: 'yes_no',
         yes_no: true,
         levels: [
-          { ...findOld(1), description: "", rank: 1 },
-          { ...findOld(5), description: "", rank: 5 },
-        ]
+          { ...findOld(1), description: '', rank: 1 },
+          { ...findOld(5), description: '', rank: 5 },
+        ],
       });
     } else {
       setFormData({
-        type: "standard",
+        type: 'standard',
         yes_no: false,
         levels: [
-          { ...findOld(1), description: "", rank: 1 },
-          { ...findOld(2), description: "", rank: 2 },
-          { ...findOld(3), description: "", rank: 3 },
-          { ...findOld(4), description: "", rank: 4 },
-          { ...findOld(5), description: "", rank: 5 },
-        ]
+          { ...findOld(1), description: '', rank: 1 },
+          { ...findOld(2), description: '', rank: 2 },
+          { ...findOld(3), description: '', rank: 3 },
+          { ...findOld(4), description: '', rank: 4 },
+          { ...findOld(5), description: '', rank: 5 },
+        ],
       });
     }
   };
@@ -123,17 +132,19 @@ export function RubricFormPage({ rubricId, onSuccess }: { rubricId?: string, onS
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.levels.length < 2) {
-      setError("Devi selezionare un tipo di rubrica (che genererà i relativi livelli) e compilarli.");
+      setError(
+        'Devi selezionare un tipo di rubrica (che genererà i relativi livelli) e compilarli.',
+      );
       return;
     }
 
-    if (formData.levels.some(l => !l.description || !l.description.trim())) {
-      setError("Devi compilare la descrizione per tutti i livelli.");
+    if (formData.levels.some((l) => !l.description || !l.description.trim())) {
+      setError('Devi compilare la descrizione per tutti i livelli.');
       return;
     }
 
     setSubmitting(true);
-    setError("");
+    setError('');
 
     try {
       if (isEditing) {
@@ -141,14 +152,14 @@ export function RubricFormPage({ rubricId, onSuccess }: { rubricId?: string, onS
       } else {
         await createRubric(formData.yes_no, formData.levels);
       }
-      
+
       if (onSuccess) {
         onSuccess();
       } else {
         window.location.reload();
       }
     } catch (err: any) {
-      setError(err.message || "Errore durante il salvataggio.");
+      setError(err.message || 'Errore durante il salvataggio.');
     } finally {
       setSubmitting(false);
     }
@@ -159,7 +170,7 @@ export function RubricFormPage({ rubricId, onSuccess }: { rubricId?: string, onS
       {/* COLONNA SINISTRA: SIDEBAR STEPS */}
       <div className="w-full md:w-72 shrink-0 p-6 md:p-8 border-b md:border-b-0 md:border-r border-slate-200 bg-slate-50/50 flex flex-col md:block">
         <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 md:mb-8 hidden md:block">
-          {isEditing ? "Modifica Rubrica" : "Nuova Rubrica"}
+          {isEditing ? 'Modifica Rubrica' : 'Nuova Rubrica'}
         </h2>
 
         <ul className="flex flex-row md:flex-col gap-2 md:gap-6 relative overflow-x-auto md:overflow-visible pb-2 md:pb-0">
@@ -186,7 +197,7 @@ export function RubricFormPage({ rubricId, onSuccess }: { rubricId?: string, onS
             Impostazioni Rubrica
           </DialogTitle>
         </DialogHeader>
-        
+
         <div className="flex-1 overflow-y-auto px-4 md:px-8 pb-4 pt-4 md:pt-0">
           {loading ? (
             <div className="text-center py-8">Caricamento dati rubrica...</div>
@@ -200,10 +211,12 @@ export function RubricFormPage({ rubricId, onSuccess }: { rubricId?: string, onS
 
               <div className="space-y-4">
                 <div className="grid gap-2">
-                  <Label>Tipo <span className="text-red-500">*</span></Label>
+                  <Label>
+                    Tipo <span className="text-red-500">*</span>
+                  </Label>
                   <Select
                     value={formData.type || undefined}
-                    onValueChange={(val) => handleYesNoChange(val === "yes_no")}
+                    onValueChange={(val) => handleYesNoChange(val === 'yes_no')}
                   >
                     <SelectTrigger className="bg-white">
                       <SelectValue placeholder="Seleziona il tipo" />
@@ -223,13 +236,20 @@ export function RubricFormPage({ rubricId, onSuccess }: { rubricId?: string, onS
 
                 <div className="space-y-2 pt-2">
                   <div className="flex items-center gap-3 px-3">
-                    <div className="w-16 shrink-0 text-xs font-semibold text-slate-500 text-center">Livello</div>
-                    <div className="flex-1 text-xs font-semibold text-slate-500">Descrizione <span className="text-red-500">*</span></div>
+                    <div className="w-16 shrink-0 text-xs font-semibold text-slate-500 text-center">
+                      Livello
+                    </div>
+                    <div className="flex-1 text-xs font-semibold text-slate-500">
+                      Descrizione <span className="text-red-500">*</span>
+                    </div>
                   </div>
                   {formData.levels.map((level, index) => (
-                    <div key={index} className="flex items-center gap-3 bg-slate-50 px-3 py-2 rounded-md border border-slate-100">
+                    <div
+                      key={index}
+                      className="flex items-center gap-3 bg-slate-50 px-3 py-2 rounded-md border border-slate-100"
+                    >
                       <div className="w-16 shrink-0 flex items-center justify-center">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-200 text-sm font-bold text-slate-600">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-200 text-sm font-bold text-slate-600">
                           {level.rank}
                         </div>
                       </div>
@@ -249,11 +269,7 @@ export function RubricFormPage({ rubricId, onSuccess }: { rubricId?: string, onS
 
               <div className="flex justify-end gap-3 pt-6 border-t">
                 <Button type="submit" disabled={submitting}>
-                  {submitting
-                    ? "Salvataggio..."
-                    : isEditing
-                    ? "Salva Modifiche"
-                    : "Crea Rubrica"}
+                  {submitting ? 'Salvataggio...' : isEditing ? 'Salva Modifiche' : 'Crea Rubrica'}
                 </Button>
               </div>
             </form>

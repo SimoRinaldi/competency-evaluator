@@ -46,13 +46,13 @@ export class UsersService {
       throw new ConflictException('Email already in use');
     }
 
-    const passwordHash = await bcrypt.hash(dto.password, 10);
-    const savedUser = await this.usersRepository.createOne(dto, passwordHash);
+    const password_hash = await bcrypt.hash(dto.password, 10);
+    const saved_user = await this.usersRepository.createOne(dto, password_hash);
 
-    // lancio evento di creazione
-    this.eventEmitter.emit('user.created', savedUser);
+    // lancia evento di creazione
+    this.eventEmitter.emit('user.created', saved_user);
 
-    return savedUser;
+    return saved_user;
   }
 
   async update(id: number, dto: UpdateUserDto): Promise<UserEntity> {
@@ -71,17 +71,17 @@ export class UsersService {
     return updated;
   }
 
-  async updatePassword(id: number, oldPass: string, newPass: string): Promise<void> {
+  async updatePassword(id: number, old_pass: string, new_pass: string): Promise<void> {
     const user = await this.usersRepository.findById(id);
     if (!user) throw new NotFoundException(`User with id ${id} not found`);
 
-    const passwordMatches = await bcrypt.compare(oldPass, user.passwordHash);
-    if (!passwordMatches) {
+    const password_matches = await bcrypt.compare(old_pass, user.passwordHash);
+    if (!password_matches) {
       throw new ConflictException('La vecchia password non è corretta');
     }
 
-    const newHash = await bcrypt.hash(newPass, 10);
-    await this.usersRepository.updatePasswordHash(id, newHash);
+    const new_hash = await bcrypt.hash(new_pass, 10);
+    await this.usersRepository.updatePasswordHash(id, new_hash);
   }
 
   async removeUser(id: number): Promise<void> {

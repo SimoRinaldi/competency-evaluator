@@ -1,10 +1,10 @@
 export * from './lib/tests-management.module';
 
-// Entità per relazioni TypeORM
+// entità
 export * from './lib/test/entities/test.entity';
 export * from './lib/test-designer/entities/test-designer.entity';
 
-// Servizi e sub-moduli per interoperabilità
+// services, modules and repositories
 export * from './lib/test/test.service';
 export * from './lib/test/test.module';
 export * from './lib/test/test.repository';

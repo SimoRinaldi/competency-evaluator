@@ -16,12 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Search, Loader2, RefreshCw, ChevronLeft, ChevronRight, Edit } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import {
@@ -414,4 +409,3 @@ export function IndicatorsManagementPage() {
     </PageContainer>
   );
 }
-

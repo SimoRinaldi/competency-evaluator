@@ -2,21 +2,10 @@ import { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from './auth-context';
 import { useFeedback } from '../../providers/feedback-provider';
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
 import { Eye, EyeOff } from 'lucide-react';
 
 export function LoginPage() {
@@ -37,13 +26,13 @@ export function LoginPage() {
 
     try {
       await login(email, password);
-      showSuccess("Accesso effettuato", "Benvenuto nella piattaforma.");
+      showSuccess('Accesso effettuato', 'Benvenuto nella piattaforma.');
       navigate(from, { replace: true });
     } catch (err: unknown) {
       if (err instanceof Error) {
-        showError(err.message, "Errore di Accesso");
+        showError(err.message, 'Errore di Accesso');
       } else {
-        showError('Errore durante il login', "Errore di Accesso");
+        showError('Errore durante il login', 'Errore di Accesso');
       }
     } finally {
       setIsLoading(false);
@@ -56,9 +45,7 @@ export function LoginPage() {
         <Card>
           <CardHeader>
             <CardTitle>Bentornato</CardTitle>
-            <CardDescription>
-              Inserisci la tua email e password per accedere.
-            </CardDescription>
+            <CardDescription>Inserisci la tua email e password per accedere.</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit}>
@@ -82,7 +69,7 @@ export function LoginPage() {
                   <div className="relative">
                     <Input
                       id="password"
-                      type={showPassword ? "text" : "password"}
+                      type={showPassword ? 'text' : 'password'}
                       placeholder="Inserisci la tua password"
                       required
                       value={password}
@@ -98,11 +85,7 @@ export function LoginPage() {
                       onClick={() => setShowPassword(!showPassword)}
                       tabIndex={-1}
                     >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       <span className="sr-only">Mostra password</span>
                     </Button>
                   </div>
@@ -111,9 +94,11 @@ export function LoginPage() {
                   <Button type="submit" disabled={isLoading} className="w-full">
                     {isLoading ? 'Accesso in corso...' : 'Accedi'}
                   </Button>
+                  {/*
                   <FieldDescription className="text-center">
                     Non hai un account? <Link to="/register" className="underline underline-offset-4 hover:text-primary">Registrati</Link>
                   </FieldDescription>
+                  */}
                 </Field>
               </FieldGroup>
             </form>

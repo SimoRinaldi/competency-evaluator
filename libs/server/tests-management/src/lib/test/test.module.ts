@@ -6,7 +6,6 @@ import { TestController } from './test.controller';
 import { TestService } from './test.service';
 import { TestRepository } from './test.repository';
 import { TestDesignerModule } from '../test-designer/test-designer.module';
-
 import { SubCompetencyModule } from '@server/competencies-management';
 
 @Module({

@@ -76,7 +76,7 @@ const navGroups = [
         icon: PencilRuler,
       },
       {
-        title: 'Oggetto di osservazione e indicatori',
+        title: 'Gestione oggetti',
         url: '/indicators-management',
         roles: ['TEST_DESIGNER'],
         icon: Target,

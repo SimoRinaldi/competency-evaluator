@@ -3,7 +3,7 @@ import { AuthProvider } from '../features/auth/auth-context';
 import { ProtectedRoute } from '../features/auth/protected-route';
 import { PublicRoute } from '../features/auth/public-route';
 import { LoginPage } from '../features/auth/login.page';
-import { RegisterPage } from '../features/auth/register.page';
+// import { RegisterPage } from '../features/auth/register.page';
 import { AppLayout } from '../features/layouts/app-layout';
 import { CreateCompetencyPage } from '../features/competencies/create-competency.page';
 import { FeedbackProvider } from '../providers/feedback-provider';
@@ -54,16 +54,16 @@ export function App() {
     <FeedbackProvider>
       <AuthProvider>
         <Routes>
-          {/* Rotte pubbliche per ospiti (Login e Registrazione) */}
+          {/* Rotte pubbliche */}
           <Route element={<PublicRoute />}>
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+            {/* <Route path="/register" element={<RegisterPage />} /> */}
           </Route>
 
-          {/* Rotte protette (richiedono autenticazione / token salvato) */}
+          {/* Rotte protette */}
           <Route element={<ProtectedRoute />}>
             <Route element={<AppLayout />}>
-              {/* Rotta accessibile a tutti gli utenti loggati
+              {/* Rotta Dashboard (per ora non implementata)
               <Route
                 path="/"
                 element={
@@ -101,10 +101,7 @@ export function App() {
               <Route element={<ProtectedRoute allowedRoles={['TEST_DESIGNER']} />}>
                 <Route path="/tests-management" element={<TestsManagementPage />} />
                 <Route path="/tests/new" element={<CreateTestPage />} />
-                <Route
-                  path="/indicators-management"
-                  element={<IndicatorsManagementPage />}
-                />
+                <Route path="/indicators-management" element={<IndicatorsManagementPage />} />
               </Route>
 
               {/* Rotte esclusive per EVALUATOR */}

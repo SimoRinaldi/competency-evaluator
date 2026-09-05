@@ -68,11 +68,24 @@ export class RubricService {
   }
 
   async remove(id: number): Promise<{ deleted: boolean }> {
+    // controlla se la rubrica è associata con almeno un indicatore
+    const is_associated = await this.rubricRepository.isAssociatedWithIndicators(id);
+    if (is_associated)
+      throw new ConflictException(
+        'Impossibile eliminare la rubrica: è attualmente associata ad un o più indicatori.',
+      );
+
+    // se non è associata, procede con l'eliminazione
     const deleted = await this.rubricRepository.deleteOne(id);
     if (!deleted) {
       throw new NotFoundException(`RubricSet con ID ${id} non trovato`);
     }
     return { deleted: true };
+  }
+
+  async checkAssociations(id: number): Promise<{ isAssociated: boolean }> {
+    const isAssociated = await this.rubricRepository.isAssociatedWithIndicators(id);
+    return { isAssociated };
   }
 
   async findMatchingRubricSet(
@@ -106,9 +119,7 @@ export class RubricService {
   ): Promise<void> {
     const duplicate = await this.findMatchingRubricSet(levels, excludeRubricSetId);
     if (duplicate) {
-      throw new ConflictException(
-        'Esiste già un rubric set con lo stesso insieme di livelli',
-      );
+      throw new ConflictException('Esiste già un rubric set con lo stesso insieme di livelli');
     }
   }
 }
