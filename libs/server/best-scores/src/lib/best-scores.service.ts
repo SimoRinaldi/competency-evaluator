@@ -1,14 +1,168 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { BestCompetencyScoreService } from './best-competency-score/best-competency-score.service';
 import { BestSubCompetencyScoreService } from './best-subcompetency-score/best-subcompetency-score.service';
 import { BestSubCompetencyScoreEntity } from './best-subcompetency-score/entities/best-subcompetency-score.entity';
+import { CompetencyService } from '@server/competencies-management';
+import { UserCompetencyEvaluationDto } from './best-competency-score/dto/user-competency-evaluation.dto';
+import { UserSubCompetencyEvaluationDto } from './best-subcompetency-score/dto/user-subcompetency-evaluation.dto';
 
 @Injectable()
 export class BestScoresService {
   constructor(
     private readonly competencyScoreService: BestCompetencyScoreService,
     private readonly subCompetencyScoreService: BestSubCompetencyScoreService,
+    private readonly competencyService: CompetencyService,
   ) {}
+
+  async findAcquiredCompetencies(user_id: number): Promise<UserCompetencyEvaluationDto[]> {
+    const userScores = await this.competencyScoreService.findByUser(user_id);
+    const acquired: UserCompetencyEvaluationDto[] = userScores
+      .filter(
+        (score) => score.competency && score.best_score_absolute >= score.competency.threshold,
+      )
+      .map((score) => ({
+        competency_id: score.competency_id,
+        title: score.competency!.title,
+        threshold: score.competency!.threshold,
+        score_absolute: score.best_score_absolute,
+        score_percentage: score.best_score_percentage,
+      }));
+
+    if (acquired.length === 0) {
+      throw new NotFoundException(`Nessuna competenza acquisita trovata per l'utente ${user_id}`);
+    }
+
+    return acquired;
+  }
+
+  async findUnacquiredCompetencies(user_id: number): Promise<UserCompetencyEvaluationDto[]> {
+    const [allCompetencies, userScores] = await Promise.all([
+      this.competencyService.findAll(),
+      this.competencyScoreService.findByUser(user_id),
+    ]);
+
+    const userScoresMap = new Map(userScores.map((score) => [score.competency_id, score]));
+
+    const unacquired: UserCompetencyEvaluationDto[] = [];
+
+    for (const competency of allCompetencies) {
+      const userScore = userScoresMap.get(competency.id);
+
+      if (!userScore) {
+        unacquired.push({
+          competency_id: competency.id,
+          title: competency.title,
+          threshold: competency.threshold,
+          score_absolute: null,
+          score_percentage: null,
+        });
+
+        // TODO: ragionare sul funzionamento soglia
+        // - se tutte le sottocompetenze sono superate => competenza superata (?)
+        // - mettere score_absolute quando esiste una sottocompetenza la cui valutazione non supera la soglia (?)
+      } else if (userScore.best_score_absolute < competency.threshold) {
+        unacquired.push({
+          competency_id: competency.id,
+          title: competency.title,
+          threshold: competency.threshold,
+          score_absolute: userScore.best_score_absolute,
+          score_percentage: userScore.best_score_percentage,
+        });
+      }
+    }
+
+    if (unacquired.length === 0) {
+      throw new NotFoundException(
+        `Nessuna competenza NON acquisita trovata per l'utente ${user_id}`,
+      );
+    }
+
+    return unacquired;
+  }
+
+  async findAcquiredSubCompetencies(
+    user_id: number,
+    competency_id: number,
+  ): Promise<UserSubCompetencyEvaluationDto[]> {
+    const [competency, userScores] = await Promise.all([
+      this.competencyService.findOne(competency_id),
+      this.subCompetencyScoreService.findByUser(user_id),
+    ]);
+
+    const userScoresMap = new Map(userScores.map((score) => [score.subcompetency_id, score]));
+
+    const subcompetencies = competency.subcompetencies ?? [];
+    const acquired: UserSubCompetencyEvaluationDto[] = [];
+
+    for (const subcomp of subcompetencies) {
+      const userScore = userScoresMap.get(subcomp.id);
+      if (userScore && userScore.best_score_absolute >= subcomp.threshold) {
+        acquired.push({
+          subcompetency_id: subcomp.id,
+          title: subcomp.title,
+          competency_id: subcomp.competency_id,
+          threshold: subcomp.threshold,
+          score_absolute: userScore.best_score_absolute,
+          score_percentage: userScore.best_score_percentage,
+        });
+      }
+    }
+
+    if (acquired.length === 0) {
+      throw new NotFoundException(
+        `Nessuna sotto-competenza acquisita trovata per l'utente ${user_id} nella competenza ${competency_id}`,
+      );
+    }
+
+    return acquired;
+  }
+
+  async findUnacquiredSubCompetencies(
+    user_id: number,
+    competency_id: number,
+  ): Promise<UserSubCompetencyEvaluationDto[]> {
+    const [competency, userScores] = await Promise.all([
+      this.competencyService.findOne(competency_id),
+      this.subCompetencyScoreService.findByUser(user_id),
+    ]);
+
+    const userScoresMap = new Map(userScores.map((score) => [score.subcompetency_id, score]));
+
+    const subcompetencies = competency.subcompetencies ?? [];
+    const unacquired: UserSubCompetencyEvaluationDto[] = [];
+
+    for (const subcomp of subcompetencies) {
+      const userScore = userScoresMap.get(subcomp.id);
+
+      if (!userScore) {
+        unacquired.push({
+          subcompetency_id: subcomp.id,
+          title: subcomp.title,
+          competency_id: subcomp.competency_id,
+          threshold: subcomp.threshold,
+          score_absolute: null,
+          score_percentage: null,
+        });
+      } else if (userScore.best_score_absolute < subcomp.threshold) {
+        unacquired.push({
+          subcompetency_id: subcomp.id,
+          title: subcomp.title,
+          competency_id: subcomp.competency_id,
+          threshold: subcomp.threshold,
+          score_absolute: userScore.best_score_absolute,
+          score_percentage: userScore.best_score_percentage,
+        });
+      }
+    }
+
+    if (unacquired.length === 0) {
+      throw new NotFoundException(
+        `Nessuna sotto-competenza NON acquisita trovata per l'utente ${user_id} nella competenza ${competency_id}`,
+      );
+    }
+
+    return unacquired;
+  }
 
   // aggiorna/inserisce il best score (assoluto e percentuale)
   // relativo alla coppia (sottocompetenza-utente_valutato)
