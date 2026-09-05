@@ -12,6 +12,7 @@ import { CreateTestDto } from './dto/create-test.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
 import { TestRepository } from './test.repository';
 import { SubCompetencyEntity } from '@server/competencies-management';
+import { EvaluatedUserService } from '@server/tests-evaluation';
 
 @Injectable()
 export class TestService {
@@ -128,6 +129,10 @@ export class TestService {
     }
 
     return this.testsRepository.findByTestDesignerId(designerId);
+  }
+
+  async findByEvaluatedUserId(evaluated_user_id: number): Promise<TestEntity[]> {
+    return this.testsRepository.findByEvaluatedUserId(evaluated_user_id);
   }
 
   async update(id: number, dto: UpdateTestDto): Promise<TestEntity> {

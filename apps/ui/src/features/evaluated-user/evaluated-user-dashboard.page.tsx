@@ -1,39 +1,42 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { fetchCurrentUser } from "../auth/auth.api";
-import { getAvailableTests, getUserExecutions } from "./evaluated-user.api";
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { fetchCurrentUser } from '../auth/auth.api';
+import {
+  getAvailableTests,
+  getAvailableTestsByUserId,
+  getUserExecutions,
+} from './evaluated-user.api';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-  CardFooter
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { PlayCircle, CheckCircle2 } from "lucide-react";
+  CardFooter,
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { PlayCircle, CheckCircle2 } from 'lucide-react';
 
 export function EvaluatedUserDashboardPage() {
   const [tests, setTests] = useState<any[]>([]);
   const [executions, setExecutions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   useEffect(() => {
     async function loadDashboard() {
       try {
         const user = await fetchCurrentUser();
-        
-        // Carichiamo tutti i test (per ora l'utente li vede tutti)
-        const allTests = await getAvailableTests();
+
+        // carichiamo tutti i test disponibili per l'utente
+        const allTests = await getAvailableTestsByUserId(user.id);
         setTests(allTests);
 
-        // Carichiamo le esecuzioni di questo utente
+        // carichiamo le esecuzioni di questo utente
         const myExecs = await getUserExecutions(user.id);
         setExecutions(myExecs);
-
       } catch (err: any) {
-        setError(err.message || "Errore nel caricamento della dashboard");
+        setError(err.message || 'Errore nel caricamento della dashboard');
       } finally {
         setLoading(false);
       }
@@ -43,7 +46,7 @@ export function EvaluatedUserDashboardPage() {
 
   // Funzione helper per controllare se l'utente ha già svolto un test
   const getExecutionForTest = (testId: number) => {
-    return executions.find(ex => ex.test_id === testId);
+    return executions.find((ex) => ex.test_id === testId);
   };
 
   return (

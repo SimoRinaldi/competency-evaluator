@@ -1,7 +1,11 @@
-import { useEffect, useState, useMemo } from "react";
-import { fetchCurrentUser } from "../auth/auth.api";
-import { getAvailableTests, getUserExecutions } from "./evaluated-user.api";
-import { PageContainer } from "../../components/page-container";
+import { useEffect, useState, useMemo } from 'react';
+import { fetchCurrentUser } from '../auth/auth.api';
+import {
+  getAvailableTests,
+  getAvailableTestsByUserId,
+  getUserExecutions,
+} from './evaluated-user.api';
+import { PageContainer } from '../../components/page-container';
 import {
   Table,
   TableBody,
@@ -9,26 +13,39 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { 
-  PlayCircle, Award, ClipboardList, Clock, 
-  CheckCircle, Search, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Eye
-} from "lucide-react";
-import { 
-  Empty, EmptyContent, EmptyDescription, 
-  EmptyHeader, EmptyMedia, EmptyTitle 
-} from "@/components/ui/empty";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
-import { UserTestModal } from "./user-test-modal";
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  PlayCircle,
+  Award,
+  ClipboardList,
+  Clock,
+  CheckCircle,
+  Search,
+  ChevronUp,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+} from 'lucide-react';
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/components/ui/empty';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
+import { UserTestModal } from './user-test-modal';
 
 const ITEMS_PER_PAGE = 5;
 
 export function UserTestsPage({ filter }: { filter: 'todo' | 'completed' }) {
   const [tests, setTests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   // Stato modale
   const [modalTestId, setModalTestId] = useState<number | null>(null);
@@ -36,7 +53,7 @@ export function UserTestsPage({ filter }: { filter: 'todo' | 'completed' }) {
   const [modalExecution, setModalExecution] = useState<any>(null);
 
   // Stati tabella
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [sortColumn, setSortColumn] = useState<string>('id');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [currentPage, setCurrentPage] = useState(1);
@@ -54,7 +71,7 @@ export function UserTestsPage({ filter }: { filter: 'todo' | 'completed' }) {
 
   // Reset pagina e ricerca quando si cambia tab
   useEffect(() => {
-    setSearchQuery("");
+    setSearchQuery('');
     setCurrentPage(1);
   }, [filter]);
 
@@ -66,38 +83,43 @@ export function UserTestsPage({ filter }: { filter: 'todo' | 'completed' }) {
     try {
       setLoading(true);
       const user = await fetchCurrentUser();
-      const allTests = await getAvailableTests();
+      const allTests = await getAvailableTestsByUserId(user.id);
       const myExecs = await getUserExecutions(user?.id);
-      
+
       const safeAllTests = Array.isArray(allTests) ? allTests : [];
       const safeMyExecs = Array.isArray(myExecs) ? myExecs : [];
-      
+
       const mappedTests = safeAllTests.map((t: any) => {
         const testExecs = safeMyExecs.filter((ex: any) => ex.test_id === t.id);
-        const execution = testExecs.find((ex: any) => ex.test_outputs && ex.test_outputs.length > 0) || testExecs[0];
-        
+        const execution =
+          testExecs.find((ex: any) => ex.test_outputs && ex.test_outputs.length > 0) ||
+          testExecs[0];
+
         let status: 'todo' | 'submitted' | 'evaluated' = 'todo';
-        
+
         // Un test è In Revisione (submitted) solo se ha almeno un output allegato
         const hasOutputs = execution?.test_outputs && execution.test_outputs.length > 0;
-        
+
         if (execution && hasOutputs) {
-          status = (execution.test_score !== null && execution.test_score !== undefined) ? 'evaluated' : 'submitted';
+          status =
+            execution.test_score !== null && execution.test_score !== undefined
+              ? 'evaluated'
+              : 'submitted';
         }
-        
+
         return { ...t, execution, status };
       });
-      
+
       // "todo" -> non consegnati (todo) e consegnati ma in attesa di voto (submitted)
       // "completed" -> valutati definitivamente (evaluated)
       const filtered = mappedTests.filter((t: any) => {
         if (filter === 'todo') return t.status === 'todo' || t.status === 'submitted';
         return t.status === 'evaluated';
       });
-      
+
       setTests(filtered);
     } catch (err: any) {
-      setError(err?.message || "Errore nel caricamento dei dati");
+      setError(err?.message || 'Errore nel caricamento dei dati');
     } finally {
       setLoading(false);
     }
@@ -114,13 +136,18 @@ export function UserTestsPage({ filter }: { filter: 'todo' | 'completed' }) {
 
   const getSortIcon = (column: string) => {
     if (sortColumn !== column) return <span className="w-4" />;
-    return sortDirection === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />;
+    return sortDirection === 'asc' ? (
+      <ChevronUp className="h-4 w-4" />
+    ) : (
+      <ChevronDown className="h-4 w-4" />
+    );
   };
 
   const filteredTests = useMemo(() => {
-    return tests.filter(t => 
-      (t.assessment_situation || "").toLowerCase().includes(searchQuery.toLowerCase()) || 
-      String(t.id).includes(searchQuery)
+    return tests.filter(
+      (t) =>
+        (t.assessment_situation || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        String(t.id).includes(searchQuery),
     );
   }, [tests, searchQuery]);
 
@@ -128,12 +155,12 @@ export function UserTestsPage({ filter }: { filter: 'todo' | 'completed' }) {
     return [...filteredTests].sort((a, b) => {
       let valA: any = a[sortColumn];
       let valB: any = b[sortColumn];
-      
+
       if (sortColumn === 'score') {
         valA = a.execution?.test_score || 0;
         valB = b.execution?.test_score || 0;
       }
-      
+
       if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
       if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
       return 0;
@@ -151,27 +178,26 @@ export function UserTestsPage({ filter }: { filter: 'todo' | 'completed' }) {
   }, [totalPages, currentPage]);
 
   const titles = {
-    todo: "Test da Svolgere",
-    completed: "Test Completati e Valutati"
+    todo: 'Test da Svolgere',
+    completed: 'Test Completati e Valutati',
   };
 
   const descriptions = {
-    todo: "Lista dei test che ti sono stati assegnati e che devi ancora completare.",
-    completed: "Consulta i tuoi test passati, le sottomissioni e le eventuali valutazioni."
+    todo: 'Lista dei test che ti sono stati assegnati e che devi ancora completare.',
+    completed: 'Consulta i tuoi test passati, le sottomissioni e le eventuali valutazioni.',
   };
 
   const emptyIcons = {
     todo: <ClipboardList />,
-    completed: <Award />
+    completed: <Award />,
   };
 
   return (
-    <PageContainer 
-      title={titles[filter]} 
-      description={descriptions[filter]}
-    >
+    <PageContainer title={titles[filter]} description={descriptions[filter]}>
       {error && (
-        <div className="p-4 bg-red-50 text-red-600 rounded-md mb-4 border border-red-200">{error}</div>
+        <div className="p-4 bg-red-50 text-red-600 rounded-md mb-4 border border-red-200">
+          {error}
+        </div>
       )}
 
       <div className="h-full flex flex-col gap-6">
@@ -197,15 +223,26 @@ export function UserTestsPage({ filter }: { filter: 'todo' | 'completed' }) {
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50 hover:bg-slate-50">
-                <TableHead className="cursor-pointer select-none font-semibold text-slate-700" onClick={() => handleSort('assessment_situation')}>
-                  <div className="flex items-center gap-1">Descrizione test {getSortIcon('assessment_situation')}</div>
-                </TableHead>
-                <TableHead className="w-44 pl-8 cursor-pointer select-none font-semibold text-slate-700 whitespace-nowrap" onClick={() => handleSort(filter === 'completed' ? 'score' : 'status')}>
+                <TableHead
+                  className="cursor-pointer select-none font-semibold text-slate-700"
+                  onClick={() => handleSort('assessment_situation')}
+                >
                   <div className="flex items-center gap-1">
-                    {filter === 'completed' ? 'Punteggio ottenuto / Punteggio massimo' : 'Stato'} {getSortIcon(filter === 'completed' ? 'score' : 'status')}
+                    Descrizione test {getSortIcon('assessment_situation')}
                   </div>
                 </TableHead>
-                <TableHead className="w-20 text-right font-semibold text-slate-700 whitespace-nowrap">Azioni</TableHead>
+                <TableHead
+                  className="w-44 pl-8 cursor-pointer select-none font-semibold text-slate-700 whitespace-nowrap"
+                  onClick={() => handleSort(filter === 'completed' ? 'score' : 'status')}
+                >
+                  <div className="flex items-center gap-1">
+                    {filter === 'completed' ? 'Punteggio ottenuto / Punteggio massimo' : 'Stato'}{' '}
+                    {getSortIcon(filter === 'completed' ? 'score' : 'status')}
+                  </div>
+                </TableHead>
+                <TableHead className="w-20 text-right font-semibold text-slate-700 whitespace-nowrap">
+                  Azioni
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -225,9 +262,11 @@ export function UserTestsPage({ filter }: { filter: 'todo' | 'completed' }) {
                         </EmptyMedia>
                         <EmptyTitle>Nessun test trovato</EmptyTitle>
                         <EmptyDescription>
-                          {searchQuery 
-                            ? "Nessun risultato corrisponde alla tua ricerca." 
-                            : (filter === 'todo' ? "Ottimo lavoro! Non hai nessun test in sospeso al momento." : "Non hai ancora completato alcun test.")}
+                          {searchQuery
+                            ? 'Nessun risultato corrisponde alla tua ricerca.'
+                            : filter === 'todo'
+                            ? 'Ottimo lavoro! Non hai nessun test in sospeso al momento.'
+                            : 'Non hai ancora completato alcun test.'}
                         </EmptyDescription>
                       </EmptyHeader>
                     </Empty>
@@ -274,23 +313,39 @@ export function UserTestsPage({ filter }: { filter: 'todo' | 'completed' }) {
                           <span className="text-sm font-bold text-green-600 mr-2">
                             {test.execution?.test_score}
                           </span>
-                          <span className="text-xs text-slate-500">/ {test.execution?.max_score}</span>
+                          <span className="text-xs text-slate-500">
+                            / {test.execution?.max_score}
+                          </span>
                         </div>
                       )}
                     </TableCell>
                     <TableCell className="text-right">
                       {test.status === 'todo' && (
-                        <Button size="sm" className="h-7 px-2.5 text-xs gap-1.5" onClick={() => openModal(test.id, 'execute', test.execution)}>
+                        <Button
+                          size="sm"
+                          className="h-7 px-2.5 text-xs gap-1.5"
+                          onClick={() => openModal(test.id, 'execute', test.execution)}
+                        >
                           <PlayCircle className="h-3.5 w-3.5" /> Esegui
                         </Button>
                       )}
                       {test.status === 'submitted' && (
-                        <Button size="sm" variant="secondary" className="h-7 px-2.5 text-xs gap-1.5" onClick={() => openModal(test.id, 'view', test.execution)}>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          className="h-7 px-2.5 text-xs gap-1.5"
+                          onClick={() => openModal(test.id, 'view', test.execution)}
+                        >
                           <Eye className="h-3.5 w-3.5" /> Dettagli
                         </Button>
                       )}
                       {test.status === 'evaluated' && (
-                        <Button size="sm" variant="outline" className="h-7 px-2.5 text-xs gap-1.5 text-green-600 border-green-200 bg-green-50" onClick={() => openModal(test.id, 'view', test.execution)}>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-7 px-2.5 text-xs gap-1.5 text-green-600 border-green-200 bg-green-50"
+                          onClick={() => openModal(test.id, 'view', test.execution)}
+                        >
                           <CheckCircle className="h-3.5 w-3.5" /> Valutato
                         </Button>
                       )}
@@ -306,14 +361,16 @@ export function UserTestsPage({ filter }: { filter: 'todo' | 'completed' }) {
         {sortedTests.length > 0 && !loading && (
           <div className="flex items-center justify-between py-4 text-sm text-slate-500">
             <div>
-              Mostrando da {((currentPage - 1) * ITEMS_PER_PAGE) + 1} a {Math.min(currentPage * ITEMS_PER_PAGE, sortedTests.length)} di {sortedTests.length} test
+              Mostrando da {(currentPage - 1) * ITEMS_PER_PAGE + 1} a{' '}
+              {Math.min(currentPage * ITEMS_PER_PAGE, sortedTests.length)} di {sortedTests.length}{' '}
+              test
             </div>
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
                 size="icon"
                 className="h-8 w-8 bg-white"
-                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
               >
                 <ChevronLeft className="h-4 w-4" />
@@ -325,7 +382,7 @@ export function UserTestsPage({ filter }: { filter: 'todo' | 'completed' }) {
                 variant="outline"
                 size="icon"
                 className="h-8 w-8 bg-white"
-                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
               >
                 <ChevronRight className="h-4 w-4" />
@@ -341,9 +398,11 @@ export function UserTestsPage({ filter }: { filter: 'todo' | 'completed' }) {
         mode={modalMode}
         execution={modalExecution}
         onClose={closeModal}
-        onSubmitted={() => { closeModal(); loadData(); }}
+        onSubmitted={() => {
+          closeModal();
+          loadData();
+        }}
       />
     </PageContainer>
   );
 }
-

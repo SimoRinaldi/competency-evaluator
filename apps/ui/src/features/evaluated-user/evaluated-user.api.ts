@@ -8,6 +8,12 @@ export async function getAvailableTests() {
   return response.json();
 }
 
+export async function getAvailableTestsByUserId(user_id: string | number) {
+  const response = await fetch(`${API_URL}/tests/user/${user_id}`, { headers: getAuthHeaders() });
+  if (!response.ok) throw new Error("Errore nel caricamento dei test dell'utente");
+  return response.json();
+}
+
 export async function getTestDetails(testId: string | number) {
   const response = await fetch(`${API_URL}/tests/${testId}`, { headers: getAuthHeaders() });
   if (!response.ok) throw new Error('Errore nel caricamento del test');
@@ -18,7 +24,7 @@ export async function getTestEvaluators(testId: string | number) {
   const response = await fetch(`${API_URL}/test_evaluators/by-test/${testId}`, {
     headers: getAuthHeaders(),
   });
-  if (!response.ok) return []; // Graceful fallback
+  if (!response.ok) return [];
   return response.json();
 }
 
@@ -58,11 +64,11 @@ export async function submitTestExecution(
   return { id: executionId };
 }
 
-export async function getUserExecutions(userId: number) {
+export async function getUserExecutions(userId: string | number) {
   const response = await fetch(`${API_URL}/test_executions/by-user/${userId}`, {
     headers: getAuthHeaders(),
   });
-  if (!response.ok) return []; // Nessuna esecuzione trovata, restituisce array vuoto
+  if (!response.ok) return [];
   return response.json();
 }
 

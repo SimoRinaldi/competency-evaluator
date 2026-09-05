@@ -74,6 +74,23 @@ export class TestRepository {
     });
   }
 
+  async findByEvaluatedUserId(user_id: number): Promise<TestEntity[]> {
+    return this.repository
+      .createQueryBuilder('test')
+      .innerJoin('test_execution', 'te', 'te.test_id = test.id')
+      .innerJoin('evaluated_user', 'eu', 'eu.id = te.user_id')
+      .where('eu.user_id = :user_id', { user_id })
+      .leftJoinAndSelect('test.test_designer', 'test_designer')
+      .leftJoinAndSelect('test_designer.user', 'test_designer_user')
+      .leftJoinAndSelect('test.subcompetencies', 'subcompetencies')
+      .leftJoinAndSelect('subcompetencies.competency', 'competency')
+      .leftJoinAndSelect('subcompetencies.observation_object', 'observation_object')
+      .leftJoinAndSelect('observation_object.indicators', 'indicators')
+      .leftJoinAndSelect('indicators.rubric_set', 'rubric_set')
+      .leftJoinAndSelect('rubric_set.levels', 'levels')
+      .getMany();
+  }
+
   async updateOne(test: TestEntity, dto: UpdateTestDto): Promise<TestEntity> {
     if (dto.assessment_situation !== undefined)
       test.assessment_situation = dto.assessment_situation;

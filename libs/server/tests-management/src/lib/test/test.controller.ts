@@ -85,4 +85,12 @@ export class TestController {
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.testService.remove(id);
   }
+
+  @Get('user/:user_id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.USER)
+  @ApiBearerAuth()
+  async findByEvaluatedUser(@Param('user_id', ParseIntPipe) user_id: number) {
+    return this.testService.findByEvaluatedUserId(user_id);
+  }
 }
