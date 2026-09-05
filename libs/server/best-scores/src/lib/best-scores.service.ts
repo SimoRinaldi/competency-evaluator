@@ -28,9 +28,7 @@ export class BestScoresService {
         score_percentage: score.best_score_percentage,
       }));
 
-    if (acquired.length === 0) {
-      throw new NotFoundException(`Nessuna competenza acquisita trovata per l'utente ${user_id}`);
-    }
+
 
     return acquired;
   }
@@ -71,11 +69,7 @@ export class BestScoresService {
       }
     }
 
-    if (unacquired.length === 0) {
-      throw new NotFoundException(
-        `Nessuna competenza NON acquisita trovata per l'utente ${user_id}`,
-      );
-    }
+
 
     return unacquired;
   }
@@ -108,11 +102,7 @@ export class BestScoresService {
       }
     }
 
-    if (acquired.length === 0) {
-      throw new NotFoundException(
-        `Nessuna sotto-competenza acquisita trovata per l'utente ${user_id} nella competenza ${competency_id}`,
-      );
-    }
+
 
     return acquired;
   }
@@ -155,11 +145,7 @@ export class BestScoresService {
       }
     }
 
-    if (unacquired.length === 0) {
-      throw new NotFoundException(
-        `Nessuna sotto-competenza NON acquisita trovata per l'utente ${user_id} nella competenza ${competency_id}`,
-      );
-    }
+
 
     return unacquired;
   }

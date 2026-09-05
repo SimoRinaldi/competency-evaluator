@@ -26,10 +26,7 @@ export class CompetencyService {
   async findAll(): Promise<CompetencyEntity[]> {
     const competencies = await this.competencyRepository.findAll();
 
-    if (competencies && competencies.length === 0) {
-      throw new NotFoundException(`No competencies found.`);
-    }
-    return competencies;
+    return competencies || [];
   }
 
   async create(dto: CreateCompetencyDto): Promise<CompetencyEntity> {

@@ -84,7 +84,7 @@ export function CompetencyScoreCard({
             </p>
             <div className="text-xs text-slate-600">
               Soglia richiesta:{' '}
-              <span className="font-semibold text-slate-800 font-mono">
+              <span className="font-semibold text-slate-800 tabular-nums">
                 {competency.threshold} pt
               </span>
             </div>
@@ -101,10 +101,10 @@ export function CompetencyScoreCard({
               <div className="space-y-0.5">
                 <span className="text-xs text-slate-500">Punteggio</span>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-2xl font-semibold font-mono text-slate-900">
+                  <span className="text-2xl font-semibold tabular-nums text-slate-900">
                     {competency.score_absolute}
                   </span>
-                  <span className="text-xs text-slate-400 font-mono">
+                  <span className="text-xs text-slate-400 tabular-nums">
                     / {maxScore !== null ? `${maxScore} pt` : '—'}
                   </span>
                 </div>
@@ -141,7 +141,7 @@ export function CompetencyScoreCard({
                   </RadialBarChart>
                 </ResponsiveContainer>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-xs font-semibold font-mono text-slate-900">
+                  <span className="text-xs font-semibold tabular-nums text-slate-900">
                     {scorePercent.toFixed(0)}%
                   </span>
                 </div>
@@ -150,7 +150,7 @@ export function CompetencyScoreCard({
 
             {/* Avanzamento */}
             <div className="mt-2 space-y-1">
-              <div className="flex justify-between text-[11px] text-slate-500 font-mono">
+              <div className="flex justify-between text-[11px] text-slate-500 tabular-nums">
                 <span>Soglia: {competency.threshold} pt</span>
                 <span>Max: {maxScore !== null ? `${maxScore} pt` : '—'}</span>
               </div>
