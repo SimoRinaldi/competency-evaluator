@@ -14,3 +14,6 @@ export * from './lib/subcompetency-historical-score/subcompetency-historical-sco
 export * from './lib/subcompetency-historical-score/subcompetency-historical-score.repository';
 
 export * from './lib/historical-scores.service';
+export * from './lib/historical-scores.controller';
+export * from './lib/competency-historical-score/dto/user-competency-evaluation.dto';
+export * from './lib/subcompetency-historical-score/dto/user-subcompetency-evaluation.dto';
