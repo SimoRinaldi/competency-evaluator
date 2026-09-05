@@ -36,7 +36,7 @@ export function SubcompetenciesModal({
 }: SubcompetenciesModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-[95vw] md:max-w-[800px] p-6 bg-white rounded-md shadow-lg border-slate-200 gap-6">
+      <DialogContent className="max-w-[95vw] md:max-w-200 p-6 bg-white rounded-md shadow-lg border-slate-200 gap-6">
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold text-slate-900">
             Sotto-competenze
@@ -84,9 +84,7 @@ export function SubcompetenciesModal({
                 ) : (
                   subcompetencies.map((sc: any) => {
                     const scorePercent =
-                      sc.score_percentage !== null
-                        ? parseFloat(sc.score_percentage) || 0
-                        : null;
+                      sc.score_percentage !== null ? parseFloat(sc.score_percentage) || 0 : null;
                     const maxScore =
                       sc.score_absolute !== null && scorePercent !== null && scorePercent > 0
                         ? Math.round((sc.score_absolute / scorePercent) * 100)

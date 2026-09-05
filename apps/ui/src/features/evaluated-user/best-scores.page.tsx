@@ -6,18 +6,14 @@ import {
   getUnacquiredCompetencies,
   getUnacquiredSubcompetencies,
 } from './evaluated-user.api';
-import { getBestCompetencyScores, getBestSubCompetencyScores } from './evaluated-user.api';
 import { PageContainer } from '../../components/page-container';
 import { CompetencyScoreCard } from './competency-score-card';
 import { SubcompetenciesModal } from './subcompetencies-modal';
 
-export function HistoricalScoresPage() {
+export function BestScoresPage() {
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [acquiredCompetencyScores, setAcquiredCompetencyScores] = useState<any[]>([]);
   const [unacquiredCompetencyScores, setUnacquiredCompetencyScores] = useState<any[]>([]);
-export function BestScoresPage() {
-  const [competencyScores, setCompetencyScores] = useState<any[]>([]);
-  const [subcompetencyScores, setSubcompetencyScores] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedCompetency, setSelectedCompetency] = useState<any | null>(null);
@@ -44,8 +40,6 @@ export function BestScoresPage() {
         getAcquiredCompetencies(userId),
         getUnacquiredCompetencies(userId),
       ]);
-      const compScores = await getBestCompetencyScores(user.id);
-      const subScores = await getBestSubCompetencyScores(user.id);
 
       setAcquiredCompetencyScores(acqCompScores);
       setUnacquiredCompetencyScores(unacqCompScores);
@@ -116,22 +110,6 @@ export function BestScoresPage() {
     );
   }
 
-  /* NON SO SE SERVIRA' ANCORA
-  const modalSubCompsData = selectedCompetency
-    ? (selectedCompetency.competency.subcompetencies || []).map((subC: any) => {
-        const subScore = subcompetencyScores.find((ss) => ss.subcompetency_id === subC.id);
-        const subScorePercent = subScore ? parseFloat(subScore.best_score_percentage) || 0 : 0;
-        return {
-          id: subC.id,
-          title: subC.title,
-          threshold: subC.threshold,
-          best_score_absolute: subScore ? subScore.best_score_absolute : 0,
-          best_score_percentage: subScorePercent,
-          acquired: subScore ? subScore.best_score_absolute >= subC.threshold : false,
-        };
-      })
-    : []; */
-
   return (
     <PageContainer
       title="Storico punteggi"
@@ -149,129 +127,6 @@ export function BestScoresPage() {
                 barColor="#0f172a"
               />
             ))}
-      {/* NON SO SE SERVIRA'
-      </div><div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {competencyScores.map((cs) => {
-          const competency = cs.competency;
-          const scorePercent = parseFloat(cs.best_score_percentage) || 0;
-          const chartData = [{ score: scorePercent, fill: '#0f172a' }];
-
-          return (
-            <div
-              key={cs.id}
-              className="border border-slate-200 rounded-md p-5 flex flex-col bg-white"
-            >
-              <h3 className="text-base font-semibold text-slate-900">{competency.title}</h3>
-
-              <Separator className="my-4 bg-slate-100" />
-
-              <div className="flex justify-between items-center mb-4">
-                <div className="flex flex-col gap-2 text-sm text-slate-600">
-                  <div>
-                    Soglia:{' '}
-                    <span className="font-semibold text-slate-900">{competency.threshold}</span>
-                  </div>
-                  <div>
-                    Ottenuto:{' '}
-                    <span className="font-semibold text-slate-900">{cs.best_score_absolute}</span>
-                  </div>
-                </div>
-
-                <div className="w-16 h-16 relative">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <RadialBarChart
-                      innerRadius="75%"
-                      outerRadius="100%"
-                      data={chartData}
-                      startAngle={90}
-                      endAngle={-270}
-                      barSize={4}
-                    >
-                      <RadialBar
-                        dataKey="score"
-                        background={{ fill: '#f1f5f9' }}
-                        cornerRadius={10}
-                      />
-                    </RadialBarChart>
-                  </ResponsiveContainer>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-xs font-bold text-slate-900">
-                      {scorePercent.toFixed(0)}%
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-auto text-right">
-                <button
-                  onClick={() => setSelectedCompetency(cs)}
-                  className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors underline underline-offset-4 cursor-pointer"
-                >
-                  Visualizza sotto-competenze
-                </button>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      <Dialog
-        open={!!selectedCompetency}
-        onOpenChange={(open) => !open && setSelectedCompetency(null)}
-      >
-        <DialogContent className="max-w-[95vw] md:max-w-[800px] p-6 bg-white rounded-md shadow-lg border-slate-200 gap-6">
-          <DialogHeader>
-            <DialogTitle className="text-lg font-semibold text-slate-900">
-              Sotto-competenze
-            </DialogTitle>
-            <p className="text-sm text-slate-500">{selectedCompetency?.competency.title}</p>
-          </DialogHeader>
-
-          <div className="overflow-x-auto border border-slate-200 rounded-md">
-            <Table>
-              <TableHeader>
-                <TableRow className="hover:bg-transparent">
-                  <TableHead className="font-medium text-slate-500 py-3">
-                    Sotto-competenza
-                  </TableHead>
-                  <TableHead className="text-center font-medium text-slate-500 py-3">
-                    Stato
-                  </TableHead>
-                  <TableHead className="text-center font-medium text-slate-500 py-3">
-                    Punteggio
-                  </TableHead>
-                  <TableHead className="text-center font-medium text-slate-500 py-3">
-                    Punteggio %
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {modalSubCompsData.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={4} className="h-24 text-center text-slate-500 text-sm">
-                      Nessun dato disponibile.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  modalSubCompsData.map((sc: any) => (
-                    <TableRow key={sc.id} className="hover:bg-slate-50">
-                      <TableCell className="text-sm font-medium text-slate-900">
-                        {sc.title}
-                      </TableCell>
-                      <TableCell className="text-center text-sm text-slate-700">
-                        {sc.acquired ? 'Acquisita' : 'Non acquisita'}
-                      </TableCell>
-                      <TableCell className="text-center text-sm text-slate-700">
-                        {sc.best_score_absolute} / {sc.threshold}
-                      </TableCell>
-                      <TableCell className="text-center text-sm text-slate-900 font-semibold">
-                        {sc.best_score_percentage.toFixed(0)}%
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table> */}
           </div>
         </div>
       )}

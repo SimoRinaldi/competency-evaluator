@@ -11,7 +11,7 @@ import { PageContainer } from '../components/page-container';
 import { UserTestsPage } from '../features/evaluated-user/user-tests.page';
 import { EvaluatorTestsPage } from '../features/evaluator/evaluator-tests.page';
 import { TestEvaluationPage } from '../features/evaluator/test-evaluation.page';
-import { BestScoresPage } from '../features/evaluated-user/best_scores.page';
+import { BestScoresPage } from '@/features/evaluated-user/best-scores.page';
 import { TestsManagementPage } from '../features/tests/tests-management.page';
 import { CreateTestPage } from '../features/tests/create-test.page';
 import { IndicatorsManagementPage } from '../features/tests/indicators-management.page';

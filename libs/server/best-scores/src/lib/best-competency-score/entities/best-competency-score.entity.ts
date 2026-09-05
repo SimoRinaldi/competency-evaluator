@@ -8,7 +8,7 @@ export class BestCompetencyScoreEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ type: 'integer', nullable: false })
+  @Column({ type: 'numeric', nullable: false })
   best_score_absolute!: number;
 
   @Column({ type: 'numeric', nullable: false })
