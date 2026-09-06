@@ -55,7 +55,7 @@ export function BestScoresPage() {
       ...sc,
       acquired:
         sc.acquired ??
-        (sc.score_absolute !== null && sc.score_absolute >= sc.threshold),
+        (sc.score_percentage !== null && parseFloat(sc.score_percentage) >= sc.threshold),
     }));
     setModalSubComps(subcomps);
   }

@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsInt, IsPositive, IsString, Max, Min } from 'class-validator';
+import { IsNotEmpty, IsInt, IsString, Max, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateCompetencyDto {
@@ -21,14 +21,4 @@ export class CreateCompetencyDto {
   @Min(1)
   @Max(5)
   weight!: number;
-
-  @ApiProperty({
-    description: 'Soglia di acquisizione della competenza',
-    example: '30',
-    required: true,
-  })
-  @IsInt()
-  @IsPositive()
-  @IsOptional()
-  threshold?: number;
 }

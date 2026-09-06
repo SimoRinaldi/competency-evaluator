@@ -28,19 +28,19 @@ export function CompetencyScoreCard({
   className,
 }: CompetencyScoreCardProps) {
   const isNotAttempted = competency.score_absolute === null;
-  const isAcquired =
-    isAcquiredProp !== undefined
-      ? isAcquiredProp
-      : !dimmed && !isNotAttempted && (competency.score_absolute ?? 0) >= competency.threshold;
-
-  const delta = !isNotAttempted ? (competency.score_absolute ?? 0) - competency.threshold : null;
-  const hasMissingSubcompetencies =
-    !isAcquired && !isNotAttempted && delta !== null && delta >= 0;
-
   const scorePercent =
     competency.score_percentage !== null
       ? parseFloat(competency.score_percentage) || 0
       : 0;
+
+  const isAcquired =
+    isAcquiredProp !== undefined
+      ? isAcquiredProp
+      : !dimmed && !isNotAttempted && scorePercent >= competency.threshold;
+
+  const delta = !isNotAttempted ? Math.round(scorePercent - competency.threshold) : null;
+  const hasMissingSubcompetencies =
+    !isAcquired && !isNotAttempted && delta !== null && delta >= 0;
 
   const maxScore =
     !isNotAttempted && scorePercent > 0
@@ -104,7 +104,7 @@ export function CompetencyScoreCard({
             <div className="text-xs text-slate-600">
               Soglia richiesta:{' '}
               <span className="font-semibold text-slate-800 font-mono">
-                {competency.threshold} pt
+                {competency.threshold}%
               </span>
             </div>
           </div>
@@ -131,11 +131,11 @@ export function CompetencyScoreCard({
                   {!hasMissingSubcompetencies && delta !== null &&
                     (delta >= 0 ? (
                       <span className="text-emerald-700 font-medium">
-                        +{delta} pt rispetto alla soglia ({competency.threshold} pt)
+                        +{delta}% rispetto alla soglia ({competency.threshold}%)
                       </span>
                     ) : (
                       <span className="text-slate-600 font-medium">
-                        {delta} pt dalla soglia ({competency.threshold} pt)
+                        {delta}% dalla soglia ({competency.threshold}%)
                       </span>
                     ))}
                 </div>
@@ -179,7 +179,7 @@ export function CompetencyScoreCard({
             {/* Avanzamento */}
             <div className="mt-2 space-y-1">
               <div className="flex justify-between text-[11px] text-slate-500 font-mono">
-                <span>Soglia: {competency.threshold} pt</span>
+                <span>Soglia: {competency.threshold}%</span>
                 <span>Max: {maxScore !== null ? `${maxScore} pt` : '—'}</span>
               </div>
               <div

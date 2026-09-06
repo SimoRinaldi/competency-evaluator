@@ -107,7 +107,7 @@ export function SubcompetenciesModal({
                           </span>
                         </TableCell>
                         <TableCell className="text-center text-sm text-slate-700 font-mono">
-                          {sc.threshold} pt
+                          {sc.threshold}%
                         </TableCell>
                         <TableCell className="text-center text-sm text-slate-700 font-mono">
                           {sc.score_absolute !== null ? sc.score_absolute : '—'} /{' '}

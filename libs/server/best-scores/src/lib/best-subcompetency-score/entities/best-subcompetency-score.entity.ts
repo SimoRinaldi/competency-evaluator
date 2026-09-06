@@ -12,7 +12,7 @@ export class BestSubCompetencyScoreEntity {
   best_score_absolute!: number;
 
   @Column({ type: 'numeric', nullable: false })
-  best_score_percentage!: string;
+  best_score_percentage!: number;
 
   @Column({ type: 'integer', nullable: false })
   user_id!: number;

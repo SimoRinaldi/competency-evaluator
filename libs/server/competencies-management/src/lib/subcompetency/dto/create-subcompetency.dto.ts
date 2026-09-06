@@ -96,10 +96,12 @@ export class CreateSubCompetencyDto {
 
   @ApiProperty({
     required: true,
-    description: 'Soglia di acquisizione della sotto-competenza',
-    example: '30',
+    description: 'Soglia percentuale di acquisizione della sotto-competenza',
+    example: '60',
   })
   @IsInt()
+  @Min(1)
+  @Max(100)
   @IsPositive()
   @IsNotEmpty()
   threshold!: number;

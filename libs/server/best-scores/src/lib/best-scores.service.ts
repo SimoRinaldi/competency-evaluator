@@ -56,7 +56,7 @@ export class BestScoresService {
 
         const isSubcompAcquired =
           subcomp_score !== undefined &&
-          subcomp_score.best_score_absolute >= subcompetency.threshold;
+          subcomp_score.best_score_percentage >= subcompetency.threshold;
         all_subcomp_are_acquired = all_subcomp_are_acquired && isSubcompAcquired;
 
         const best_score_subcompetencies: UserSubCompetencyEvaluationDto = {
@@ -74,7 +74,7 @@ export class BestScoresService {
 
       const isCompAcquired =
         comp_score !== undefined &&
-        comp_score.best_score_absolute >= competency.threshold;
+        comp_score.best_score_percentage >= competency.threshold;
 
       if (all_subcomp_are_acquired && isCompAcquired) {
         user_scores.acquired_competencies.push(best_score_competencies);

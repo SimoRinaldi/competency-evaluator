@@ -15,7 +15,7 @@ export class BestCompetencyScoreRepository {
   async createOne(dto: CreateBestCompetencyScoreDto): Promise<BestCompetencyScoreEntity> {
     const score = this.repository.create({
       best_score_absolute: dto.best_score_absolute,
-      best_score_percentage: dto.best_score_percentage,
+      best_score_percentage: Number(dto.best_score_percentage),
       user_id: dto.user_id,
       competency_id: dto.competency_id,
     });
@@ -52,7 +52,7 @@ export class BestCompetencyScoreRepository {
       .createQueryBuilder('comp_hist_score')
       .innerJoinAndSelect('comp_hist_score.competency', 'competency')
       .where('comp_hist_score.user_id = :id', { id: user_id })
-      .andWhere('comp_hist_score.best_score_absolute >= competency.threshold')
+      .andWhere('comp_hist_score.best_score_percentage >= competency.threshold')
       .getMany();
   }
 
@@ -70,7 +70,7 @@ export class BestCompetencyScoreRepository {
   ): Promise<BestCompetencyScoreEntity> {
     if (dto.best_score_absolute !== undefined) score.best_score_absolute = dto.best_score_absolute;
     if (dto.best_score_percentage !== undefined)
-      score.best_score_percentage = dto.best_score_percentage;
+      score.best_score_percentage = Number(dto.best_score_percentage);
     if (dto.user_id !== undefined) score.user_id = dto.user_id;
     if (dto.competency_id !== undefined) score.competency_id = dto.competency_id;
 
