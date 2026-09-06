@@ -117,7 +117,7 @@ export function CompetencyScoreCard({
         {isNotAttempted ? (
           <div className="py-4 space-y-2">
             <p className="text-xs text-slate-500">
-              Nessuna prova completata per questa competenza.
+              Ancora nessuna sottocompetenza valutata.
             </p>
             <div className="text-xs text-slate-600">
               Soglia richiesta:{' '}
@@ -183,7 +183,7 @@ export function CompetencyScoreCard({
                       </span>
                     </div>
                   </div>
-                  
+
                   {/* Soglia */}
                   <div className="text-[11px] font-medium text-slate-500">
                     Soglia: <span className="text-slate-800">{competency.threshold}%</span>
