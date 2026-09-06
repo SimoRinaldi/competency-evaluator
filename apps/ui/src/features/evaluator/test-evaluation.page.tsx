@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft, CheckCircle2, Circle, Search, Eye, Users, FileText } from "lucide-react";
+import { ChevronLeft, CheckCircle2, Circle, Search, Eye, Users, FileText, Pencil, Play, Clock, RefreshCw } from "lucide-react";
 import { PageContainer } from "../../components/page-container";
 import { fetchCurrentUser } from "../auth/auth.api";
 import { getEvaluatorProfile } from "./evaluator.api";
@@ -29,6 +29,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 import { UserEvaluationModal } from "./user-evaluation-modal";
 
@@ -91,7 +92,7 @@ export function TestEvaluationPage() {
     },
     {
       id: "status",
-      header: "Stato Valutazione",
+      header: "Stato",
       cell: ({ row }) => {
         const exec = row.original;
         const hasDelivered = exec.test_outputs && exec.test_outputs.length > 0;
@@ -100,26 +101,26 @@ export function TestEvaluationPage() {
         
         if (!hasDelivered) {
           return (
-            <span className="inline-flex items-center text-xs font-semibold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full gap-1.5 border border-slate-200">
-              <Circle className="h-3.5 w-3.5" /> In attesa di consegna
+            <span className="inline-flex items-center justify-center bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full text-xs font-normal border border-slate-200">
+              In attesa di consegna
             </span>
           );
         } else if (isCompletelyEvaluated) {
           return (
-            <span className="inline-flex items-center text-xs font-semibold text-green-700 bg-green-100 px-2.5 py-1 rounded-full gap-1.5 border border-green-200">
-              <CheckCircle2 className="h-3.5 w-3.5" /> Punteggio Finale ({exec.test_score}/{exec.max_score})
+            <span className="inline-flex items-center justify-center bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full text-xs font-normal border border-slate-200">
+              punteggio ({exec.test_score}/{exec.max_score})
             </span>
           );
         } else if (isEvaluatedByMe) {
           return (
-            <span className="inline-flex items-center text-xs font-semibold text-blue-700 bg-blue-100 px-2.5 py-1 rounded-full gap-1.5 border border-blue-200">
-              <FileText className="h-3.5 w-3.5" /> La tua valutazione è stata inviata
+            <span className="inline-flex items-center justify-center bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full text-xs font-normal border border-slate-200">
+              La tua valutazione è stata inviata
             </span>
           );
         } else {
           return (
-            <span className="inline-flex items-center text-xs font-semibold text-amber-700 bg-amber-100 px-2.5 py-1 rounded-full gap-1.5 border border-amber-200">
-              <Circle className="h-3.5 w-3.5" /> Da Valutare
+            <span className="inline-flex items-center justify-center bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full text-xs font-normal border border-slate-200">
+              Da valutare
             </span>
           );
         }
@@ -134,35 +135,41 @@ export function TestEvaluationPage() {
         const isCompletelyEvaluated = exec.test_score !== null && exec.test_score !== undefined;
         const isEvaluatedByMe = exec._is_evaluated_by_me;
         
-        if (!hasDelivered) {
-          return (
-            <div className="flex justify-end">
-              <Button 
-                variant="ghost" 
-                size="sm"
-                disabled
-                className="text-slate-400 gap-1.5"
-              >
-                In attesa
-              </Button>
-            </div>
-          );
-        }
-
-        const canEdit = !isCompletelyEvaluated;
-        const btnVariant = isEvaluatedByMe || isCompletelyEvaluated ? "outline" : "default";
-        
         return (
-          <div className="flex justify-end">
-            <Button 
-              variant={btnVariant} 
-              size="sm"
-              onClick={() => setSelectedExecutionId(exec.id)}
-              className={btnVariant === "outline" ? "text-slate-600 gap-1.5" : "gap-1.5"}
-            >
-              {btnVariant === "outline" ? <Eye className="h-3.5 w-3.5" /> : null}
-              {!canEdit ? "Dettagli" : isEvaluatedByMe ? "Visualizza" : "Valuta"}
-            </Button>
+          <div className="flex justify-end items-center">
+            <TooltipProvider delayDuration={150}>
+              {!hasDelivered ? (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" disabled className="h-8 w-8 text-slate-400 cursor-not-allowed">
+                      <Clock className="h-4 w-4" />
+                      <span className="sr-only">In attesa</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top"><p>In attesa</p></TooltipContent>
+                </Tooltip>
+              ) : (!isCompletelyEvaluated && !isEvaluatedByMe) ? (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-slate-900 cursor-pointer" onClick={() => setSelectedExecutionId(exec.id)}>
+                      <Play className="h-4 w-4" />
+                      <span className="sr-only">Valuta</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top"><p>Valuta</p></TooltipContent>
+                </Tooltip>
+              ) : (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-slate-900 cursor-pointer" onClick={() => setSelectedExecutionId(exec.id)}>
+                      <FileText className="h-4 w-4" />
+                      <span className="sr-only">Dettagli</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top"><p>Dettagli</p></TooltipContent>
+                </Tooltip>
+              )}
+            </TooltipProvider>
           </div>
         );
       },
@@ -208,11 +215,11 @@ export function TestEvaluationPage() {
 
   return (
     <PageContainer 
-      title={`Utenti del Test #${id}`}
+      title={`Utenti del test #${id}`}
       description="Visualizza e valuta le esecuzioni degli utenti per questo test."
     >
       <div className="mb-4">
-        <Button variant="ghost" onClick={() => navigate('/evaluations/pending')} className="pl-0 text-muted-foreground hover:text-foreground">
+        <Button variant="ghost" onClick={() => navigate('/evaluator/tests')} className="pl-0 text-muted-foreground hover:text-foreground">
           <ChevronLeft className="mr-2 h-4 w-4" /> Torna alla lista dei test
         </Button>
       </div>
@@ -224,19 +231,26 @@ export function TestEvaluationPage() {
       ) : (
         <div className="flex flex-col gap-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4">
-            <div className="relative w-full sm:max-w-sm">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Cerca per nome o email..."
-                value={globalFilter ?? ""}
-                onChange={(event) => setGlobalFilter(String(event.target.value))}
-                className="!pl-10"
-              />
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="text-sm font-medium text-muted-foreground hidden sm:block">
-                Totale Utenti: {executions.length}
+            <div className="flex items-center gap-3 w-full max-w-md">
+              <div className="relative w-full">
+                <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Cerca utente per nome o email..."
+                  value={globalFilter ?? ""}
+                  onChange={(event) => setGlobalFilter(String(event.target.value))}
+                  className="!pl-10 bg-white"
+                />
               </div>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={loadData}
+                disabled={loading}
+                className="shrink-0 bg-white"
+                title="Aggiorna tabella"
+              >
+                <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+              </Button>
             </div>
           </div>
 
@@ -246,7 +260,7 @@ export function TestEvaluationPage() {
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow key={headerGroup.id}>
                     {headerGroup.headers.map((header) => (
-                      <TableHead key={header.id} className="px-4">
+                      <TableHead key={header.id} className="px-4 font-semibold text-slate-900">
                         {header.isPlaceholder
                           ? null
                           : flexRender(
@@ -263,7 +277,7 @@ export function TestEvaluationPage() {
                   <TableRow>
                     <TableCell
                       colSpan={columns.length}
-                      className="h-24 text-center"
+                      className="h-24 text-center text-slate-500 font-normal"
                     >
                       Caricamento in corso...
                     </TableCell>
@@ -275,7 +289,7 @@ export function TestEvaluationPage() {
                       data-state={row.getIsSelected() && "selected"}
                     >
                       {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id} className="px-4 py-3">
+                        <TableCell key={cell.id} className="px-4 py-1.5 font-normal">
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext()
@@ -288,7 +302,7 @@ export function TestEvaluationPage() {
                   <TableRow>
                     <TableCell
                       colSpan={columns.length}
-                      className="h-24 text-center text-slate-500"
+                      className="h-24 text-center text-slate-500 font-normal"
                     >
                       Nessun utente trovato per la ricerca.
                     </TableCell>
@@ -296,6 +310,12 @@ export function TestEvaluationPage() {
                 )}
               </TableBody>
             </Table>
+          </div>
+          
+          <div className="flex items-center justify-between py-4 px-1">
+            <div className="text-sm font-medium text-slate-500">
+              {table.getFilteredRowModel().rows.length} elementi
+            </div>
           </div>
         </div>
       )}
