@@ -35,7 +35,7 @@ import {
   getEvaluationsForExecution,
   FullTest, 
   TestExecution 
-} from './evaluator.api';
+} from './evaluations.api';
 
 export interface UserEvaluationModalProps {
   testId: string | number | null;

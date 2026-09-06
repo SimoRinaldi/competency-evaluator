@@ -24,12 +24,9 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Search, Loader2, RefreshCw, Edit } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import {
-  getSubCompetencies,
-  updateSubCompetencyObservationObject,
-  fetchRubrics,
-} from '../competencies/competencies.api';
-import { ObservationObjectPanel } from '../competencies/components/observation-object-panel';
+import { getSubCompetencies, updateSubCompetencyObservationObject } from './competencies.api';
+import { fetchRubrics } from '../rubrics/rubrics.api';
+import { ObservationObjectPanel } from './components/observation-object-panel';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 
@@ -391,3 +388,4 @@ export function IndicatorsManagementPage() {
     </PageContainer>
   );
 }
+

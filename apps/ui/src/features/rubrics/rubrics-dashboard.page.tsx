@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchRubrics, deleteRubric, createRubric, checkRubricAssociations } from '../competencies/competencies.api';
+import { fetchRubrics, deleteRubric, createRubric, checkRubricAssociations } from './rubrics.api';
 import { PageContainer } from '../../components/page-container';
 import {
   ColumnDef,
@@ -39,7 +39,7 @@ import {
 } from 'lucide-react';
 import { RubricFormPage } from './rubric-form.page';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CreateRubricForm } from '../competencies/components/create-rubric-modal';
+import { CreateRubricForm } from '../rubrics/components/create-rubric-modal';
 import {
   AlertDialog,
   AlertDialogAction,

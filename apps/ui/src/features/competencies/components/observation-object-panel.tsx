@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { RubricPickerModal } from './rubric-picker-modal';
+import { RubricPickerModal } from '../../rubrics/components/rubric-picker-modal';
 import {
   ColumnDef,
   flexRender,

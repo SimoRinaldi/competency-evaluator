@@ -16,7 +16,12 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<AuthResponse>;
-  register: (name: string, email: string, password: string, role: UserRole) => Promise<AuthResponse>;
+  register: (
+    name: string,
+    email: string,
+    password: string,
+    role: UserRole,
+  ) => Promise<AuthResponse>;
   logout: () => void;
   refreshUser: () => Promise<void>;
 }
@@ -46,7 +51,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const userData = await fetchCurrentUser();
       setUser(userData);
     } catch {
-      // If fetching user fails (e.g. token expired / 401), clear invalid token
       logout();
     } finally {
       setIsLoading(false);
@@ -74,7 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     name: string,
     email: string,
     password: string,
-    role: UserRole
+    role: UserRole,
   ): Promise<AuthResponse> => {
     return apiRegister(name, email, password, role);
   };

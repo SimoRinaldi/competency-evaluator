@@ -30,7 +30,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Loader2, AlertCircle, Plus, Trash2 } from 'lucide-react';
 import { fetchCurrentUser } from '../auth/auth.api';
-import { getTestDetails, submitTestExecution, getTestEvaluators } from './evaluated-user.api';
+import { getTestDetails, submitTestExecution, getTestEvaluators } from './test-executions.api';
 
 export interface UserTestModalProps {
   testId: number | null;

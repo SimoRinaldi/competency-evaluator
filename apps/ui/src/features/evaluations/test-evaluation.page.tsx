@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getTestExecutions, TestExecution, getEvaluatorStatus } from "./evaluator.api";
+import { getTestExecutions, TestExecution, getEvaluatorStatus } from "./evaluations.api";
 import {
   ColumnDef,
   flexRender,
@@ -21,7 +21,7 @@ import { Input } from "@/components/ui/input";
 import { ChevronLeft, CheckCircle2, Circle, Search, Eye, Users, FileText, Pencil, Play, Clock, RefreshCw } from "lucide-react";
 import { PageContainer } from "../../components/page-container";
 import { fetchCurrentUser } from "../auth/auth.api";
-import { getEvaluatorProfile } from "./evaluator.api";
+import { getEvaluatorProfile } from "./evaluations.api";
 import {
   Empty,
   EmptyDescription,

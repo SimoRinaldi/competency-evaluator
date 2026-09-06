@@ -4,7 +4,7 @@ import {
   getBestScores,
   UserCompetencyEvaluation,
   UserSubCompetencyEvaluation,
-} from './evaluated-user.api';
+} from './test-executions.api';
 import { PageContainer } from '../../components/page-container';
 import { CompetencyScoreCard } from './competency-score-card';
 import { SubcompetenciesModal } from './subcompetencies-modal';

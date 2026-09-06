@@ -3,7 +3,7 @@ import { fetchCurrentUser } from '../auth/auth.api';
 import {
   getAvailableTestsByUserId,
   getUserExecutions,
-} from './evaluated-user.api';
+} from './test-executions.api';
 import { PageContainer } from '../../components/page-container';
 import {
   ColumnDef,

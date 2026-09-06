@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchCurrentUser } from '../auth/auth.api';
-import { getEvaluatorProfile, Test, getTestExecutions, TestExecution } from './evaluator.api';
+import { getEvaluatorProfile, Test, getTestExecutions, TestExecution } from './evaluations.api';
 import { PageContainer } from '../../components/page-container';
 import {
   ColumnDef,

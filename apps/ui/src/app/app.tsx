@@ -8,18 +8,18 @@ import { AppLayout } from '../features/layouts/app-layout';
 import { CreateCompetencyPage } from '../features/competencies/create-competency.page';
 import { FeedbackProvider } from '../providers/feedback-provider';
 import { PageContainer } from '../components/page-container';
-import { UserTestsPage } from '../features/evaluated-user/user-tests.page';
-import { EvaluatorTestsPage } from '../features/evaluator/evaluator-tests.page';
-import { TestEvaluationPage } from '../features/evaluator/test-evaluation.page';
-import { BestScoresPage } from '@/features/evaluated-user/best-scores.page';
+import { UserTestsPage } from '../features/test-executions/user-tests.page';
+import { EvaluatorTestsPage } from '../features/evaluations/evaluator-tests.page';
+import { TestEvaluationPage } from '../features/evaluations/test-evaluation.page';
+import { BestScoresPage } from '@/features/test-executions/best-scores.page';
 import { TestsManagementPage } from '../features/tests/tests-management.page';
 import { CreateTestPage } from '../features/tests/create-test.page';
-import { IndicatorsManagementPage } from '../features/tests/indicators-management.page';
+import { IndicatorsManagementPage } from '../features/competencies/indicators-management.page';
 import { EditCompetencyPage } from '../features/competencies/edit-competency.page';
-import { AdminDashboardPage } from '../features/admin/dashboard.page';
-import { UsersDashboardPage } from '../features/admin/users-dashboard.page';
-import { UserFormPage } from '../features/admin/user-form.page';
-import { RubricsDashboardPage } from '../features/admin/rubrics-dashboard.page';
+import { AdminDashboardPage } from '../features/competencies/competencies-dashboard.page';
+import { UsersDashboardPage } from '../features/users/users-dashboard.page';
+import { UserFormPage } from '../features/users/user-form.page';
+import { RubricsDashboardPage } from '../features/rubrics/rubrics-dashboard.page';
 import { useAuth } from '../features/auth/auth-context';
 
 const Placeholder = ({ title }: { title: string }) => (
