@@ -45,6 +45,14 @@ export class CompetencyService {
     id: number,
     dto: UpdateCompetencyDto
   ): Promise<CompetencyEntity> {
+    // Controllo associazione test: blocca la modifica se la competenza fa parte di un test
+    const isAssociated = await this.competencyRepository.isAssociatedWithAnyTest(id);
+    if (isAssociated) {
+      throw new ConflictException(
+        'Impossibile modificare la competenza: è attualmente associata ad uno o più test.'
+      );
+    }
+
     if (dto.title) {
       const existing = await this.competencyRepository.findByTitle(
         dto.title
@@ -63,9 +71,22 @@ export class CompetencyService {
   }
 
   async remove(id: number): Promise<void> {
+    // Controllo associazione test: blocca l'eliminazione se la competenza fa parte di un test
+    const isAssociated = await this.competencyRepository.isAssociatedWithAnyTest(id);
+    if (isAssociated) {
+      throw new ConflictException(
+        'Impossibile eliminare la competenza: è attualmente associata ad uno o più test.'
+      );
+    }
+
     const deleted = await this.competencyRepository.deleteOne(id);
     if (!deleted) {
       throw new NotFoundException(`Competency with id ${id} not found`);
     }
+  }
+
+  async checkAssociations(id: number): Promise<{ isAssociated: boolean }> {
+    const isAssociated = await this.competencyRepository.isAssociatedWithAnyTest(id);
+    return { isAssociated };
   }
 }

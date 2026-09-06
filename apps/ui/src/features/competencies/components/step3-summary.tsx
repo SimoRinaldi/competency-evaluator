@@ -170,7 +170,7 @@ export function Step3Summary({
           onClick={onEditStep2}
           className="inline-flex h-11 items-center justify-center rounded-md border border-gray-300 bg-white px-6 text-sm font-medium hover:bg-gray-100 shadow-sm"
         >
-          ← Torna a Sottocompetenze
+          Torna a Sottocompetenze
         </button>
         <button
           type="button"

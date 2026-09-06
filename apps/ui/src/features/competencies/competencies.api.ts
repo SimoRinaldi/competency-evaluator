@@ -160,6 +160,28 @@ export async function updateCompetencyChain(id: string | number, payload: any) {
   return response.json();
 }
 
+export const checkCompetencyAssociations = async (id: number): Promise<{ isAssociated: boolean }> => {
+  const response = await fetch(`${API_URL}/competencies/check-associations/${id}`, {
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.message || "Errore durante il controllo delle associazioni");
+  }
+  return response.json();
+};
+
+export const deleteCompetency = async (id: number): Promise<void> => {
+  const response = await fetch(`${API_URL}/competencies/${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.message || "Errore durante l'eliminazione della competenza");
+  }
+};
+
 export async function getSubCompetencies() {
   const response = await fetch(`${API_URL}/subcompetencies`, {
     headers: getAuthHeaders(),

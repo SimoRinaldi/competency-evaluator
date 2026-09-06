@@ -355,7 +355,7 @@ export function SubCompetencyPanel({
               onClick={onGoBack}
               className="inline-flex h-10 items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium hover:bg-gray-100 shadow-sm"
             >
-              ← Torna a Dati Generali
+              Torna a Dati Generali
             </button>
           )}
           {showGoToSummary && onGoToSummary && (
@@ -364,7 +364,7 @@ export function SubCompetencyPanel({
               onClick={onGoToSummary}
               className="inline-flex h-10 items-center justify-center rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-slate-800"
             >
-              Vai al Riepilogo ➔
+              Vai al Riepilogo
             </button>
           )}
         </div>
