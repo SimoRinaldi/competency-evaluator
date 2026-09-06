@@ -12,14 +12,13 @@ import { UserTestsPage } from '../features/test-executions/user-tests.page';
 import { EvaluatorTestsPage } from '../features/evaluations/evaluator-tests.page';
 import { TestEvaluationPage } from '../features/evaluations/test-evaluation.page';
 import { BestScoresPage } from '@/features/test-executions/best-scores.page';
-import { TestsManagementPage } from '../features/tests/tests-management.page';
-import { CreateTestPage } from '../features/tests/create-test.page';
-import { IndicatorsManagementPage } from '../features/competencies/indicators-management.page';
+import { TestsManagementPage } from '../features/tests/tests-table.page';
+import { IndicatorsManagementPage } from '../features/competencies/observation-indicators.page';
 import { EditCompetencyPage } from '../features/competencies/edit-competency.page';
-import { AdminDashboardPage } from '../features/competencies/competencies-dashboard.page';
-import { UsersDashboardPage } from '../features/users/users-dashboard.page';
+import { AdminDashboardPage } from '../features/competencies/competencies-table.page';
+import { UsersDashboardPage } from '../features/users/users-table.page';
 import { UserFormPage } from '../features/users/user-form.page';
-import { RubricsDashboardPage } from '../features/rubrics/rubrics-dashboard.page';
+import { RubricsDashboardPage } from '../features/rubrics/rubrics-table.page';
 import { useAuth } from '../features/auth/auth-context';
 
 const Placeholder = ({ title }: { title: string }) => (
@@ -100,7 +99,6 @@ export function App() {
               {/* Rotte esclusive per TEST_DESIGNER */}
               <Route element={<ProtectedRoute allowedRoles={['TEST_DESIGNER']} />}>
                 <Route path="/tests-management" element={<TestsManagementPage />} />
-                <Route path="/tests/new" element={<CreateTestPage />} />
                 <Route path="/indicators-management" element={<IndicatorsManagementPage />} />
               </Route>
 

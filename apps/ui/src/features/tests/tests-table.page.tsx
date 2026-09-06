@@ -34,12 +34,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   Empty,
   EmptyDescription,
@@ -68,7 +63,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { CreateTestModal } from './create-test-modal';
-import { ViewTestModal } from './view-test-modal';
+import { ViewTestModal } from './tests-view-modal';
 import { toast } from 'sonner';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 
@@ -280,9 +275,7 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
         accessorKey: 'id',
         header: 'Numero',
         cell: ({ row }) => (
-          <span className="text-sm font-normal text-slate-600">
-            #{row.original.id}
-          </span>
+          <span className="text-sm font-normal text-slate-600">#{row.original.id}</span>
         ),
       },
       {
@@ -300,7 +293,9 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
             </HoverCardTrigger>
             <HoverCardContent className="w-96 bg-white text-sm text-slate-700 shadow-lg border border-slate-200">
               <p className="font-semibold text-slate-900 mb-1">Descrizione test</p>
-              <p className="leading-relaxed whitespace-pre-wrap font-normal">{row.original.assessment_situation}</p>
+              <p className="leading-relaxed whitespace-pre-wrap font-normal">
+                {row.original.assessment_situation}
+              </p>
             </HoverCardContent>
           </HoverCard>
         ),
@@ -460,7 +455,10 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id} className="px-4 font-semibold text-slate-900 whitespace-nowrap">
+                    <TableHead
+                      key={header.id}
+                      className="px-4 font-semibold text-slate-900 whitespace-nowrap"
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(header.column.columnDef.header, header.getContext())}
@@ -515,7 +513,9 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
       </div>
 
       <div className="flex items-center justify-between py-4 px-1">
-        <div className="text-sm font-medium text-slate-500">{table.getFilteredRowModel().rows.length} elementi</div>
+        <div className="text-sm font-medium text-slate-500">
+          {table.getFilteredRowModel().rows.length} elementi
+        </div>
       </div>
 
       {/* MODALS */}

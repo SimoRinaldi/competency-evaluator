@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { fetchRubrics } from '../../rubrics/rubrics.api';
-import { fetchTools, fetchMethods, fetchSkills } from '../metadata.api';
-import { CreateRubricModal } from '../../rubrics/components/create-rubric-modal';
-import { RubricPickerModal } from '../../rubrics/components/rubric-picker-modal';
-import { MetadataPickerModal } from './metadata-picker-modal';
-import { ObservationObjectPanel } from './observation-object-panel';
+import { fetchTools, fetchMethods, fetchSkills } from '../competencies.api';
+import { CreateRubricModal } from '../../rubrics/create-rubric-modal';
+import { RubricPickerModal } from '../../rubrics/rubric-picker-modal';
+import { MetadataPickerModal } from './metadata-modal-competency';
+import { ObservationObjectPanel } from './observation-object-modal-competency';
 
 export function SubCompetencyPanel({
   initialData,
@@ -35,8 +35,12 @@ export function SubCompetencyPanel({
   const [indicators, setIndicators] = useState<any[]>(initialData?.indicators || []);
 
   const [selectedTools, setSelectedTools] = useState<(number | string)[]>(initialData?.tools || []);
-  const [selectedMethods, setSelectedMethods] = useState<(number | string)[]>(initialData?.methods || []);
-  const [selectedSkills, setSelectedSkills] = useState<(number | string)[]>(initialData?.skills || []);
+  const [selectedMethods, setSelectedMethods] = useState<(number | string)[]>(
+    initialData?.methods || [],
+  );
+  const [selectedSkills, setSelectedSkills] = useState<(number | string)[]>(
+    initialData?.skills || [],
+  );
 
   const [dbRubrics, setDbRubrics] = useState<any[]>([]);
   const [dbTools, setDbTools] = useState<any[]>([]);

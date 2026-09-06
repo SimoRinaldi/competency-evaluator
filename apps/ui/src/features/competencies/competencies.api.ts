@@ -5,7 +5,7 @@ const API_URL = 'http://localhost:3333/api';
 export async function createCompetency(title: string, weight: number) {
   const response = await fetch(`${API_URL}/competencies`, {
     method: 'POST',
-    headers: getAuthHeaders(), // gli header con il token
+    headers: getAuthHeaders(),
     body: JSON.stringify({ title, weight }),
   });
 
@@ -13,7 +13,6 @@ export async function createCompetency(title: string, weight: number) {
 
   return response.json();
 }
-
 
 export async function getCompetencyById(id: string | number) {
   const response = await fetch(`${API_URL}/competencies/${id}`, {
@@ -37,6 +36,7 @@ export async function updateCompetency(
   if (!response.ok) throw new Error("Errore durante l'aggiornamento della competenza");
   return response.json();
 }
+
 export async function getCompetencies() {
   const response = await fetch(`${API_URL}/competencies`, {
     headers: getAuthHeaders(),
@@ -75,13 +75,15 @@ export async function updateCompetencyChain(id: string | number, payload: any) {
   return response.json();
 }
 
-export const checkCompetencyAssociations = async (id: number): Promise<{ isAssociated: boolean }> => {
+export const checkCompetencyAssociations = async (
+  id: number,
+): Promise<{ isAssociated: boolean }> => {
   const response = await fetch(`${API_URL}/competencies/check-associations/${id}`, {
     headers: getAuthHeaders(),
   });
   if (!response.ok) {
     const errorData = await response.json().catch(() => null);
-    throw new Error(errorData?.message || "Errore durante il controllo delle associazioni");
+    throw new Error(errorData?.message || 'Errore durante il controllo delle associazioni');
   }
   return response.json();
 };
@@ -113,10 +115,7 @@ export async function getSubCompetencyById(id: string | number) {
   return response.json();
 }
 
-export async function updateSubCompetencyObservationObject(
-  id: string | number,
-  payload: any,
-) {
+export async function updateSubCompetencyObservationObject(id: string | number, payload: any) {
   const response = await fetch(
     `${API_URL}/competencies_management/subcompetency/${id}/observation-object`,
     {
@@ -128,10 +127,26 @@ export async function updateSubCompetencyObservationObject(
   if (!response.ok) {
     const errorData = await response.json().catch(() => null);
     throw new Error(
-      errorData?.message ||
-        "Errore durante l'aggiornamento dell'oggetto di osservazione",
+      errorData?.message || "Errore durante l'aggiornamento dell'oggetto di osservazione",
     );
   }
   return response.json();
 }
 
+export async function fetchTools() {
+  const response = await fetch(`${API_URL}/tools`, { headers: getAuthHeaders() });
+  if (!response.ok) throw new Error('Errore nel caricamento dei tools');
+  return response.json();
+}
+
+export async function fetchMethods() {
+  const response = await fetch(`${API_URL}/methods`, { headers: getAuthHeaders() });
+  if (!response.ok) throw new Error('Errore nel caricamento dei methods');
+  return response.json();
+}
+
+export async function fetchSkills() {
+  const response = await fetch(`${API_URL}/skills`, { headers: getAuthHeaders() });
+  if (!response.ok) throw new Error('Errore nel caricamento delle skills');
+  return response.json();
+}

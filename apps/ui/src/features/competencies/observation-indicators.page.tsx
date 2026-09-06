@@ -15,18 +15,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Search, Loader2, RefreshCw, Edit } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { getSubCompetencies, updateSubCompetencyObservationObject } from './competencies.api';
 import { fetchRubrics } from '../rubrics/rubrics.api';
-import { ObservationObjectPanel } from './components/observation-object-panel';
+import { ObservationObjectPanel } from './components/observation-object-modal-competency';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 
@@ -220,7 +215,9 @@ export function IndicatorsManagementPage() {
                     <Edit className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent side="top">Modifica oggetto di osservazione e indicatori</TooltipContent>
+                <TooltipContent side="top">
+                  Modifica oggetto di osservazione e indicatori
+                </TooltipContent>
               </Tooltip>
             </TooltipProvider>
           </div>
@@ -286,7 +283,10 @@ export function IndicatorsManagementPage() {
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => {
                     return (
-                      <TableHead key={header.id} className="px-4 font-semibold text-slate-900 whitespace-nowrap">
+                      <TableHead
+                        key={header.id}
+                        className="px-4 font-semibold text-slate-900 whitespace-nowrap"
+                      >
                         {header.isPlaceholder
                           ? null
                           : flexRender(header.column.columnDef.header, header.getContext())}
@@ -330,7 +330,9 @@ export function IndicatorsManagementPage() {
       </div>
 
       <div className="flex items-center justify-between py-4 px-1">
-        <div className="text-sm font-medium text-slate-500">{table.getFilteredRowModel().rows.length} elementi</div>
+        <div className="text-sm font-medium text-slate-500">
+          {table.getFilteredRowModel().rows.length} elementi
+        </div>
       </div>
 
       {/* MODALE DI MODIFICA: Oggetto di osservazione e indicatori */}
@@ -388,4 +390,3 @@ export function IndicatorsManagementPage() {
     </PageContainer>
   );
 }
-

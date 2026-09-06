@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Step1Competency } from './components/step1-competency';
-import { SubCompetencyPanel } from './components/sub-competency-panel';
-import { Step3Summary } from './components/step3-summary';
+import { Step1Competency } from './components/step1-modal-competency';
+import { SubCompetencyPanel } from './components/step2-modal-competency';
+import { Step3Summary } from './components/step3-modal-competency';
 import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { createCompetencyChain } from './competencies.api';
 import { useFeedback } from '../../providers/feedback-provider';
@@ -40,7 +40,7 @@ export function CreateCompetencyPage({ onSuccess }: { onSuccess?: () => void }) 
   // Chiave per forzare lo svuotamento del form quando si crea una nuova sottocompetenza
   const [formResetKey, setFormResetKey] = useState(0);
 
-  // Funzione per salvare la sottocompetenza dalla modale/panel
+  // Funzione per salvare la sottocompetenza dalla modale
   const handleSaveSubCompetency = (subData: any) => {
     const updatedSubs = [...subCompetencies];
     if (activeSubIndex === -1) {
@@ -49,12 +49,8 @@ export function CreateCompetencyPage({ onSuccess }: { onSuccess?: () => void }) 
       updatedSubs[activeSubIndex] = subData;
     }
     setSubCompetencies(updatedSubs);
-    setActiveSubIndex(-1); // torna alla visualizzazione vuota
+    setActiveSubIndex(-1);
 
-    // --- GARBAGE COLLECTION ---
-    // Eliminiamo dalla memoria globale i tools/methods/skills temporanei
-    // che l'utente aveva creato col bottone "+ Crea" ma che alla fine
-    // NON sono stati associati a NESSUNA sottocompetenza salvata.
     const referencedTools = new Set<string>();
     const referencedMethods = new Set<string>();
     const referencedSkills = new Set<string>();

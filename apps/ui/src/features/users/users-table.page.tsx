@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
-import { getUsers, User } from "../users/users.api";
-import { PageContainer } from "../../components/page-container";
+import { useEffect, useState } from 'react';
+import { getUsers, User } from './users.api';
+import { PageContainer } from '../../components/page-container';
 import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   useReactTable,
-} from "@tanstack/react-table";
+} from '@tanstack/react-table';
 import {
   Table,
   TableBody,
@@ -15,7 +15,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 import {
   Empty,
   EmptyContent,
@@ -23,43 +23,39 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "@/components/ui/empty";
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Pencil, Plus, Search, RefreshCw, UserX, ArrowUpRight } from "lucide-react";
-import { UserFormPage } from "./user-form.page";
+} from '@/components/ui/empty';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Pencil, Plus, Search, RefreshCw, UserX, ArrowUpRight } from 'lucide-react';
+import { UserFormPage } from './user-form.page';
 
 const roleMap: Record<string, string> = {
-  ADMIN: "ADMIN",
-  EVALUATOR: "VALUTATORE",
-  TEST_DESIGNER: "TEST DESIGNER",
-  USER: "UTENTE"
+  ADMIN: 'ADMIN',
+  EVALUATOR: 'VALUTATORE',
+  TEST_DESIGNER: 'TEST DESIGNER',
+  USER: 'UTENTE',
 };
 
 const columns: ColumnDef<User>[] = [
   {
-    accessorKey: "name",
-    header: "Nome",
+    accessorKey: 'name',
+    header: 'Nome',
   },
   {
-    accessorKey: "email",
-    header: "Email",
+    accessorKey: 'email',
+    header: 'Email',
   },
   {
-    accessorKey: "role",
-    header: "Ruolo",
+    accessorKey: 'role',
+    header: 'Ruolo',
     cell: ({ row }) => {
       const role = row.original.role;
       return <span>{roleMap[role] || role}</span>;
     },
   },
   {
-    id: "actions",
+    id: 'actions',
     cell: ({ row }) => {
       const user = row.original;
       return (
@@ -84,19 +80,19 @@ const columns: ColumnDef<User>[] = [
 export function UsersDashboardPage() {
   const [data, setData] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [globalFilter, setGlobalFilter] = useState("");
+  const [globalFilter, setGlobalFilter] = useState('');
 
   async function loadData() {
-      setLoading(true);
-      try {
-        const result = await getUsers();
-        setData(result);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
+    setLoading(true);
+    try {
+      const result = await getUsers();
+      setData(result);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
     }
+  }
 
   useEffect(() => {
     loadData();
@@ -115,8 +111,8 @@ export function UsersDashboardPage() {
 
   if (!loading && data.length === 0) {
     return (
-      <PageContainer 
-        title="Gestione Utenti" 
+      <PageContainer
+        title="Gestione Utenti"
         description="Visualizza, crea e modifica gli utenti di sistema."
       >
         <Empty className="mt-8">
@@ -126,8 +122,8 @@ export function UsersDashboardPage() {
             </EmptyMedia>
             <EmptyTitle>Nessun utente trovato</EmptyTitle>
             <EmptyDescription>
-              Non hai ancora creato nessun utente nel sistema.
-              Inizia aggiungendo il primo utente (studente o valutatore).
+              Non hai ancora creato nessun utente nel sistema. Inizia aggiungendo il primo utente
+              (studente o valutatore).
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent className="flex-row justify-center gap-2">
@@ -148,27 +144,33 @@ export function UsersDashboardPage() {
   }
 
   return (
-    <PageContainer 
-      title="Gestione Utenti" 
+    <PageContainer
+      title="Gestione Utenti"
       description="Visualizza, crea e modifica gli utenti di sistema."
     >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4">
         <div className="flex items-center gap-3 w-full max-w-md">
-        <div className="relative w-full">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Cerca per nome o email..."
-            value={globalFilter ?? ""}
-            onChange={(event) => setGlobalFilter(String(event.target.value))}
-            className="!pl-10 bg-white"
-          />
+          <div className="relative w-full">
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Cerca per nome o email..."
+              value={globalFilter ?? ''}
+              onChange={(event) => setGlobalFilter(String(event.target.value))}
+              className="!pl-10 bg-white"
+            />
+          </div>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={loadData}
+            disabled={loading}
+            className="shrink-0 bg-white"
+            title="Aggiorna tabella"
+          >
+            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+          </Button>
         </div>
-        <Button variant="outline" size="icon" onClick={loadData} disabled={loading} className="shrink-0 bg-white" title="Aggiorna tabella">
-          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-        </Button>
-      </div>
         <div className="flex items-center gap-4">
-          
           <Dialog>
             <DialogTrigger asChild>
               <Button>
@@ -192,10 +194,7 @@ export function UsersDashboardPage() {
                     <TableHead key={header.id} className="px-4">
                       {header.isPlaceholder
                         ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                        : flexRender(header.column.columnDef.header, header.getContext())}
                     </TableHead>
                   );
                 })}
@@ -205,35 +204,23 @@ export function UsersDashboardPage() {
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
+                <TableCell colSpan={columns.length} className="h-24 text-center">
                   Caricamento in corso...
                 </TableCell>
               </TableRow>
             ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
+                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="px-4 py-1.5">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
+                <TableCell colSpan={columns.length} className="h-24 text-center">
                   Nessun utente trovato per la ricerca.
                 </TableCell>
               </TableRow>
@@ -242,9 +229,7 @@ export function UsersDashboardPage() {
         </Table>
       </div>
       <div className="flex items-center justify-between py-4 px-1">
-        <div className="text-sm font-medium text-slate-500">
-          {data.length} elementi
-        </div>
+        <div className="text-sm font-medium text-slate-500">{data.length} elementi</div>
       </div>
     </PageContainer>
   );

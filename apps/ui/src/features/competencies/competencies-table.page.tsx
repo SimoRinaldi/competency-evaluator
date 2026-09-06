@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { getCompetencies, checkCompetencyAssociations, deleteCompetency } from "../competencies/competencies.api";
-import { PageContainer } from "../../components/page-container";
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { getCompetencies, checkCompetencyAssociations, deleteCompetency } from './competencies.api';
+import { PageContainer } from '../../components/page-container';
 import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   useReactTable,
-} from "@tanstack/react-table";
+} from '@tanstack/react-table';
 import {
   Table,
   TableBody,
@@ -16,7 +16,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 import {
   Empty,
   EmptyContent,
@@ -24,9 +24,9 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "@/components/ui/empty";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/empty';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Dialog,
   DialogContent,
@@ -34,11 +34,21 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from "@/components/ui/dialog";
-import { CreateCompetencyPage } from "../competencies/create-competency.page";
-import { EditCompetencyPage } from "../competencies/edit-competency.page";
-import { Edit, Trash2, Plus, Search, RefreshCw, BookX, ArrowUpRight, TriangleAlert, Loader2 } from "lucide-react";
-import { toast } from "sonner";
+} from '@/components/ui/dialog';
+import { CreateCompetencyPage } from './create-competency.page';
+import { EditCompetencyPage } from './edit-competency.page';
+import {
+  Edit,
+  Trash2,
+  Plus,
+  Search,
+  RefreshCw,
+  BookX,
+  ArrowUpRight,
+  TriangleAlert,
+  Loader2,
+} from 'lucide-react';
+import { toast } from 'sonner';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -48,7 +58,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from '@/components/ui/alert-dialog';
 
 type Competency = {
   id: number;
@@ -59,21 +69,21 @@ type Competency = {
 
 const columns: ColumnDef<Competency>[] = [
   {
-    accessorKey: "title",
-    header: "Titolo",
+    accessorKey: 'title',
+    header: 'Titolo',
   },
   {
-    accessorKey: "weight",
+    accessorKey: 'weight',
     header: () => <div className="text-center">Peso</div>,
-    cell: ({ row }) => <div className="text-center">{row.getValue("weight")}</div>,
+    cell: ({ row }) => <div className="text-center">{row.getValue('weight')}</div>,
   },
   {
-    accessorKey: "threshold",
+    accessorKey: 'threshold',
     header: () => <div className="text-center">Soglia</div>,
-    cell: ({ row }) => <div className="text-center">{row.getValue("threshold")}</div>,
+    cell: ({ row }) => <div className="text-center">{row.getValue('threshold')}</div>,
   },
   {
-    id: "actions",
+    id: 'actions',
     header: () => <div className="text-right">Azioni</div>,
     cell: ({ row, table }) => {
       const comp = row.original;
@@ -83,7 +93,13 @@ const columns: ColumnDef<Competency>[] = [
   },
 ];
 
-function CompetencyRowActions({ comp, refreshData }: { comp: Competency, refreshData?: () => void }) {
+function CompetencyRowActions({
+  comp,
+  refreshData,
+}: {
+  comp: Competency;
+  refreshData?: () => void;
+}) {
   const [open, setOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -93,12 +109,12 @@ function CompetencyRowActions({ comp, refreshData }: { comp: Competency, refresh
     try {
       const { isAssociated } = await checkCompetencyAssociations(comp.id);
       if (isAssociated) {
-        toast.error("Impossibile modificare: la competenza è associata ad uno o più test");
+        toast.error('Impossibile modificare: la competenza è associata ad uno o più test');
         return;
       }
       setOpen(true);
     } catch (err: any) {
-      toast.error(err.message || "Errore durante la verifica della competenza");
+      toast.error(err.message || 'Errore durante la verifica della competenza');
     }
   };
 
@@ -107,12 +123,12 @@ function CompetencyRowActions({ comp, refreshData }: { comp: Competency, refresh
     try {
       const { isAssociated } = await checkCompetencyAssociations(comp.id);
       if (isAssociated) {
-        toast.error("Impossibile eliminare: la competenza è associata ad uno o più test");
+        toast.error('Impossibile eliminare: la competenza è associata ad uno o più test');
         return;
       }
       setDeleteOpen(true);
     } catch (err: any) {
-      toast.error(err.message || "Errore durante la verifica della competenza");
+      toast.error(err.message || 'Errore durante la verifica della competenza');
     }
   };
 
@@ -120,7 +136,7 @@ function CompetencyRowActions({ comp, refreshData }: { comp: Competency, refresh
     setIsDeleting(true);
     try {
       await deleteCompetency(comp.id);
-      toast.success("Competenza eliminata con successo");
+      toast.success('Competenza eliminata con successo');
       setDeleteOpen(false);
       if (refreshData) refreshData();
     } catch (e: any) {
@@ -133,9 +149,9 @@ function CompetencyRowActions({ comp, refreshData }: { comp: Competency, refresh
   return (
     <div className="flex items-center justify-end gap-2">
       <Dialog open={open} onOpenChange={setOpen}>
-        <Button 
-          variant="ghost" 
-          size="icon" 
+        <Button
+          variant="ghost"
+          size="icon"
           className="h-8 w-8 text-slate-500 hover:text-sky-600 cursor-pointer"
           title="Modifica"
           onClick={handleEditClick}
@@ -144,12 +160,12 @@ function CompetencyRowActions({ comp, refreshData }: { comp: Competency, refresh
           <Edit className="h-4 w-4" />
         </Button>
         <DialogContent className="max-w-[95vw] xl:max-w-[1400px] w-full h-[90vh] p-0 flex flex-col md:flex-row overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
-          <EditCompetencyPage 
-            competencyId={comp.id.toString()} 
+          <EditCompetencyPage
+            competencyId={comp.id.toString()}
             onSuccess={() => {
               setOpen(false);
               if (refreshData) refreshData();
-            }} 
+            }}
           />
         </DialogContent>
       </Dialog>
@@ -173,7 +189,10 @@ function CompetencyRowActions({ comp, refreshData }: { comp: Competency, refresh
               Conferma Eliminazione
             </AlertDialogTitle>
             <AlertDialogDescription className="text-slate-600 space-y-2 mt-2">
-              <p>Sei sicuro di voler eliminare questa competenza compresa di tutte le sue sottocompetenze?</p>
+              <p>
+                Sei sicuro di voler eliminare questa competenza compresa di tutte le sue
+                sottocompetenze?
+              </p>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -200,20 +219,20 @@ function CompetencyRowActions({ comp, refreshData }: { comp: Competency, refresh
 export function AdminDashboardPage() {
   const [data, setData] = useState<Competency[]>([]);
   const [loading, setLoading] = useState(true);
-  const [globalFilter, setGlobalFilter] = useState("");
+  const [globalFilter, setGlobalFilter] = useState('');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   async function loadData() {
-      setLoading(true);
-      try {
-        const result = await getCompetencies();
-        setData(result);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
+    setLoading(true);
+    try {
+      const result = await getCompetencies();
+      setData(result);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
     }
+  }
 
   useEffect(() => {
     loadData();
@@ -230,15 +249,12 @@ export function AdminDashboardPage() {
     onGlobalFilterChange: setGlobalFilter,
     meta: {
       refreshData: () => loadData(),
-    }
+    },
   });
 
   if (!loading && data.length === 0) {
     return (
-      <PageContainer 
-        title="Gestione Competenze" 
-        description="Gestisci le competenze del sistema."
-      >
+      <PageContainer title="Gestione Competenze" description="Gestisci le competenze del sistema.">
         <Empty className="mt-8">
           <EmptyHeader>
             <EmptyMedia variant="icon">
@@ -246,8 +262,8 @@ export function AdminDashboardPage() {
             </EmptyMedia>
             <EmptyTitle>Nessuna competenza</EmptyTitle>
             <EmptyDescription>
-              Non hai ancora creato nessuna competenza nel sistema.
-              Inizia creandone una per popolare il database.
+              Non hai ancora creato nessuna competenza nel sistema. Inizia creandone una per
+              popolare il database.
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent className="flex-row justify-center gap-2">
@@ -258,7 +274,12 @@ export function AdminDashboardPage() {
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-[95vw] xl:max-w-[1400px] w-full h-[90vh] p-0 flex flex-col md:flex-row overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
-                <CreateCompetencyPage onSuccess={() => { setIsCreateOpen(false); loadData(); }} />
+                <CreateCompetencyPage
+                  onSuccess={() => {
+                    setIsCreateOpen(false);
+                    loadData();
+                  }}
+                />
               </DialogContent>
             </Dialog>
           </EmptyContent>
@@ -268,27 +289,30 @@ export function AdminDashboardPage() {
   }
 
   return (
-    <PageContainer 
-      title="Gestione Competenze" 
-      description="Gestisci le competenze del sistema."
-    >
+    <PageContainer title="Gestione Competenze" description="Gestisci le competenze del sistema.">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4">
         <div className="flex items-center gap-3 w-full max-w-md">
-        <div className="relative w-full">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Cerca per titolo..."
-            value={globalFilter ?? ""}
-            onChange={(event) => setGlobalFilter(String(event.target.value))}
-            className="!pl-10 bg-white"
-          />
+          <div className="relative w-full">
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Cerca per titolo..."
+              value={globalFilter ?? ''}
+              onChange={(event) => setGlobalFilter(String(event.target.value))}
+              className="!pl-10 bg-white"
+            />
+          </div>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={loadData}
+            disabled={loading}
+            className="shrink-0 bg-white"
+            title="Aggiorna tabella"
+          >
+            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+          </Button>
         </div>
-        <Button variant="outline" size="icon" onClick={loadData} disabled={loading} className="shrink-0 bg-white" title="Aggiorna tabella">
-          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-        </Button>
-      </div>
         <div className="flex items-center gap-4">
-          
           <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
             <DialogTrigger asChild>
               <Button>
@@ -296,7 +320,12 @@ export function AdminDashboardPage() {
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-[95vw] xl:max-w-[1400px] w-full h-[90vh] p-0 flex flex-col md:flex-row overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
-              <CreateCompetencyPage onSuccess={() => { setIsCreateOpen(false); loadData(); }} />
+              <CreateCompetencyPage
+                onSuccess={() => {
+                  setIsCreateOpen(false);
+                  loadData();
+                }}
+              />
             </DialogContent>
           </Dialog>
         </div>
@@ -312,10 +341,7 @@ export function AdminDashboardPage() {
                     <TableHead key={header.id} className="px-4">
                       {header.isPlaceholder
                         ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                        : flexRender(header.column.columnDef.header, header.getContext())}
                     </TableHead>
                   );
                 })}
@@ -325,35 +351,23 @@ export function AdminDashboardPage() {
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
+                <TableCell colSpan={columns.length} className="h-24 text-center">
                   Caricamento in corso...
                 </TableCell>
               </TableRow>
             ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
+                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="px-4 py-1.5">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
+                <TableCell colSpan={columns.length} className="h-24 text-center">
                   Nessuna competenza trovata per la ricerca.
                 </TableCell>
               </TableRow>
@@ -362,9 +376,7 @@ export function AdminDashboardPage() {
         </Table>
       </div>
       <div className="flex items-center justify-between py-4 px-1">
-        <div className="text-sm font-medium text-slate-500">
-          {data.length} elementi
-        </div>
+        <div className="text-sm font-medium text-slate-500">{data.length} elementi</div>
       </div>
     </PageContainer>
   );

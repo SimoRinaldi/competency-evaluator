@@ -28,18 +28,10 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Edit,
-  Plus,
-  Search,
-  RefreshCw,
-  TableProperties,
-  ArrowUpRight,
-  Trash2,
-} from 'lucide-react';
-import { RubricFormPage } from './rubric-form.page';
+import { Edit, Plus, Search, RefreshCw, TableProperties, ArrowUpRight, Trash2 } from 'lucide-react';
+import { RubricFormPage } from './edit-rubric-modal';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CreateRubricForm } from '../rubrics/components/create-rubric-modal';
+import { CreateRubricForm } from './create-rubric-modal';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -222,9 +214,9 @@ export function RubricsDashboardPage() {
             <div className="flex items-center justify-end gap-2">
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     className="h-8 w-8 text-slate-500 hover:text-sky-600 cursor-pointer"
                     title="Modifica"
                   >

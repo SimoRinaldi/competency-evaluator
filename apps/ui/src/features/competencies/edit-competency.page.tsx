@@ -3,12 +3,18 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { getCompetencyById, updateCompetencyChain } from './competencies.api';
 import { useFeedback } from '../../providers/feedback-provider';
 
-import { Step1Competency } from './components/step1-competency';
-import { SubCompetencyPanel } from './components/sub-competency-panel';
-import { Step3Summary } from './components/step3-summary';
+import { Step1Competency } from './components/step1-modal-competency';
+import { SubCompetencyPanel } from './components/step2-modal-competency';
+import { Step3Summary } from './components/step3-modal-competency';
 import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
-export function EditCompetencyPage({ competencyId: propId, onSuccess }: { competencyId?: string; onSuccess?: () => void }) {
+export function EditCompetencyPage({
+  competencyId: propId,
+  onSuccess,
+}: {
+  competencyId?: string;
+  onSuccess?: () => void;
+}) {
   const navigate = useNavigate();
   const { showSuccess } = useFeedback();
   const { id: paramId } = useParams();

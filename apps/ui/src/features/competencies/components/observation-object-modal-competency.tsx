@@ -1,11 +1,6 @@
 import { useState, useMemo } from 'react';
-import { RubricPickerModal } from '../../rubrics/components/rubric-picker-modal';
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+import { RubricPickerModal } from '../../rubrics/rubric-picker-modal';
+import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import {
   Table,
   TableBody,
@@ -13,20 +8,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
-import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Plus, Trash2, Pencil } from "lucide-react";
+} from '@/components/ui/table';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Plus, Trash2, Pencil } from 'lucide-react';
 
 export function ObservationObjectPanel({
   obsDescription,
@@ -74,7 +60,7 @@ export function ObservationObjectPanel({
 
   function handleSaveIndicator() {
     if (!indDesc || !indWeight || !indRubricId) return;
-    
+
     const newIndicator = {
       ...(editingIndex !== null && indicators[editingIndex]?.id
         ? { id: indicators[editingIndex].id }
@@ -91,7 +77,7 @@ export function ObservationObjectPanel({
     } else {
       setIndicators([...indicators, newIndicator]);
     }
-    
+
     closeForm();
   }
 
@@ -126,12 +112,18 @@ export function ObservationObjectPanel({
 
   function getLevelColorClassByColIndex(colIndex: number) {
     switch (colIndex) {
-      case 1: return "bg-red-100 text-slate-700 border-red-200";
-      case 2: return "bg-orange-100 text-slate-700 border-orange-200";
-      case 3: return "bg-slate-100 text-slate-700 border-slate-200";
-      case 4: return "bg-lime-100 text-slate-700 border-lime-200";
-      case 5: return "bg-green-100 text-slate-700 border-green-200";
-      default: return "bg-slate-100 text-slate-700 border-slate-200";
+      case 1:
+        return 'bg-red-100 text-slate-700 border-red-200';
+      case 2:
+        return 'bg-orange-100 text-slate-700 border-orange-200';
+      case 3:
+        return 'bg-slate-100 text-slate-700 border-slate-200';
+      case 4:
+        return 'bg-lime-100 text-slate-700 border-lime-200';
+      case 5:
+        return 'bg-green-100 text-slate-700 border-green-200';
+      default:
+        return 'bg-slate-100 text-slate-700 border-slate-200';
     }
   }
 
@@ -167,77 +159,79 @@ export function ObservationObjectPanel({
                   {level.description || `Livello ${colIdx}`}
                 </span>
               </HoverCardTrigger>
-              <HoverCardContent className="flex w-64 flex-col gap-0.5 z-50 bg-white shadow-md border p-3 rounded-lg" side="top">
+              <HoverCardContent
+                className="flex w-64 flex-col gap-0.5 z-50 bg-white shadow-md border p-3 rounded-lg"
+                side="top"
+              >
                 <div className="font-semibold text-xs text-slate-900">Livello {colIdx}</div>
                 <div className="text-xs text-slate-700 break-words mt-1">{level.description}</div>
                 <div className="mt-1 text-[10px] text-muted-foreground">
-                  {rubric.yes_no ? "Scala Binaria" : "Scala Standard"}
+                  {rubric.yes_no ? 'Scala Binaria' : 'Scala Standard'}
                 </div>
               </HoverCardContent>
             </HoverCard>
           );
         })}
         {isBinary && (
-          <span className="text-[10px] text-slate-500 font-medium ml-1 shrink-0">
-            (Binaria)
-          </span>
+          <span className="text-[10px] text-slate-500 font-medium ml-1 shrink-0">(Binaria)</span>
         )}
       </div>
     );
   };
 
-  const columns = useMemo<ColumnDef<any>[]>(() => [
-    {
-      accessorKey: "description",
-      header: "Descrizione",
-      cell: ({ row }) => (
-        <span className="block truncate font-normal text-slate-900 max-w-[180px] sm:max-w-xs">
-          {row.getValue("description")}
-        </span>
-      ),
-    },
-    {
-      accessorKey: "weight",
-      header: () => <div className="text-center">Peso</div>,
-      cell: ({ row }) => (
-        <div className="text-center font-normal text-slate-700">
-          {row.getValue("weight")}
-        </div>
-      ),
-    },
-    {
-      id: "rubric",
-      header: "Rubrica",
-      cell: ({ row }) => {
-        const rubric = getSelectedRubric(row.original.rubricId);
-        return <RubricLevelsPreview rubric={rubric} />;
+  const columns = useMemo<ColumnDef<any>[]>(
+    () => [
+      {
+        accessorKey: 'description',
+        header: 'Descrizione',
+        cell: ({ row }) => (
+          <span className="block truncate font-normal text-slate-900 max-w-[180px] sm:max-w-xs">
+            {row.getValue('description')}
+          </span>
+        ),
       },
-    },
-    {
-      id: "actions",
-      header: () => <div className="text-right">Azioni</div>,
-      cell: ({ row }) => (
-        <div className="flex items-center justify-end">
-          <TooltipProvider delayDuration={150}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button 
-                  type="button"
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-8 w-8 text-slate-500 hover:text-slate-900 cursor-pointer"
-                  onClick={() => openEditForm(row.index)}
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="top">Modifica indicatore</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-      ),
-    },
-  ], [dbRubrics, newRubrics]);
+      {
+        accessorKey: 'weight',
+        header: () => <div className="text-center">Peso</div>,
+        cell: ({ row }) => (
+          <div className="text-center font-normal text-slate-700">{row.getValue('weight')}</div>
+        ),
+      },
+      {
+        id: 'rubric',
+        header: 'Rubrica',
+        cell: ({ row }) => {
+          const rubric = getSelectedRubric(row.original.rubricId);
+          return <RubricLevelsPreview rubric={rubric} />;
+        },
+      },
+      {
+        id: 'actions',
+        header: () => <div className="text-right">Azioni</div>,
+        cell: ({ row }) => (
+          <div className="flex items-center justify-end">
+            <TooltipProvider delayDuration={150}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-slate-500 hover:text-slate-900 cursor-pointer"
+                    onClick={() => openEditForm(row.index)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">Modifica indicatore</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        ),
+      },
+    ],
+    [dbRubrics, newRubrics],
+  );
 
   const table = useReactTable({
     data: indicators,
@@ -280,7 +274,9 @@ export function ObservationObjectPanel({
             </h4>
             <div className="space-y-3">
               <div>
-                <label className="text-xs font-medium text-slate-600">Descrizione <span className="text-red-500">*</span></label>
+                <label className="text-xs font-medium text-slate-600">
+                  Descrizione <span className="text-red-500">*</span>
+                </label>
                 <input
                   type="text"
                   value={indDesc}
@@ -291,7 +287,9 @@ export function ObservationObjectPanel({
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-medium text-slate-600">Peso (1-5) <span className="text-red-500">*</span></label>
+                  <label className="text-xs font-medium text-slate-600">
+                    Peso (1-5) <span className="text-red-500">*</span>
+                  </label>
                   <input
                     type="number"
                     min="1"
@@ -302,7 +300,9 @@ export function ObservationObjectPanel({
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-medium text-slate-600">Rubrica Associata <span className="text-red-500">*</span></label>
+                  <label className="text-xs font-medium text-slate-600">
+                    Rubrica Associata <span className="text-red-500">*</span>
+                  </label>
                   <div className="flex gap-2 mt-1">
                     <Button
                       type="button"
@@ -312,7 +312,7 @@ export function ObservationObjectPanel({
                     >
                       {indRubricId ? (
                         <span className="truncate">
-                          {getSelectedRubric(indRubricId)?.title || "Rubrica selezionata"}
+                          {getSelectedRubric(indRubricId)?.title || 'Rubrica selezionata'}
                         </span>
                       ) : (
                         <span className="text-muted-foreground">Seleziona una rubrica...</span>
@@ -324,7 +324,9 @@ export function ObservationObjectPanel({
 
               {indRubricId && (
                 <div className="mt-2 p-3 bg-white border rounded-lg">
-                  <div className="text-xs font-medium text-slate-500 mb-1.5">Anteprima livelli rubrica:</div>
+                  <div className="text-xs font-medium text-slate-500 mb-1.5">
+                    Anteprima livelli rubrica:
+                  </div>
                   <RubricLevelsPreview rubric={getSelectedRubric(indRubricId)} />
                 </div>
               )}
@@ -340,12 +342,14 @@ export function ObservationObjectPanel({
                   >
                     <Trash2 className="h-4 w-4 mr-1" /> Elimina
                   </Button>
-                ) : <div />}
+                ) : (
+                  <div />
+                )}
                 <div className="flex gap-2">
                   <Button type="button" variant="outline" onClick={closeForm}>
                     Annulla
                   </Button>
-                  <Button 
+                  <Button
                     type="button"
                     onClick={handleSaveIndicator}
                     disabled={
@@ -374,10 +378,7 @@ export function ObservationObjectPanel({
                       <TableHead key={header.id} className="px-4 font-semibold text-slate-900">
                         {header.isPlaceholder
                           ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
+                          : flexRender(header.column.columnDef.header, header.getContext())}
                       </TableHead>
                     );
                   })}
@@ -387,16 +388,10 @@ export function ObservationObjectPanel({
             <TableBody>
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                  >
+                  <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id} className="px-4 py-1.5 align-middle">
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </TableCell>
                     ))}
                   </TableRow>

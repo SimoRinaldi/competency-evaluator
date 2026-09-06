@@ -7,7 +7,7 @@ import {
 } from './test-executions.api';
 import { PageContainer } from '../../components/page-container';
 import { CompetencyScoreCard } from './competency-score-card';
-import { SubcompetenciesModal } from './subcompetencies-modal';
+import { SubcompetenciesModal } from './subcompetencies-score-modal';
 
 export function BestScoresPage() {
   const [acquiredCompetencyScores, setAcquiredCompetencyScores] = useState<
@@ -18,11 +18,10 @@ export function BestScoresPage() {
   >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [selectedCompetency, setSelectedCompetency] =
-    useState<UserCompetencyEvaluation | null>(null);
-  const [modalSubComps, setModalSubComps] = useState<
-    UserSubCompetencyEvaluation[]
-  >([]);
+  const [selectedCompetency, setSelectedCompetency] = useState<UserCompetencyEvaluation | null>(
+    null,
+  );
+  const [modalSubComps, setModalSubComps] = useState<UserSubCompetencyEvaluation[]>([]);
 
   useEffect(() => {
     loadScores();
