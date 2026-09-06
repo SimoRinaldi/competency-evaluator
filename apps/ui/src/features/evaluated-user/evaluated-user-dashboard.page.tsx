@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchCurrentUser } from '../auth/auth.api';
 import {
-  getAvailableTests,
   getAvailableTestsByUserId,
   getUserExecutions,
 } from './evaluated-user.api';

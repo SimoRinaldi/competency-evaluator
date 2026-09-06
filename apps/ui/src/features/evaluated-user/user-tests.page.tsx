@@ -1,7 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { fetchCurrentUser } from '../auth/auth.api';
 import {
-  getAvailableTests,
   getAvailableTestsByUserId,
   getUserExecutions,
 } from './evaluated-user.api';
@@ -20,7 +19,6 @@ import {
   PlayCircle,
   Award,
   ClipboardList,
-  Clock,
   CheckCircle,
   Search,
   ChevronUp,
@@ -31,7 +29,6 @@ import {
 } from 'lucide-react';
 import {
   Empty,
-  EmptyContent,
   EmptyDescription,
   EmptyHeader,
   EmptyMedia,

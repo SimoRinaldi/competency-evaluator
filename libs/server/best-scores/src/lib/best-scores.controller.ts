@@ -3,68 +3,22 @@ import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagg
 import { JwtAuthGuard, Roles, RolesGuard } from '@server/security';
 import { UserRole } from '@server/users';
 import { BestScoresService } from './best-scores.service';
-import { UserCompetencyEvaluationDto } from './best-competency-score/dto/user-competency-evaluation.dto';
-import { UserSubCompetencyEvaluationDto } from './best-subcompetency-score/dto/user-subcompetency-evaluation.dto';
+import { BestScoresDto } from './dto/best-scores.dto';
 
 @ApiTags('Best Scores APIs')
 @Controller('best_scores')
 export class BestScoresController {
   constructor(private readonly bestScoresService: BestScoresService) {}
 
-  @Get('competencies/acquired/:userId')
+  @Get(':userId')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.USER)
+  @Roles(UserRole.USER)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Recupera le competenze superate da un utente' })
-  @ApiResponse({ status: 200, type: [UserCompetencyEvaluationDto] })
-  findAcquiredCompetencies(
+  @ApiOperation({ summary: 'Recupera gli score dell\'utente' })
+  @ApiResponse({ status: 200, type: BestScoresDto })
+  async findBestScores(
     @Param('userId', ParseIntPipe) userId: number,
-  ): Promise<UserCompetencyEvaluationDto[]> {
-    return this.bestScoresService.findAcquiredCompetencies(userId);
-  }
-
-  @Get('competencies/unacquired/:userId')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.USER)
-  @ApiBearerAuth()
-  @ApiOperation({
-    summary: 'Recupera le competenze non superate o mai affrontate da un utente',
-  })
-  @ApiResponse({ status: 200, type: [UserCompetencyEvaluationDto] })
-  findUnacquiredCompetencies(
-    @Param('userId', ParseIntPipe) userId: number,
-  ): Promise<UserCompetencyEvaluationDto[]> {
-    return this.bestScoresService.findUnacquiredCompetencies(userId);
-  }
-
-  @Get('subcompetencies/acquired/:userId/:competencyId')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.USER)
-  @ApiBearerAuth()
-  @ApiOperation({
-    summary: 'Recupera le sotto-competenze superate da un utente per una specifica competenza',
-  })
-  @ApiResponse({ status: 200, type: [UserSubCompetencyEvaluationDto] })
-  findAcquiredSubCompetencies(
-    @Param('userId', ParseIntPipe) userId: number,
-    @Param('competencyId', ParseIntPipe) competencyId: number,
-  ): Promise<UserSubCompetencyEvaluationDto[]> {
-    return this.bestScoresService.findAcquiredSubCompetencies(userId, competencyId);
-  }
-
-  @Get('subcompetencies/unacquired/:userId/:competencyId')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.USER)
-  @ApiBearerAuth()
-  @ApiOperation({
-    summary:
-      'Recupera le sotto-competenze non superate o mai affrontate da un utente per una specifica competenza',
-  })
-  @ApiResponse({ status: 200, type: [UserSubCompetencyEvaluationDto] })
-  findUnacquiredSubCompetencies(
-    @Param('userId', ParseIntPipe) userId: number,
-    @Param('competencyId', ParseIntPipe) competencyId: number,
-  ): Promise<UserSubCompetencyEvaluationDto[]> {
-    return this.bestScoresService.findUnacquiredSubCompetencies(userId, competencyId);
+  ): Promise<BestScoresDto> {
+    return this.bestScoresService.getBestScores(userId);
   }
 }

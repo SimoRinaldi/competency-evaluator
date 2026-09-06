@@ -225,11 +225,13 @@ export function SubCompetencyPanel({
 
           <div className="space-y-2 w-full md:w-32">
             <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-              Soglia minima <span className="text-red-500">*</span>
+              Soglia minima (%) <span className="text-red-500">*</span>
             </label>
             <input
               type="number"
               min="1"
+              max="100"
+              placeholder="es. 60"
               required
               disabled={disabledBaseFields}
               value={threshold}

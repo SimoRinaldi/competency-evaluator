@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { UserSubCompetencyEvaluationDto } from '../../best-subcompetency-score/dto/user-subcompetency-evaluation.dto';
 
 export class UserCompetencyEvaluationDto {
   @ApiProperty({
@@ -15,7 +16,7 @@ export class UserCompetencyEvaluationDto {
 
   @ApiProperty({
     example: 60,
-    description: 'Soglia minima per considerare la competenza acquisita',
+    description: 'Soglia percentuale minima per considerare la competenza acquisita',
   })
   threshold!: number;
 
@@ -33,5 +34,11 @@ export class UserCompetencyEvaluationDto {
     description:
       "Punteggio percentuale ottenuto dall'utente (null se mai affrontata)",
   })
-  score_percentage!: string | null;
+  score_percentage!: number | null;
+
+  @ApiProperty({
+    type: () => [UserSubCompetencyEvaluationDto],
+    description: 'Elenco delle sotto-competenze associate',
+  })
+  subcompetencies!: UserSubCompetencyEvaluationDto[];
 }

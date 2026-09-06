@@ -512,7 +512,7 @@ export function CreateTestPage() {
                         <SelectItem key={comp.id} value={String(comp.id)}>
                           <span className="font-medium text-slate-900">{comp.title}</span>{' '}
                           <span className="text-xs text-slate-500">
-                            (Peso: {comp.weight}, Soglia: {comp.threshold})
+                            (Peso: {comp.weight}, Soglia: {comp.threshold}%)
                           </span>
                         </SelectItem>
                       ))}
@@ -524,7 +524,7 @@ export function CreateTestPage() {
                   <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 flex justify-between items-center mt-3">
                     <div>
                       Peso: <strong>{selectedCompetency.weight}</strong> | Soglia minima:{' '}
-                      <strong>{selectedCompetency.threshold}</strong>
+                      <strong>{selectedCompetency.threshold}%</strong>
                     </div>
                     <span className="text-slate-500 font-medium">
                       {allSubcompetenciesForCompetency.length} sottocompetenze collegate

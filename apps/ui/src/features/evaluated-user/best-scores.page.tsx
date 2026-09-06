@@ -1,25 +1,28 @@
 import { useEffect, useState } from 'react';
 import { fetchCurrentUser } from '../auth/auth.api';
 import {
-  getAcquiredCompetencies,
-  getAcquiredSubcompetencies,
-  getUnacquiredCompetencies,
-  getUnacquiredSubcompetencies,
+  getBestScores,
+  UserCompetencyEvaluation,
+  UserSubCompetencyEvaluation,
 } from './evaluated-user.api';
 import { PageContainer } from '../../components/page-container';
 import { CompetencyScoreCard } from './competency-score-card';
 import { SubcompetenciesModal } from './subcompetencies-modal';
 
 export function BestScoresPage() {
-  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
-  const [acquiredCompetencyScores, setAcquiredCompetencyScores] = useState<any[]>([]);
-  const [unacquiredCompetencyScores, setUnacquiredCompetencyScores] = useState<any[]>([]);
+  const [acquiredCompetencyScores, setAcquiredCompetencyScores] = useState<
+    UserCompetencyEvaluation[]
+  >([]);
+  const [unacquiredCompetencyScores, setUnacquiredCompetencyScores] = useState<
+    UserCompetencyEvaluation[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [selectedCompetency, setSelectedCompetency] = useState<any | null>(null);
-  const [modalSubComps, setModalSubComps] = useState<any[]>([]);
-  const [modalLoading, setModalLoading] = useState(false);
-  const [modalError, setModalError] = useState('');
+  const [selectedCompetency, setSelectedCompetency] =
+    useState<UserCompetencyEvaluation | null>(null);
+  const [modalSubComps, setModalSubComps] = useState<
+    UserSubCompetencyEvaluation[]
+  >([]);
 
   useEffect(() => {
     loadScores();
@@ -34,15 +37,11 @@ export function BestScoresPage() {
         return;
       }
       const userId = Number(user.id);
-      setCurrentUserId(userId);
 
-      const [acqCompScores, unacqCompScores] = await Promise.all([
-        getAcquiredCompetencies(userId),
-        getUnacquiredCompetencies(userId),
-      ]);
+      const data = await getBestScores(userId);
 
-      setAcquiredCompetencyScores(acqCompScores);
-      setUnacquiredCompetencyScores(unacqCompScores);
+      setAcquiredCompetencyScores(data.acquired_competencies ?? []);
+      setUnacquiredCompetencyScores(data.unacquired_competencies ?? []);
     } catch (err: any) {
       setError(err?.message || 'Errore nel caricamento dello storico');
     } finally {
@@ -50,38 +49,15 @@ export function BestScoresPage() {
     }
   }
 
-  async function handleOpenSubcompetencies(competency: any) {
+  function handleOpenSubcompetencies(competency: UserCompetencyEvaluation) {
     setSelectedCompetency(competency);
-    setModalLoading(true);
-    setModalError('');
-    setModalSubComps([]);
-
-    const userId = currentUserId;
-    if (!userId) {
-      setModalError('Utente non identificato');
-      setModalLoading(false);
-      return;
-    }
-
-    const competencyId = competency.competency_id ?? competency.id;
-
-    try {
-      const [acquired, unacquired] = await Promise.all([
-        getAcquiredSubcompetencies(userId, competencyId),
-        getUnacquiredSubcompetencies(userId, competencyId),
-      ]);
-
-      const combined = [
-        ...acquired.map((s: any) => ({ ...s, acquired: true })),
-        ...unacquired.map((s: any) => ({ ...s, acquired: false })),
-      ].sort((a: any, b: any) => (a.subcompetency_id ?? a.id) - (b.subcompetency_id ?? b.id));
-
-      setModalSubComps(combined);
-    } catch (err: any) {
-      setModalError(err?.message || 'Errore nel caricamento delle sotto-competenze');
-    } finally {
-      setModalLoading(false);
-    }
+    const subcomps = (competency.subcompetencies ?? []).map((sc) => ({
+      ...sc,
+      acquired:
+        sc.acquired ??
+        (sc.score_percentage !== null && parseFloat(sc.score_percentage) >= sc.threshold),
+    }));
+    setModalSubComps(subcomps);
   }
 
   if (loading) {
@@ -121,8 +97,9 @@ export function BestScoresPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {acquiredCompetencyScores.map((cs) => (
               <CompetencyScoreCard
-                key={cs.competency_id ?? cs.id}
+                key={cs.competency_id}
                 competency={cs}
+                isAcquired={true}
                 onViewSubcompetencies={handleOpenSubcompetencies}
                 barColor="#0f172a"
               />
@@ -137,8 +114,9 @@ export function BestScoresPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {unacquiredCompetencyScores.map((cs) => (
               <CompetencyScoreCard
-                key={cs.competency_id ?? cs.id}
+                key={cs.competency_id}
                 competency={cs}
+                isAcquired={false}
                 onViewSubcompetencies={handleOpenSubcompetencies}
                 dimmed
               />
@@ -152,8 +130,7 @@ export function BestScoresPage() {
         onClose={() => setSelectedCompetency(null)}
         competency={selectedCompetency}
         subcompetencies={modalSubComps}
-        isLoading={modalLoading}
-        error={modalError}
+        isLoading={false}
       />
     </PageContainer>
   );

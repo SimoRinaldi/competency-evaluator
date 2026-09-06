@@ -39,5 +39,12 @@ export class UserSubCompetencyEvaluationDto {
     description:
       "Punteggio percentuale ottenuto dall'utente (null se mai affrontata)",
   })
-  score_percentage!: string | null;
+  score_percentage!: number | null;
+
+  @ApiProperty({
+    example: true,
+    description: 'Indica se la sotto-competenza è stata acquisita',
+    required: false,
+  })
+  acquired?: boolean;
 }

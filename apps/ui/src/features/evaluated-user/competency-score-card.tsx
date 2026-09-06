@@ -1,4 +1,4 @@
-import { ChevronRight } from 'lucide-react';
+import { AlertCircle, ChevronRight } from 'lucide-react';
 import { RadialBarChart, RadialBar, ResponsiveContainer } from 'recharts';
 import { cn } from '@/lib/utils';
 
@@ -10,10 +10,12 @@ export interface CompetencyScoreCardProps {
     threshold: number;
     score_absolute: number | null;
     score_percentage: string | null;
+    subcompetencies?: any[];
   };
   onViewSubcompetencies: (competency: any) => void;
   barColor?: string;
   dimmed?: boolean;
+  isAcquired?: boolean;
   className?: string;
 }
 
@@ -22,22 +24,31 @@ export function CompetencyScoreCard({
   onViewSubcompetencies,
   barColor,
   dimmed = false,
+  isAcquired: isAcquiredProp,
   className,
 }: CompetencyScoreCardProps) {
   const isNotAttempted = competency.score_absolute === null;
-  const isAcquired = !isNotAttempted && (competency.score_absolute ?? 0) >= competency.threshold;
-  const delta = !isNotAttempted ? (competency.score_absolute ?? 0) - competency.threshold : null;
   const scorePercent =
     competency.score_percentage !== null
       ? parseFloat(competency.score_percentage) || 0
       : 0;
+
+  const isAcquired =
+    isAcquiredProp !== undefined
+      ? isAcquiredProp
+      : !dimmed && !isNotAttempted && scorePercent >= competency.threshold;
+
+  const delta = !isNotAttempted ? Math.round(scorePercent - competency.threshold) : null;
+  const hasMissingSubcompetencies =
+    !isAcquired && !isNotAttempted && delta !== null && delta >= 0;
 
   const maxScore =
     !isNotAttempted && scorePercent > 0
       ? Math.round(((competency.score_absolute as number) / scorePercent) * 100)
       : null;
 
-  const effectiveBarColor = barColor ?? (isAcquired ? '#0f172a' : '#64748b');
+  const effectiveBarColor =
+    barColor ?? (isAcquired ? '#0f172a' : hasMissingSubcompetencies ? '#d97706' : '#64748b');
   const chartData = [{ score: scorePercent, fill: effectiveBarColor }];
 
   return (
@@ -69,10 +80,18 @@ export function CompetencyScoreCard({
                 ? 'bg-white/90 text-slate-600 border-slate-200'
                 : isAcquired
                 ? 'bg-emerald-50 text-emerald-700 border-emerald-200/80'
+                : hasMissingSubcompetencies
+                ? 'bg-amber-50 text-amber-800 border-amber-200/80'
                 : 'bg-white/90 text-slate-700 border-slate-200'
             )}
           >
-            {isNotAttempted ? 'Non svolta' : isAcquired ? 'Acquisita' : 'Non superata'}
+            {isNotAttempted
+              ? 'Non svolta'
+              : isAcquired
+              ? 'Acquisita'
+              : hasMissingSubcompetencies
+              ? 'Non acquisita'
+              : 'Non superata'}
           </span>
         </div>
 
@@ -85,7 +104,7 @@ export function CompetencyScoreCard({
             <div className="text-xs text-slate-600">
               Soglia richiesta:{' '}
               <span className="font-semibold text-slate-800 tabular-nums">
-                {competency.threshold} pt
+                {competency.threshold}%
               </span>
             </div>
           </div>
@@ -109,14 +128,14 @@ export function CompetencyScoreCard({
                   </span>
                 </div>
                 <div className="text-xs pt-0.5">
-                  {delta !== null &&
+                  {!hasMissingSubcompetencies && delta !== null &&
                     (delta >= 0 ? (
                       <span className="text-emerald-700 font-medium">
-                        +{delta} pt rispetto alla soglia ({competency.threshold} pt)
+                        +{delta}% rispetto alla soglia ({competency.threshold}%)
                       </span>
                     ) : (
                       <span className="text-slate-600 font-medium">
-                        {delta} pt dalla soglia ({competency.threshold} pt)
+                        {delta}% dalla soglia ({competency.threshold}%)
                       </span>
                     ))}
                 </div>
@@ -148,10 +167,19 @@ export function CompetencyScoreCard({
               </div>
             </div>
 
+            {hasMissingSubcompetencies && (
+              <div className="my-2.5 p-2.5 rounded-md bg-amber-50 border border-amber-200/80 text-amber-900 text-xs flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <span className="leading-snug">
+                  Per acquisire la competenza è necessario acquisire tutte le sue sotto-competenze.
+                </span>
+              </div>
+            )}
+
             {/* Avanzamento */}
             <div className="mt-2 space-y-1">
               <div className="flex justify-between text-[11px] text-slate-500 tabular-nums">
-                <span>Soglia: {competency.threshold} pt</span>
+                <span>Soglia: {competency.threshold}%</span>
                 <span>Max: {maxScore !== null ? `${maxScore} pt` : '—'}</span>
               </div>
               <div
