@@ -162,7 +162,7 @@ export function UserEvaluationModal({
   const isReadOnly = hasAlreadyEvaluated || isEvaluated;
 
   const steps = useMemo(() => {
-    const list = [{ id: "info", label: "Dati Valutazione" }];
+    const list = [{ id: "info", label: "Dati valutazione" }];
     if (test?.subcompetencies) {
       test.subcompetencies.forEach(sc => {
         list.push({ id: `sc-${sc.id}`, label: sc.title });
@@ -198,20 +198,19 @@ export function UserEvaluationModal({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-        <DialogContent className="max-w-[95vw] xl:max-w-[1200px] w-full h-[90vh] p-0 flex flex-col overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
+        <DialogContent className="max-w-[95vw] xl:max-w-[1200px] w-full max-h-[90vh] p-0 flex flex-col overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
           
           <DialogHeader className="p-6 pb-4 border-b border-slate-200 bg-white shrink-0">
             <DialogTitle className="text-xl font-bold text-slate-900 flex items-center gap-2">
-              Valutazione Utente
-              {isEvaluated && <span className="text-xs font-semibold px-2 py-1 bg-green-100 text-green-700 rounded-full">Già valutato</span>}
+              Valutazione {execution?.evaluated_user?.user?.name || "Utente"}
             </DialogTitle>
           </DialogHeader>
 
-          <div className="flex flex-1 overflow-hidden min-h-0 bg-white">
+          <div className="flex flex-col md:flex-row flex-1 overflow-hidden min-h-0 bg-white">
             
             {/* Sidebar */}
-            <div className="w-64 border-r border-slate-200 bg-slate-50 flex flex-col shrink-0">
-              <div className="flex-1 overflow-y-auto p-4">
+            <div className="w-full md:w-64 border-b md:border-b-0 md:border-r border-slate-200 bg-slate-50 flex flex-col shrink-0">
+              <div className="flex-1 overflow-y-auto p-4 max-h-[200px] md:max-h-none">
                 <nav className="flex flex-col gap-1.5">
                   {steps.map((step, idx) => {
                     const status = getStepStatus(step.id);
@@ -220,22 +219,20 @@ export function UserEvaluationModal({
                       <button
                         key={step.id}
                         onClick={() => setActiveStep(step.id)}
-                        className={`text-left px-4 py-3 rounded-lg text-sm transition-all flex items-center gap-3 relative overflow-hidden group ${
+                        className={`text-left px-4 py-2.5 rounded-lg text-sm transition-all flex items-center gap-3 relative overflow-hidden group ${
                           isActive 
                             ? "bg-white shadow-sm border border-slate-200 text-primary font-bold" 
                             : "text-slate-600 hover:bg-slate-100 border border-transparent font-medium"
                         }`}
                       >
-                        {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-l-lg" />}
                         <div className="flex flex-col flex-1 truncate">
                           <span className="truncate">{step.label}</span>
                           {step.id !== "info" && (
-                            <span className={`text-[10px] mt-0.5 ${status === 'completed' ? 'text-green-600' : 'text-slate-400'}`}>
+                            <span className="text-[10px] mt-0.5 text-slate-400">
                               {status === 'completed' ? 'Completato' : status === 'partial' ? 'In corso...' : 'Da valutare'}
                             </span>
                           )}
                         </div>
-                        {status === 'completed' && <CheckCircle2 className={`h-4 w-4 shrink-0 ${isActive ? 'text-primary' : 'text-green-500'}`} />}
                       </button>
                     );
                   })}
@@ -245,7 +242,7 @@ export function UserEvaluationModal({
 
             {/* Main Content Pane */}
             <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-white">
-              <div className="flex-1 overflow-y-auto p-6 md:p-10">
+              <div className="flex-1 overflow-y-auto p-4 md:p-8">
                 {loading ? (
                   <div className="flex flex-col items-center justify-center py-20 gap-3">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -256,7 +253,7 @@ export function UserEvaluationModal({
                     {activeStep === "info" && (
                       <div className="space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-300">
                         <div>
-                          <h2 className="text-2xl font-bold text-slate-800 mb-6">Dati Valutazione</h2>
+                          <h2 className="text-2xl font-bold text-slate-800 mb-6">Dati valutazione</h2>
                           
                           <div className="grid md:grid-cols-2 gap-6">
                             {/* Dati utente */}
@@ -306,7 +303,7 @@ export function UserEvaluationModal({
 
                         {/* Descrizione Test */}
                         <div className="space-y-3">
-                          <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Situation Assessment</h3>
+                          <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Descrizione test</h3>
                           <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
                             <p className="text-[15px] text-slate-700 whitespace-pre-wrap leading-relaxed">
                               {test.assessment_situation}
@@ -317,7 +314,7 @@ export function UserEvaluationModal({
                     )}
 
                     {activeStep.startsWith("sc-") && (
-                      <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
+                      <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
                         {(() => {
                           const scId = Number(activeStep.replace("sc-", ""));
                           const sc = test.subcompetencies?.find(s => s.id === scId);
@@ -335,8 +332,8 @@ export function UserEvaluationModal({
                                 <div className="space-y-10">
                                   {sc.observation_object.indicators.map((indicator) => (
                                     <div key={indicator.id} className="space-y-4">
-                                      <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                                        <p className="text-base font-semibold text-slate-800">
+                                      <div className="bg-slate-100 p-4 rounded-lg border border-slate-200">
+                                        <p className="text-[15px] font-bold text-slate-900">
                                           {indicator.description}
                                         </p>
                                       </div>
@@ -345,40 +342,31 @@ export function UserEvaluationModal({
                                         value={String(evaluations[indicator.id] || "")} 
                                         onValueChange={(val) => handleSelectLevel(indicator.id, Number(val))}
                                         disabled={isReadOnly}
-                                        className="flex flex-col gap-1.5 px-1"
+                                        className="flex flex-col gap-4 pl-1 pt-1"
                                       >
                                         {indicator.rubric_set?.levels?.map((level) => {
                                           const isSelected = evaluations[indicator.id] === level.rank;
                                           return (
-                                            <FieldLabel 
-                                              key={level.id}
-                                              htmlFor={`indicator-${indicator.id}-level-${level.rank}`}
-                                              className={`px-4 py-3 rounded-xl border transition-all cursor-pointer ${
-                                                isSelected
-                                                  ? "border-primary bg-primary/10 ring-1 ring-primary shadow-sm"
-                                                  : isReadOnly 
-                                                    ? "border-slate-200 opacity-60 cursor-not-allowed" 
-                                                    : "border-slate-200 hover:border-primary/50 hover:bg-slate-50"
-                                              }`}
-                                            >
-                                              <Field orientation="horizontal" className="flex items-center justify-between w-full">
-                                                <FieldContent className="flex-1 pr-4">
-                                                  <FieldTitle className={`text-sm font-bold ${isSelected ? "text-primary" : "text-slate-800"}`}>
-                                                    {level.description || level.title || `Livello ${level.rank}`}
-                                                  </FieldTitle>
-                                                  <FieldDescription className={`text-xs mt-1 leading-tight font-medium ${isSelected ? "text-primary" : "text-slate-500"}`}>
-                                                    Livello {level.rank} {level.title && level.description ? ` - ${level.title}` : ""}
-                                                  </FieldDescription>
-                                                </FieldContent>
-                                                <div className="flex-shrink-0 flex items-center">
-                                                  <RadioGroupItem 
-                                                    value={String(level.rank)} 
-                                                    id={`indicator-${indicator.id}-level-${level.rank}`} 
-                                                    className={`h-4 w-4 ${isSelected ? "border-primary text-primary" : "border-slate-300"}`}
-                                                  />
-                                                </div>
-                                              </Field>
-                                            </FieldLabel>
+                                            <div key={level.id} className="flex items-start gap-3 group">
+                                              <RadioGroupItem 
+                                                value={String(level.rank)} 
+                                                id={`indicator-${indicator.id}-level-${level.rank}`} 
+                                                className={`mt-1 h-4 w-4 ${isSelected ? "border-primary text-primary ring-1 ring-primary ring-offset-1" : "border-slate-300"}`}
+                                              />
+                                              <label 
+                                                htmlFor={`indicator-${indicator.id}-level-${level.rank}`}
+                                                className={`flex flex-col cursor-pointer ${isReadOnly ? "cursor-not-allowed opacity-70" : "group-hover:opacity-80"} mt-0.5`}
+                                              >
+                                                <span className={`text-[15px] leading-snug ${isSelected ? "text-primary font-bold" : "text-slate-800 font-medium"}`}>
+                                                  {level.description || `Livello ${level.rank}`}
+                                                </span>
+                                                {level.description && (
+                                                  <span className="text-sm text-slate-500 mt-1">
+                                                    Livello {level.rank}
+                                                  </span>
+                                                )}
+                                              </label>
+                                            </div>
                                           );
                                         })}
                                       </RadioGroup>
