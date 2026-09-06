@@ -16,11 +16,19 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, AlertCircle, Plus, Trash2, Send, FileText, ExternalLink } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Loader2, AlertCircle, Plus, Trash2 } from 'lucide-react';
 import { fetchCurrentUser } from '../auth/auth.api';
 import { getTestDetails, submitTestExecution, getTestEvaluators } from './evaluated-user.api';
 
@@ -132,18 +140,20 @@ export function UserTestModal({
   return (
     <>
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-[95vw] xl:max-w-[900px] w-full max-h-[90vh] p-0 flex flex-col overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
+      <DialogContent className="max-w-[95vw] xl:max-w-[1000px] w-full max-h-[90vh] p-0 flex flex-col overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
 
         {/* HEADER */}
-        <DialogHeader className="p-6 pb-4 border-b border-slate-100">
-          <DialogTitle className="text-xl font-bold text-slate-900">
-            {isExecute ? 'Esegui Test' : 'Dettagli Consegna'}
-          </DialogTitle>
-          <p className="text-xs text-slate-400 mt-1">
-            {isExecute
-              ? `Leggi la descrizione del test, eseguilo e poi carica i tuoi materiali. Clicca Consegna per confermare e consegnare la tua risposta`
-              : `Riepilogo della tua consegna.`}
-          </p>
+        <DialogHeader className="p-6 pb-4 border-b border-slate-100 flex flex-row items-center justify-between">
+          <div>
+            <DialogTitle className="text-xl font-bold text-slate-900">
+              {isExecute ? 'Esegui Test' : 'Dettagli Test'}
+            </DialogTitle>
+            <p className="text-xs text-slate-400 mt-1">
+              {isExecute
+                ? 'Leggi la descrizione del test, svolgilo e invia i tuoi materiali.'
+                : 'Riepilogo del test, della valutazione e dei file consegnati.'}
+            </p>
+          </div>
         </DialogHeader>
 
         {/* BODY */}
@@ -163,148 +173,244 @@ export function UserTestModal({
             </div>
           ) : test ? (
             <div className="space-y-6">
-              {/* Consegna */}
-              <div className="space-y-2.5">
-                <h3 className="text-base font-semibold text-slate-800">Descrizione Test</h3>
-                <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 w-full">
-                  <p className="text-sm text-slate-600 whitespace-pre-wrap leading-relaxed">
-                    {test.assessment_situation}
-                  </p>
+              {/* Informazioni Generali / Punteggio */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-50/60 p-4 rounded-xl border border-slate-100">
+                <div className="md:col-span-2 flex flex-col gap-1.5">
+                  <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                    Descrizione test
+                  </span>
+                  <span className="text-sm font-normal text-slate-800 leading-relaxed whitespace-pre-wrap">
+                    {test.assessment_situation || '-'}
+                  </span>
                 </div>
+                {!isExecute && (
+                  execution?.test_score !== null && execution?.test_score !== undefined ? (
+                    <div className="flex flex-col gap-1.5 border-t md:border-t-0 md:border-l border-slate-200 md:pl-6 pt-4 md:pt-0">
+                      <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                        Punteggio ottenuto
+                      </span>
+                      <div className="flex items-baseline gap-1 text-slate-900 mt-1">
+                        <span className="text-3xl font-semibold">{execution.test_score}</span>
+                        <span className="text-sm font-normal text-slate-500">/ {execution.max_score}</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-1.5 border-t md:border-t-0 md:border-l border-slate-200 md:pl-6 pt-4 md:pt-0">
+                      <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                        Stato
+                      </span>
+                      <span className="text-sm font-normal text-amber-700 mt-1">
+                        In attesa di valutazione
+                      </span>
+                    </div>
+                  )
+                )}
               </div>
-
-              {/* Metadati (Sottocompetenze e Valutatori) */}
-              {(test.subcompetencies?.length > 0 || evaluators?.length > 0) && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
-                  {test.subcompetencies?.length > 0 && (
-                    <div className="space-y-1.5">
-                      <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Sottocompetenze Valutate</span>
-                      <div className="flex flex-wrap gap-1.5 mt-1">
-                        {test.subcompetencies.map((sc: any) => (
-                          <span key={sc.id} className="inline-flex items-center px-2 py-1 rounded-md bg-sky-50 text-sky-700 text-xs font-medium border border-sky-100">
-                            {sc.title}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  
-                  {evaluators?.length > 0 && (
-                    <div className="space-y-1.5">
-                      <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Valutatori Assegnati</span>
-                      <div className="flex flex-wrap gap-1.5 mt-1">
-                        {evaluators.map((ev: any) => (
-                          <span key={ev.id} className="inline-flex items-center px-2 py-1 rounded-md bg-amber-50 text-amber-700 text-xs font-medium border border-amber-100">
-                            {ev.user?.name || `Valutatore #${ev.user_id}`}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
 
               {/* SEZIONE EXECUTE: form per caricare file */}
               {isExecute && (
-                <form onSubmit={handleValidation} className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-base font-semibold text-slate-800">I tuoi file</h3>
-                    <Button type="button" variant="outline" size="sm" onClick={handleAddOutput}>
-                      <Plus className="mr-1.5 h-3.5 w-3.5" /> Aggiungi file
-                    </Button>
-                  </div>
+                <>
+                  <div className="w-full h-px bg-slate-100" />
+                  <form onSubmit={handleValidation} className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-base font-semibold text-slate-800">I tuoi file</h3>
+                      <Button type="button" variant="outline" size="sm" onClick={handleAddOutput}>
+                        <Plus className="mr-1.5 h-3.5 w-3.5" /> Aggiungi file
+                      </Button>
+                    </div>
 
-                  {error && saving === false && (
-                    <p className="text-sm text-destructive font-medium">{error}</p>
-                  )}
+                    {error && saving === false && (
+                      <p className="text-sm text-destructive font-medium">{error}</p>
+                    )}
 
-                  {outputs.map((out, index) => (
-                    <Card key={index} className="relative overflow-visible border-slate-200">
-                      {outputs.length > 1 && (
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="icon"
-                          className="absolute -top-3 -right-3 rounded-full h-7 w-7"
-                          onClick={() => handleRemoveOutput(index)}
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                      )}
-                      <CardContent className="pt-5">
-                        <div className="grid gap-3 md:grid-cols-2">
-                          <div className="space-y-1.5">
-                            <Label className="text-xs">Nome file <span className="text-destructive">*</span></Label>
-                            <Input
-                              placeholder="Es. relazione_finale.pdf"
-                              value={out.name}
-                              onChange={(e) => handleChangeOutput(index, 'name', e.target.value)}
-                              required
-                            />
+                    {outputs.map((out, index) => (
+                      <Card key={index} className="relative overflow-visible border-slate-200">
+                        {outputs.length > 1 && (
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="icon"
+                            className="absolute -top-3 -right-3 rounded-full h-7 w-7"
+                            onClick={() => handleRemoveOutput(index)}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        )}
+                        <CardContent className="pt-5">
+                          <div className="grid gap-3 md:grid-cols-2">
+                            <div className="space-y-1.5">
+                              <Label className="text-xs">Nome file <span className="text-destructive">*</span></Label>
+                              <Input
+                                placeholder="Es. relazione_finale.pdf"
+                                value={out.name}
+                                onChange={(e) => handleChangeOutput(index, 'name', e.target.value)}
+                                required
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <Label className="text-xs">Versione</Label>
+                              <Input
+                                placeholder="Es. 1.0"
+                                value={out.version}
+                                onChange={(e) => handleChangeOutput(index, 'version', e.target.value)}
+                              />
+                            </div>
+                            <div className="space-y-1.5 md:col-span-2">
+                              <Label className="text-xs">URL</Label>
+                              <Input
+                                placeholder="https://drive.google.com/file/..."
+                                value={out.url}
+                                onChange={(e) => handleChangeOutput(index, 'url', e.target.value)}
+                              />
+                            </div>
+                            <div className="space-y-1.5 md:col-span-2">
+                              <Label className="text-xs">Descrizione</Label>
+                              <Input
+                                placeholder="Breve descrizione del contenuto"
+                                value={out.description}
+                                onChange={(e) => handleChangeOutput(index, 'description', e.target.value)}
+                              />
+                            </div>
                           </div>
-                          <div className="space-y-1.5">
-                            <Label className="text-xs">Versione</Label>
-                            <Input
-                              placeholder="Es. 1.0"
-                              value={out.version}
-                              onChange={(e) => handleChangeOutput(index, 'version', e.target.value)}
-                            />
-                          </div>
-                          <div className="space-y-1.5 md:col-span-2">
-                            <Label className="text-xs">URL</Label>
-                            <Input
-                              placeholder="https://drive.google.com/file/..."
-                              value={out.url}
-                              onChange={(e) => handleChangeOutput(index, 'url', e.target.value)}
-                            />
-                          </div>
-                          <div className="space-y-1.5 md:col-span-2">
-                            <Label className="text-xs">Descrizione</Label>
-                            <Input
-                              placeholder="Breve descrizione del contenuto"
-                              value={out.description}
-                              onChange={(e) => handleChangeOutput(index, 'description', e.target.value)}
-                            />
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </form>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </form>
+                </>
               )}
 
-              {/* SEZIONE VIEW: lista output in sola lettura */}
+              {/* SEZIONE VIEW: visualizzazione pulita in stile TestSummaryView */}
               {!isExecute && (
-                <div className="space-y-4">
-                  <h3 className="text-base font-semibold text-slate-800">File Consegnati</h3>
-                  {submittedOutputs.length === 0 ? (
-                    <p className="text-sm text-slate-500 italic">Nessun file registrato per questa consegna.</p>
-                  ) : (
-                    <div className="space-y-3">
-                      {submittedOutputs.map((out: any, i: number) => (
-                        <div key={i} className="flex items-center gap-4 p-4 rounded-lg border border-slate-200 bg-slate-50">
-                          <FileText className="h-5 w-5 text-slate-400 shrink-0" />
-                          <div className="min-w-0 flex-1">
-                            <p className="text-sm font-medium text-slate-800 truncate" title={out.name}>{out.name}</p>
-                            {out.version && <span className="text-xs text-slate-500 bg-white border border-slate-200 px-1.5 py-0.5 rounded-md mt-1 inline-block">v{out.version}</span>}
-                            {out.description && <p className="text-xs text-slate-500 mt-1 line-clamp-2" title={out.description}>{out.description}</p>}
-                          </div>
+                <>
+                  {/* Sottocompetenze */}
+                  {test.subcompetencies?.length > 0 && (
+                    <>
+                      <div className="w-full h-px bg-slate-100" />
+                      <div className="flex flex-col gap-3">
+                        <div className="flex flex-col gap-0.5">
+                          <h4 className="text-lg font-semibold text-slate-800">Sottocompetenze</h4>
+                          <p className="text-sm text-slate-500">
+                            {test.subcompetencies.length}{' '}
+                            {test.subcompetencies.length === 1 ? 'elemento' : 'elementi'}
+                          </p>
                         </div>
-                      ))}
-                    </div>
+                        <div className="border rounded-md overflow-hidden bg-white shadow-sm">
+                          <Table>
+                            <TableHeader>
+                              <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
+                                <TableHead className="font-semibold text-slate-900">Titolo</TableHead>
+                                <TableHead className="text-center font-semibold text-slate-900">Soglia</TableHead>
+                                <TableHead className="text-center font-semibold text-slate-900">Peso</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {test.subcompetencies.map((sc: any) => (
+                                <TableRow key={sc.id}>
+                                  <TableCell className="font-normal text-slate-700">{sc.title}</TableCell>
+                                  <TableCell className="text-center font-normal text-slate-600">{sc.threshold}%</TableCell>
+                                  <TableCell className="text-center font-normal text-slate-600">{sc.weight}</TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </div>
+                      </div>
+                    </>
                   )}
 
-                  {/* Badge punteggio se valutato */}
-                  {execution?.test_score !== null && execution?.test_score !== undefined && (
-                    <div className="flex items-center justify-between p-4 rounded-lg bg-green-50 border border-green-200 mt-4">
-                      <span className="text-sm font-semibold text-green-800">Punteggio finale</span>
-                      <span className="text-2xl font-black text-green-600">
-                        {execution.test_score}
-                        <span className="text-base font-normal text-green-500 ml-1">/ {execution.max_score}</span>
-                      </span>
+                  {/* Materiali consegnati */}
+                  <div className="w-full h-px bg-slate-100" />
+                  <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-0.5">
+                      <h4 className="text-lg font-semibold text-slate-800">Materiali consegnati</h4>
+                      <p className="text-sm text-slate-500">
+                        {submittedOutputs.length}{' '}
+                        {submittedOutputs.length === 1 ? 'file' : 'file'}
+                      </p>
                     </div>
+                    <div className="border rounded-md overflow-hidden bg-white shadow-sm">
+                      <Table>
+                        <TableHeader>
+                          <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
+                            <TableHead className="font-semibold text-slate-900">Nome</TableHead>
+                            <TableHead className="text-center font-semibold text-slate-900">Versione</TableHead>
+                            <TableHead className="font-semibold text-slate-900">Descrizione</TableHead>
+                            <TableHead className="text-right font-semibold text-slate-900">Collegamento</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {submittedOutputs.length === 0 ? (
+                            <TableRow>
+                              <TableCell colSpan={4} className="h-16 text-center text-slate-400 font-normal">
+                                Nessun file registrato per questa consegna
+                              </TableCell>
+                            </TableRow>
+                          ) : (
+                            submittedOutputs.map((out: any, i: number) => (
+                              <TableRow key={i}>
+                                <TableCell className="font-normal text-slate-800">{out.name}</TableCell>
+                                <TableCell className="text-center font-normal text-slate-500">
+                                  {out.version ? `v${out.version}` : '—'}
+                                </TableCell>
+                                <TableCell className="font-normal text-slate-600">
+                                  {out.description || '—'}
+                                </TableCell>
+                                <TableCell className="text-right font-normal">
+                                  {out.url ? (
+                                    <a
+                                      href={out.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-primary hover:underline text-xs"
+                                    >
+                                      Apri link
+                                    </a>
+                                  ) : (
+                                    '—'
+                                  )}
+                                </TableCell>
+                              </TableRow>
+                            ))
+                          )}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </div>
+
+                  {/* Valutatori se presenti */}
+                  {evaluators?.length > 0 && (
+                    <>
+                      <div className="w-full h-px bg-slate-100" />
+                      <div className="flex flex-col gap-3">
+                        <div className="flex flex-col gap-0.5">
+                          <h4 className="text-lg font-semibold text-slate-800">Valutatori</h4>
+                          <p className="text-sm text-slate-500">
+                            {evaluators.length}{' '}
+                            {evaluators.length === 1 ? 'elemento' : 'elementi'}
+                          </p>
+                        </div>
+                        <div className="border rounded-md overflow-hidden bg-white shadow-sm">
+                          <Table>
+                            <TableHeader>
+                              <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
+                                <TableHead className="font-semibold text-slate-900">Nome</TableHead>
+                                <TableHead className="font-semibold text-slate-900">Email</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {evaluators.map((ev: any) => (
+                                <TableRow key={ev.id}>
+                                  <TableCell className="font-normal text-slate-700">{ev.user?.name || `Valutatore #${ev.user_id}`}</TableCell>
+                                  <TableCell className="font-normal text-slate-500">{ev.user?.email || '—'}</TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </div>
+                      </div>
+                    </>
                   )}
-                </div>
+                </>
               )}
             </div>
           ) : null}
@@ -325,7 +431,7 @@ export function UserTestModal({
               {saving ? (
                 <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Invio in corso...</>
               ) : (
-                <><Send className="mr-2 h-4 w-4" /> Consegna</>
+                "Consegna"
               )}
             </Button>
           )}
@@ -346,8 +452,8 @@ export function UserTestModal({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={saving}>Annulla</AlertDialogCancel>
-          <AlertDialogAction onClick={executeSubmit} disabled={saving} className="bg-sky-600 hover:bg-sky-700">
-            {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Send className="h-4 w-4 mr-2" />}
+          <AlertDialogAction onClick={executeSubmit} disabled={saving} className="bg-primary hover:bg-primary/90 text-primary-foreground">
+            {saving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
             Conferma e Consegna
           </AlertDialogAction>
         </AlertDialogFooter>

@@ -52,7 +52,7 @@ export function MetadataPickerModal({
             type="button"
             onClick={handleCreate}
             disabled={!newItemName.trim() || hasExactMatch}
-            className="inline-flex h-10 items-center justify-center rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+            className="inline-flex h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
           >
             + Crea
           </button>
@@ -78,18 +78,9 @@ export function MetadataPickerModal({
                   onChange={() => onToggleSelection(item.id)}
                   className="w-4 h-4 text-foreground border-border rounded focus:ring-slate-900 cursor-pointer"
                 />
-                <span
-                  className={`text-sm ${
-                    isSelected ? 'font-bold text-foreground' : 'font-medium text-slate-700'
-                  }`}
-                >
+                <span className="text-sm font-medium text-slate-700">
                   {item.name}
                 </span>
-                {String(item.id).startsWith('temp_') && (
-                  <span className="ml-auto text-[10px] font-bold uppercase tracking-widest bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">
-                    Nuovo
-                  </span>
-                )}
               </label>
             );
           })}

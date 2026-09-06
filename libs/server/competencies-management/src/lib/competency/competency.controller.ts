@@ -64,4 +64,12 @@ export class CompetencyController {
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.competencyService.remove(id);
   }
+
+  @Get('check-associations/:id') // GET /competencies/check-associations/:id
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  checkAssociations(@Param('id', ParseIntPipe) id: number) {
+    return this.competencyService.checkAssociations(id);
+  }
 }

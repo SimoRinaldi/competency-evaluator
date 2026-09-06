@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Eye, EyeOff } from 'lucide-react';
 
 export function UserFormPage({ userId, onSuccess }: { userId?: string; onSuccess?: () => void }) {
   const { id: paramId } = useParams();
@@ -21,6 +22,7 @@ export function UserFormPage({ userId, onSuccess }: { userId?: string; onSuccess
   const [loading, setLoading] = useState(isEditing);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -152,14 +154,28 @@ export function UserFormPage({ userId, onSuccess }: { userId?: string; onSuccess
                 {!isEditing && (
                   <div className="grid gap-2">
                     <Label htmlFor="password">Password</Label>
-                    <Input
-                      id="password"
-                      type="password"
-                      placeholder="Scegli una password (min 6 caratteri)"
-                      value={formData.password}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      required={!isEditing}
-                    />
+                    <div className="relative">
+                      <Input
+                        id="password"
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="Scegli una password (min 6 caratteri)"
+                        value={formData.password}
+                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                        required={!isEditing}
+                        className="pr-10"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-muted-foreground hover:text-foreground"
+                        onClick={() => setShowPassword(!showPassword)}
+                        tabIndex={-1}
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        <span className="sr-only">Mostra password</span>
+                      </Button>
+                    </div>
                   </div>
                 )}
 

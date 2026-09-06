@@ -27,7 +27,7 @@ export class RubricService {
   async findOne(id: number): Promise<RubricSetEntity> {
     const set = await this.rubricRepository.findById(id);
     if (!set) {
-      throw new NotFoundException(`RubricSet con ID ${id} non trovato`);
+      throw new NotFoundException(`Rubrica con ID ${id} non trovata`);
     }
     return set;
   }
@@ -62,7 +62,7 @@ export class RubricService {
 
     const rubric_set = await this.rubricRepository.updateOne(id, updateRubricSetDto);
     if (!rubric_set) {
-      throw new NotFoundException(`RubricSet con ID ${id} non trovato`);
+      throw new NotFoundException(`Rubrica con ID ${id} non trovata`);
     }
     return rubric_set;
   }
@@ -78,7 +78,7 @@ export class RubricService {
     // se non è associata, procede con l'eliminazione
     const deleted = await this.rubricRepository.deleteOne(id);
     if (!deleted) {
-      throw new NotFoundException(`RubricSet con ID ${id} non trovato`);
+      throw new NotFoundException(`Rubrica con ID ${id} non trovata`);
     }
     return { deleted: true };
   }
@@ -119,7 +119,7 @@ export class RubricService {
   ): Promise<void> {
     const duplicate = await this.findMatchingRubricSet(levels, excludeRubricSetId);
     if (duplicate) {
-      throw new ConflictException('Esiste già un rubric set con lo stesso insieme di livelli');
+      throw new ConflictException('Esiste già una rubrica con lo stesso insieme di livelli');
     }
   }
 }

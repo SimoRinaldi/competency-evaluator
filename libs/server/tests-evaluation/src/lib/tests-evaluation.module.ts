@@ -3,7 +3,7 @@ import { ServerCompetenciesManagementModule } from '@server/competencies-managem
 import { RubricLevelAssignmentModule } from './rubric-level-assignment/rubric-level-assignment.module';
 import { TestEvaluatorModule } from './test-evaluator/test-evaluator.module';
 import { TestsEvaluationService } from './tests-evaluation.service';
-import { ServerHistoricalScoresModule } from '@server/historical-scores';
+import { ServerBestScoresModule } from '@server/best_scores';
 import { ServerTestsExecutionModule } from '@server/tests-execution';
 
 import { TestsEvaluationController } from './tests-evaluation.controller';
@@ -13,16 +13,11 @@ import { TestsEvaluationController } from './tests-evaluation.controller';
     ServerCompetenciesManagementModule,
     RubricLevelAssignmentModule,
     TestEvaluatorModule,
-    ServerHistoricalScoresModule,
+    ServerBestScoresModule,
     ServerTestsExecutionModule,
   ],
   controllers: [TestsEvaluationController],
   providers: [TestsEvaluationService],
-  exports: [
-    RubricLevelAssignmentModule,
-    TestEvaluatorModule,
-    TestsEvaluationService,
-  ],
+  exports: [RubricLevelAssignmentModule, TestEvaluatorModule, TestsEvaluationService],
 })
 export class ServerTestsEvaluationModule {}
-

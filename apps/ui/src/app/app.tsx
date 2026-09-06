@@ -11,7 +11,7 @@ import { PageContainer } from '../components/page-container';
 import { UserTestsPage } from '../features/evaluated-user/user-tests.page';
 import { EvaluatorTestsPage } from '../features/evaluator/evaluator-tests.page';
 import { TestEvaluationPage } from '../features/evaluator/test-evaluation.page';
-import { HistoricalScoresPage } from '../features/evaluated-user/historical-scores.page';
+import { BestScoresPage } from '@/features/evaluated-user/best-scores.page';
 import { TestsManagementPage } from '../features/tests/tests-management.page';
 import { CreateTestPage } from '../features/tests/create-test.page';
 import { IndicatorsManagementPage } from '../features/tests/indicators-management.page';
@@ -121,7 +121,7 @@ export function App() {
               <Route element={<ProtectedRoute allowedRoles={['USER']} />}>
                 <Route path="/my-tests/todo" element={<UserTestsPage filter="todo" />} />
                 <Route path="/my-tests/completed" element={<UserTestsPage filter="completed" />} />
-                <Route path="/my-tests/history" element={<HistoricalScoresPage />} />
+                <Route path="/my-tests/history" element={<BestScoresPage />} />
               </Route>
             </Route>
 

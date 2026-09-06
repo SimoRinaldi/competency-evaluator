@@ -18,6 +18,9 @@ export function SubCompetencyPanel({
   onSave,
   onCancel,
   disabledBaseFields = false,
+  onGoToSummary,
+  showGoToSummary,
+  onGoBack,
 }: any) {
   const [title, setTitle] = useState(initialData?.title || '');
   const [weight, setWeight] = useState(initialData?.weight || '');
@@ -222,11 +225,13 @@ export function SubCompetencyPanel({
 
           <div className="space-y-2 w-full md:w-32">
             <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-              Soglia minima <span className="text-red-500">*</span>
+              Soglia minima (%) <span className="text-red-500">*</span>
             </label>
             <input
               type="number"
               min="1"
+              max="100"
+              placeholder="es. 60"
               required
               disabled={disabledBaseFields}
               value={threshold}
@@ -344,23 +349,45 @@ export function SubCompetencyPanel({
       <div className="border-b border-border"></div>
 
       {/* --- BOTTONI SALVATAGGIO --- */}
-      <div className="flex justify-end gap-3">
-        {initialData && (
+      <div className="flex justify-between items-center w-full">
+        <div className="flex gap-2">
+          {onGoBack && (
+            <button
+              type="button"
+              onClick={onGoBack}
+              className="inline-flex h-10 items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium hover:bg-gray-100 shadow-sm"
+            >
+              Torna a Dati Generali
+            </button>
+          )}
+          {showGoToSummary && onGoToSummary && (
+            <button
+              type="button"
+              onClick={onGoToSummary}
+              className="inline-flex h-10 items-center justify-center rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-slate-800"
+            >
+              Vai al Riepilogo
+            </button>
+          )}
+        </div>
+        <div className="flex gap-3">
+          {initialData && (
+            <button
+              type="button"
+              onClick={onCancel}
+              className="inline-flex h-10 items-center justify-center rounded-md border border-gray-300 bg-transparent px-4 py-2 text-sm font-medium hover:bg-gray-100"
+            >
+              Annulla Modifiche
+            </button>
+          )}
           <button
-            type="button"
-            onClick={onCancel}
-            className="inline-flex h-10 items-center justify-center rounded-md border border-gray-300 bg-transparent px-4 py-2 text-sm font-medium hover:bg-gray-100"
+            type="submit"
+            disabled={indicators.length === 0}
+            className="inline-flex h-10 items-center justify-center rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-emerald-700 disabled:bg-slate-300 disabled:cursor-not-allowed disabled:pointer-events-none"
           >
-            Annulla Modifiche
+            Conferma Sottocompetenza
           </button>
-        )}
-        <button
-          type="submit"
-          disabled={indicators.length === 0}
-          className="inline-flex h-10 items-center justify-center rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-emerald-700 disabled:bg-slate-300 disabled:cursor-not-allowed disabled:pointer-events-none"
-        >
-          Conferma Sottocompetenza
-        </button>
+        </div>
       </div>
 
       {/* ===================== MODALE METADATI ===================== */}

@@ -110,4 +110,19 @@ export class RubricLevelAssignmentService {
         );
     }
   }
+
+  async hasEvaluated(test_execution_id: number, evaluator_id: number): Promise<boolean> {
+    const assignments = await this.rubricLevelAssignmentsRepository.findByExecutionAndEvaluator(
+      test_execution_id,
+      evaluator_id
+    );
+    return assignments.length > 0;
+  }
+
+  async getEvaluations(test_execution_id: number, evaluator_id: number): Promise<RubricLevelAssignmentEntity[]> {
+    return this.rubricLevelAssignmentsRepository.findByExecutionAndEvaluator(
+      test_execution_id,
+      evaluator_id
+    );
+  }
 }

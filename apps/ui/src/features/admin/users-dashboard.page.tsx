@@ -71,7 +71,7 @@ const columns: ColumnDef<User>[] = [
                 <Pencil className="h-4 w-4" />
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-[95vw] xl:max-w-[1400px] w-full h-[90vh] p-0 flex flex-col md:flex-row overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
+            <DialogContent className="max-w-[95vw] md:max-w-[900px] w-full max-h-[90vh] p-0 flex flex-col md:flex-row overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
               <UserFormPage userId={user.id.toString()} />
             </DialogContent>
           </Dialog>
@@ -137,17 +137,11 @@ export function UsersDashboardPage() {
                   <Plus className="mr-2 h-4 w-4" /> Nuovo
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-[95vw] xl:max-w-[1400px] w-full h-[90vh] p-0 flex flex-col md:flex-row overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
+              <DialogContent className="max-w-[95vw] md:max-w-[900px] w-full max-h-[90vh] p-0 flex flex-col md:flex-row overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
                 <UserFormPage />
               </DialogContent>
             </Dialog>
-            <Button variant="outline">Importa</Button>
           </EmptyContent>
-          <Button variant="link" className="text-muted-foreground" size="sm" asChild>
-            <a href="#">
-              Scopri di più <ArrowUpRight className="ml-1 h-3 w-3" />
-            </a>
-          </Button>
         </Empty>
       </PageContainer>
     );
@@ -181,7 +175,7 @@ export function UsersDashboardPage() {
                 <Plus className="mr-2 h-4 w-4" /> Nuovo
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-[95vw] xl:max-w-[1400px] w-full h-[90vh] p-0 flex flex-col md:flex-row overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
+            <DialogContent className="max-w-[95vw] md:max-w-[900px] w-full max-h-[90vh] p-0 flex flex-col md:flex-row overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
               <UserFormPage />
             </DialogContent>
           </Dialog>

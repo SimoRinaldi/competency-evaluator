@@ -20,6 +20,12 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Plus, Trash2, Pencil } from "lucide-react";
 
 export function ObservationObjectPanel({
@@ -185,7 +191,7 @@ export function ObservationObjectPanel({
       accessorKey: "description",
       header: "Descrizione",
       cell: ({ row }) => (
-        <span className="block truncate font-medium text-slate-900 max-w-[180px] sm:max-w-xs">
+        <span className="block truncate font-normal text-slate-900 max-w-[180px] sm:max-w-xs">
           {row.getValue("description")}
         </span>
       ),
@@ -194,7 +200,7 @@ export function ObservationObjectPanel({
       accessorKey: "weight",
       header: () => <div className="text-center">Peso</div>,
       cell: ({ row }) => (
-        <div className="text-center font-medium text-slate-700">
+        <div className="text-center font-normal text-slate-700">
           {row.getValue("weight")}
         </div>
       ),
@@ -212,16 +218,22 @@ export function ObservationObjectPanel({
       header: () => <div className="text-right">Azioni</div>,
       cell: ({ row }) => (
         <div className="flex items-center justify-end">
-          <Button 
-            type="button"
-            variant="ghost" 
-            size="sm" 
-            className="h-8 w-8 p-0 text-slate-500 hover:text-sky-600 cursor-pointer"
-            title="Modifica indicatore"
-            onClick={() => openEditForm(row.index)}
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
+          <TooltipProvider delayDuration={150}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  type="button"
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8 text-slate-500 hover:text-slate-900 cursor-pointer"
+                  onClick={() => openEditForm(row.index)}
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top">Modifica indicatore</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       ),
     },
@@ -262,89 +274,73 @@ export function ObservationObjectPanel({
         </div>
 
         {isFormOpen && (
-          <div className="bg-card p-5 rounded-md border border-border shadow-sm space-y-4 mb-4">
-            <h4 className="font-semibold text-foreground text-base">
-              {editingIndex !== null ? 'Modifica indicatore' : 'Nuovo indicatore'}
+          <div className="p-4 border rounded-xl bg-slate-50/50 space-y-4">
+            <h4 className="font-semibold text-sm text-slate-700">
+              {editingIndex !== null ? 'Modifica Indicatore' : 'Nuovo Indicatore'}
             </h4>
-
-            <div className="space-y-4">
-              <div className="flex gap-4">
-                <div className="flex-1 space-y-2">
-                  <label className="text-sm font-medium leading-none">
-                    Descrizione <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={indDesc}
-                    onChange={(e) => setIndDesc(e.target.value)}
-                    placeholder="Es. Usa punteggiatura corretta"
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                  />
-                </div>
-                <div className="w-32 space-y-2">
-                  <label className="text-sm font-medium leading-none">
-                    Peso (1-5) <span className="text-red-500">*</span>
-                  </label>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-medium text-slate-600">Descrizione <span className="text-red-500">*</span></label>
+                <input
+                  type="text"
+                  value={indDesc}
+                  onChange={(e) => setIndDesc(e.target.value)}
+                  placeholder="Es. Capacità di sintesi"
+                  className="flex h-9 w-full rounded-md border border-gray-300 bg-white px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 mt-1"
+                />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-medium text-slate-600">Peso (1-5) <span className="text-red-500">*</span></label>
                   <input
                     type="number"
                     min="1"
                     max="5"
                     value={indWeight}
-                    onChange={(e) => {
-                      const val = parseInt(e.target.value);
-                      if (e.target.value === '' || (val >= 1 && val <= 5)) {
-                        setIndWeight(e.target.value);
-                      }
-                    }}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                    onChange={(e) => setIndWeight(e.target.value)}
+                    className="flex h-9 w-full rounded-md border border-gray-300 bg-white px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 mt-1"
                   />
                 </div>
-              </div>
-
-              <div className="flex gap-4 items-end">
-                <div className="flex-1 space-y-2">
-                  <label className="text-sm font-medium leading-none">
-                    Rubrica Valutazione <span className="text-red-500">*</span>
-                  </label>
-                  <div className="flex gap-2 items-stretch">
-                    <div
-                      className={`flex-1 px-3 py-2 border rounded-md text-sm ${
-                        indRubricId
-                          ? 'bg-background border-input'
-                          : 'bg-muted/30 border-input text-muted-foreground'
-                      }`}
+                <div>
+                  <label className="text-xs font-medium text-slate-600">Rubrica Associata <span className="text-red-500">*</span></label>
+                  <div className="flex gap-2 mt-1">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full justify-start text-left font-normal bg-white"
+                      onClick={() => setIsRubricPickerOpen(true)}
                     >
                       {indRubricId ? (
-                        <RubricLevelsPreview rubric={getSelectedRubric(indRubricId)} />
+                        <span className="truncate">
+                          {getSelectedRubric(indRubricId)?.title || "Rubrica selezionata"}
+                        </span>
                       ) : (
-                        'Nessuna selezionata'
+                        <span className="text-muted-foreground">Seleziona una rubrica...</span>
                       )}
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setIsRubricPickerOpen(true)}
-                      className="inline-flex items-center justify-center rounded-md border border-input bg-background px-6 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground h-auto"
-                    >
-                      Scegli
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-4 flex justify-between items-center border-t border-border mt-4">
-                <div>
-                  {editingIndex !== null && (
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="sm"
-                      onClick={handleDeleteIndicator}
-                    >
-                      <Trash2 className="h-4 w-4 mr-1.5" />
-                      Rimuovi indicatore
-                    </Button>
-                  )}
+              {indRubricId && (
+                <div className="mt-2 p-3 bg-white border rounded-lg">
+                  <div className="text-xs font-medium text-slate-500 mb-1.5">Anteprima livelli rubrica:</div>
+                  <RubricLevelsPreview rubric={getSelectedRubric(indRubricId)} />
                 </div>
+              )}
+
+              <div className="flex justify-between items-center pt-2">
+                {editingIndex !== null ? (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    onClick={() => handleDeleteIndicator(editingIndex)}
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" /> Elimina
+                  </Button>
+                ) : <div />}
                 <div className="flex gap-2">
                   <Button type="button" variant="outline" onClick={closeForm}>
                     Annulla
@@ -375,7 +371,7 @@ export function ObservationObjectPanel({
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => {
                     return (
-                      <TableHead key={header.id} className="px-4">
+                      <TableHead key={header.id} className="px-4 font-semibold text-slate-900">
                         {header.isPlaceholder
                           ? null
                           : flexRender(
@@ -396,7 +392,7 @@ export function ObservationObjectPanel({
                     data-state={row.getIsSelected() && "selected"}
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className="px-4 py-2.5">
+                      <TableCell key={cell.id} className="px-4 py-1.5 align-middle">
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()
@@ -409,7 +405,7 @@ export function ObservationObjectPanel({
                 <TableRow>
                   <TableCell
                     colSpan={columns.length}
-                    className="h-24 text-center text-muted-foreground"
+                    className="h-24 text-center text-muted-foreground font-normal"
                   >
                     Nessun indicatore aggiunto.
                   </TableCell>

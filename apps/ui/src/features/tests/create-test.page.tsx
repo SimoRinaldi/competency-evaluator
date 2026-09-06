@@ -512,7 +512,7 @@ export function CreateTestPage() {
                         <SelectItem key={comp.id} value={String(comp.id)}>
                           <span className="font-medium text-slate-900">{comp.title}</span>{' '}
                           <span className="text-xs text-slate-500">
-                            (Peso: {comp.weight}, Soglia: {comp.threshold})
+                            (Peso: {comp.weight}, Soglia: {comp.threshold}%)
                           </span>
                         </SelectItem>
                       ))}
@@ -524,7 +524,7 @@ export function CreateTestPage() {
                   <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 flex justify-between items-center mt-3">
                     <div>
                       Peso: <strong>{selectedCompetency.weight}</strong> | Soglia minima:{' '}
-                      <strong>{selectedCompetency.threshold}</strong>
+                      <strong>{selectedCompetency.threshold}%</strong>
                     </div>
                     <span className="text-slate-500 font-medium">
                       {allSubcompetenciesForCompetency.length} sottocompetenze collegate
@@ -578,7 +578,7 @@ export function CreateTestPage() {
               {/* Data table */}
               <div className="border border-slate-200 rounded-md overflow-hidden bg-white shadow-sm">
                 <Table>
-                  <TableHeader className="bg-slate-50">
+                  <TableHeader>
                     <TableRow>
                       <TableHead className="w-12 text-center">
                         <input
@@ -594,13 +594,13 @@ export function CreateTestPage() {
                           onChange={toggleAllVisibleSubs}
                         />
                       </TableHead>
-                      <TableHead className="font-semibold text-slate-700">
+                      <TableHead className="font-semibold text-slate-900">
                         Titolo Sottocompetenza
                       </TableHead>
-                      <TableHead className="w-20 text-center font-semibold text-slate-700">
+                      <TableHead className="w-20 text-center font-semibold text-slate-900">
                         Peso
                       </TableHead>
-                      <TableHead className="w-20 text-center font-semibold text-slate-700">
+                      <TableHead className="w-20 text-center font-semibold text-slate-900">
                         Soglia
                       </TableHead>
                     </TableRow>
@@ -608,7 +608,7 @@ export function CreateTestPage() {
                   <TableBody>
                     {paginatedSubcompetencies.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={4} className="h-32 text-center text-xs text-slate-400">
+                        <TableCell colSpan={4} className="h-32 text-center text-xs text-slate-400 font-normal">
                           Nessuna sottocompetenza disponibile o trovata.
                         </TableCell>
                       </TableRow>
@@ -630,7 +630,7 @@ export function CreateTestPage() {
                                 onChange={() => toggleSub(sub.id)}
                               />
                             </TableCell>
-                            <TableCell className="font-medium text-slate-900 text-sm">
+                            <TableCell className="font-normal text-slate-900 text-sm">
                               {sub.title}
                             </TableCell>
                             <TableCell className="text-center text-slate-600 text-xs">
@@ -732,7 +732,7 @@ export function CreateTestPage() {
 
               <div className="border border-slate-200 rounded-md overflow-hidden bg-white shadow-sm">
                 <Table>
-                  <TableHeader className="bg-slate-50">
+                  <TableHeader>
                     <TableRow>
                       <TableHead className="w-12 text-center">
                         <input
@@ -747,8 +747,8 @@ export function CreateTestPage() {
                           onChange={toggleAllVisibleEvaluatedUsers}
                         />
                       </TableHead>
-                      <TableHead className="font-semibold text-slate-700">Nome Utente</TableHead>
-                      <TableHead className="font-semibold text-slate-700">Email</TableHead>
+                      <TableHead className="font-semibold text-slate-900">Nome Utente</TableHead>
+                      <TableHead className="font-semibold text-slate-900">Email</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -776,7 +776,7 @@ export function CreateTestPage() {
                                 onChange={() => toggleEvaluatedUser(eu.id)}
                               />
                             </TableCell>
-                            <TableCell className="font-medium text-slate-900 text-sm">
+                            <TableCell className="font-normal text-slate-900 text-sm">
                               {eu.user?.name ?? '-'}
                             </TableCell>
                             <TableCell className="text-slate-600 text-xs">
@@ -875,7 +875,7 @@ export function CreateTestPage() {
 
               <div className="border border-slate-200 rounded-md overflow-hidden bg-white shadow-sm">
                 <Table>
-                  <TableHeader className="bg-slate-50">
+                  <TableHeader>
                     <TableRow>
                       <TableHead className="w-12 text-center">
                         <input
@@ -890,16 +890,16 @@ export function CreateTestPage() {
                           onChange={toggleAllVisibleTestEvaluators}
                         />
                       </TableHead>
-                      <TableHead className="font-semibold text-slate-700">
+                      <TableHead className="font-semibold text-slate-900">
                         Nome Valutatore
                       </TableHead>
-                      <TableHead className="font-semibold text-slate-700">Email</TableHead>
+                      <TableHead className="font-semibold text-slate-900">Email</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {paginatedTestEvaluators.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={3} className="h-32 text-center text-xs text-slate-400">
+                        <TableCell colSpan={3} className="h-32 text-center text-xs text-slate-400 font-normal">
                           Nessun valutatore trovato.
                         </TableCell>
                       </TableRow>
@@ -921,7 +921,7 @@ export function CreateTestPage() {
                                 onChange={() => toggleTestEvaluator(te.id)}
                               />
                             </TableCell>
-                            <TableCell className="font-medium text-slate-900 text-sm">
+                            <TableCell className="font-normal text-slate-900 text-sm">
                               {te.user?.name ?? '-'}
                             </TableCell>
                             <TableCell className="text-slate-600 text-xs">

@@ -8,7 +8,7 @@ import { SubCompetencyPanel } from './components/sub-competency-panel';
 import { Step3Summary } from './components/step3-summary';
 import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
-export function EditCompetencyPage({ competencyId: propId }: { competencyId?: string }) {
+export function EditCompetencyPage({ competencyId: propId, onSuccess }: { competencyId?: string; onSuccess?: () => void }) {
   const navigate = useNavigate();
   const { showSuccess } = useFeedback();
   const { id: paramId } = useParams();
@@ -216,7 +216,11 @@ export function EditCompetencyPage({ competencyId: propId }: { competencyId?: st
 
         await updateCompetencyChain(id, payload);
         showSuccess('Competenza modificata con successo!');
-        navigate('/competencies');
+        if (onSuccess) {
+          onSuccess();
+        } else {
+          window.location.reload();
+        }
       }
     } catch (error: any) {
       setSubmitError(error.message || 'Errore durante il salvataggio');
@@ -420,6 +424,9 @@ export function EditCompetencyPage({ competencyId: propId }: { competencyId?: st
               setNewSkills={setNewSkills}
               onSave={handleSaveSubCompetency}
               onCancel={() => setActiveSubIndex(-1)}
+              onGoToSummary={() => setActiveMenu(3)}
+              showGoToSummary={subCompetencies.length > 0 && activeSubIndex === -1}
+              onGoBack={() => setActiveMenu(1)}
             />
           )}
 

@@ -8,6 +8,12 @@ export async function getAvailableTests() {
   return response.json();
 }
 
+export async function getAvailableTestsByUserId(user_id: string | number) {
+  const response = await fetch(`${API_URL}/tests/user/${user_id}`, { headers: getAuthHeaders() });
+  if (!response.ok) throw new Error("Errore nel caricamento dei test dell'utente");
+  return response.json();
+}
+
 export async function getTestDetails(testId: string | number) {
   const response = await fetch(`${API_URL}/tests/${testId}`, { headers: getAuthHeaders() });
   if (!response.ok) throw new Error('Errore nel caricamento del test');
@@ -15,12 +21,19 @@ export async function getTestDetails(testId: string | number) {
 }
 
 export async function getTestEvaluators(testId: string | number) {
-  const response = await fetch(`${API_URL}/test_evaluators/by-test/${testId}`, { headers: getAuthHeaders() });
-  if (!response.ok) return []; // Graceful fallback
+  const response = await fetch(`${API_URL}/test_evaluators/by-test/${testId}`, {
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) return [];
   return response.json();
 }
 
-export async function submitTestExecution(testId: number, userId: number, outputs: { name: string, description: string, url: string, version: string }[], existingExecutionId?: number) {
+export async function submitTestExecution(
+  testId: number,
+  userId: number,
+  outputs: { name: string; description: string; url: string; version: string }[],
+  existingExecutionId?: number,
+) {
   let executionId = existingExecutionId;
 
   if (!executionId) {
@@ -28,7 +41,7 @@ export async function submitTestExecution(testId: number, userId: number, output
     const executionRes = await fetch(`${API_URL}/test_executions`, {
       method: 'POST',
       headers: getAuthHeaders(),
-      body: JSON.stringify({ test_id: testId, user_id: userId })
+      body: JSON.stringify({ test_id: testId, user_id: userId }),
     });
     if (!executionRes.ok) throw new Error("Errore durante la creazione dell'esecuzione del test");
     const execution = await executionRes.json();
@@ -42,8 +55,8 @@ export async function submitTestExecution(testId: number, userId: number, output
       headers: getAuthHeaders(),
       body: JSON.stringify({
         ...output,
-        test_execution_id: executionId
-      })
+        test_execution_id: executionId,
+      }),
     });
     if (!outRes.ok) throw new Error('Errore durante il salvataggio dei file output');
   }
@@ -51,46 +64,58 @@ export async function submitTestExecution(testId: number, userId: number, output
   return { id: executionId };
 }
 
-export async function getUserExecutions(userId: number) {
-  const response = await fetch(`${API_URL}/test_executions/by-user/${userId}`, { headers: getAuthHeaders() });
-  if (!response.ok) return []; // Nessuna esecuzione trovata, restituisce array vuoto
+export async function getUserExecutions(userId: string | number) {
+  const response = await fetch(`${API_URL}/test_executions/by-user/${userId}`, {
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) return [];
   return response.json();
 }
 
-export async function getCompetencyHistoricalScores(userId: string | number): Promise<any[]> {
-  const response = await fetch(`${API_URL}/competency_historical_scores/by-user/${userId}`, {
+export async function getBestCompetencyScores(userId: string | number): Promise<any[]> {
+  const response = await fetch(`${API_URL}/best_competency_score/by-user/${userId}`, {
     headers: getAuthHeaders(),
   });
   if (!response.ok) throw new Error('Errore nel caricamento dei punteggi delle competenze');
   return response.json();
 }
 
-export async function getSubCompetencyHistoricalScores(userId: string | number): Promise<any[]> {
-  const response = await fetch(`${API_URL}/subcompetency_historical_scores/by-user/${userId}`, { headers: getAuthHeaders() });
+export async function getBestSubCompetencyScores(userId: string | number): Promise<any[]> {
+  const response = await fetch(`${API_URL}/best_subcompetency_score/by-user/${userId}`, {
+    headers: getAuthHeaders(),
+  });
   if (!response.ok) return [];
   return response.json();
 }
 
-export async function getAcquiredCompetencies(userId: number) {
-  const response = await fetch(`${API_URL}/historical_scores/competencies/acquired/${userId}`, { headers: getAuthHeaders() });
-  if (!response.ok) return [];
-  return response.json();
+export interface UserSubCompetencyEvaluation {
+  competency_id: number;
+  subcompetency_id: number;
+  threshold: number;
+  title: string;
+  score_absolute: number | null;
+  score_percentage: string | null;
+  acquired?: boolean;
 }
 
-export async function getUnacquiredCompetencies(userId: number) {
-  const response = await fetch(`${API_URL}/historical_scores/competencies/unacquired/${userId}`, { headers: getAuthHeaders() });
-  if (!response.ok) return [];
-  return response.json();
+export interface UserCompetencyEvaluation {
+  competency_id: number;
+  title: string;
+  threshold: number;
+  score_absolute: number | null;
+  score_percentage: string | null;
+  subcompetencies: UserSubCompetencyEvaluation[];
 }
 
-export async function getAcquiredSubcompetencies(userId: number, competencyId: number) {
-  const response = await fetch(`${API_URL}/historical_scores/subcompetencies/acquired/${userId}/${competencyId}`, { headers: getAuthHeaders() });
-  if (!response.ok) return [];
-  return response.json();
+export interface BestScoresResponse {
+  acquired_competencies: UserCompetencyEvaluation[];
+  unacquired_competencies: UserCompetencyEvaluation[];
 }
 
-export async function getUnacquiredSubcompetencies(userId: number, competencyId: number) {
-  const response = await fetch(`${API_URL}/historical_scores/subcompetencies/unacquired/${userId}/${competencyId}`, { headers: getAuthHeaders() });
-  if (!response.ok) return [];
+export async function getBestScores(userId: string | number): Promise<BestScoresResponse> {
+  const response = await fetch(`${API_URL}/best_scores/${userId}`, {
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) throw new Error('Errore nel caricamento dei punteggi');
   return response.json();
 }

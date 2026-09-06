@@ -82,4 +82,13 @@ export class RubricLevelAssignmentRepository {
       ],
     });
   }
+
+  async findByExecutionAndEvaluator(
+    test_execution_id: number,
+    evaluator_id: number
+  ): Promise<RubricLevelAssignmentEntity[]> {
+    return this.repository.find({
+      where: { test_execution_id, evaluator_id },
+    });
+  }
 }

@@ -61,4 +61,20 @@ export class CompetencyRepository {
     const result = await this.repository.delete(id);
     return (result.affected ?? 0) > 0;
   }
+
+  // Metodo per controllare se la competenza o una sua sottocompetenza 
+  // fa parte di un test. Serve per bloccare la modifica/eliminazione
+  // se il test esiste già (come da richiesta).
+  async isAssociatedWithAnyTest(id: number): Promise<boolean> {
+    const record = await this.repository.manager
+      .createQueryBuilder()
+      .select('ts.test_id')
+      .from('test_subcompetency', 'ts')
+      .innerJoin('subcompetency', 'sc', 'sc.id = ts.subcompetency_id')
+      .where('sc.competency_id = :id', { id })
+      .limit(1)
+      .getRawOne();
+      
+    return !!record;
+  }
 }

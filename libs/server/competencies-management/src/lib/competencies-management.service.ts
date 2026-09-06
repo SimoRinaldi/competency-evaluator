@@ -48,13 +48,13 @@ export class CompetenciesManagementService {
     try {
       const manager = query_runner.manager;
 
-      // 1. Creiamo al volo la competenza principale
+      // Creo la competenza
       const saved_competency = await this.createCompetencyChain(manager, dto);
 
-      // 2. Creiamo ricorsivamente tutte le sotto-competenze e i loro figli
+      // Creo sottocompetenze
       await this.syncSubCompetenciesChain(manager, saved_competency, dto.subcompetencies);
 
-      // 3. Ricarichiamo l'albero completo pulito per restituirlo al client
+      // Ricarico tutto per restituirlo
       const result = await manager.findOne(CompetencyEntity, {
         where: { id: saved_competency.id },
         relations: {
@@ -137,9 +137,7 @@ export class CompetenciesManagementService {
       // Se nel payload ci sono le sotto-competenze facciamo il diffing/upsert gerarchico
       if (dto.subcompetencies) {
         if (dto.subcompetencies.length === 0) {
-          throw new BadRequestException(
-            'La competenza deve contenere almeno una sotto-competenza',
-          );
+          throw new BadRequestException('La competenza deve contenere almeno una sotto-competenza');
         }
         await this.syncSubCompetenciesChain(
           manager,
@@ -152,6 +150,9 @@ export class CompetenciesManagementService {
           title: existing_competency.title,
           weight: existing_competency.weight,
         });
+        if (dto.weight !== undefined) {
+          await this.recalculateCompetencyThreshold(manager, existing_competency.id);
+        }
       }
 
       // Recuperiamo l'albero aggiornato dal database prima di inviarlo al client
@@ -213,21 +214,19 @@ export class CompetenciesManagementService {
       });
 
       if (!subcompetency) {
-        throw new NotFoundException(
-          `Sotto-competenza con ID ${subcompetency_id} non trovata`,
-        );
+        throw new NotFoundException(`Sotto-competenza con ID ${subcompetency_id} non trovata`);
       }
 
       //cache per i set di rubriche usati in questa transazione
       const rubric_sets_cache: RubricSetEntity[] = [];
 
       // dincronizzo l'oggetto di osservazione e gli indicatori (riutilizzando il metodo modulare di diffing)
-      await this.syncObservationObjectChain(
-        manager,
-        dto,
-        subcompetency,
-        rubric_sets_cache,
-      );
+      await this.syncObservationObjectChain(manager, dto, subcompetency, rubric_sets_cache);
+
+      const parent_comp_id = subcompetency.competency_id ?? subcompetency.competency?.id;
+      if (parent_comp_id) {
+        await this.recalculateCompetencyThreshold(manager, parent_comp_id);
+      }
 
       const updated_sub = await manager.findOne(SubCompetencyEntity, {
         where: { id: subcompetency_id },
@@ -417,14 +416,68 @@ export class CompetenciesManagementService {
       await manager.remove(subs_to_remove);
     }
 
-    // Ricalcoliamo al volo la soglia totale della competenza come somma delle sotto-competenze
-    const comp_threshold = subcompetency_dtos.reduce((sum, sub) => sum + sub.threshold, 0);
-    competency.threshold = comp_threshold;
+    // Salvo eventuali modifiche a titolo e peso della competenza
     await manager.update(CompetencyEntity, competency.id, {
       title: competency.title,
       weight: competency.weight,
+    });
+
+    // Ricalcolo la soglia della competenza con Opzione 1 (coerente con i punteggi massimi e gli indicatori)
+    competency.threshold = await this.recalculateCompetencyThreshold(manager, competency.id);
+  }
+
+  // Ricalcola la soglia della competenza in base ai punteggi massimi delle sue sotto-competenze e indicatori (Opzione 1)
+  async recalculateCompetencyThreshold(
+    manager: EntityManager,
+    competency_id: number,
+  ): Promise<number> {
+    const competency = await manager.findOne(CompetencyEntity, {
+      where: { id: competency_id },
+      relations: {
+        subcompetencies: {
+          observation_object: {
+            indicators: true,
+          },
+        },
+      },
+    });
+
+    if (!competency || !competency.subcompetencies || competency.subcompetencies.length === 0) {
+      return 0;
+    }
+
+    const p_comp = Number(competency.weight) || 0;
+    let total_max_score = 0;
+    let total_weighted_threshold = 0;
+
+    for (const sub of competency.subcompetencies) {
+      const p_sub = Number(sub.weight) || 0;
+      const sub_threshold = Number(sub.threshold) || 0;
+      const indicators = sub.observation_object?.indicators ?? [];
+
+      let sub_max_score = 0;
+      if (indicators.length > 0) {
+        for (const ind of indicators) {
+          const p_ind = Number(ind.weight) || 0;
+          sub_max_score += (p_comp + p_sub + p_ind) * 5;
+        }
+      } else {
+        // mi sembra che ci siano sempre gli indicatori ma in caso...
+        sub_max_score = p_sub > 0 ? p_sub * 5 : 5;
+      }
+
+      total_max_score += sub_max_score;
+      total_weighted_threshold += sub_threshold * sub_max_score;
+    }
+
+    const comp_threshold =
+      total_max_score > 0 ? Math.round(total_weighted_threshold / total_max_score) : 0;
+
+    await manager.update(CompetencyEntity, competency.id, {
       threshold: comp_threshold,
     });
+
+    return comp_threshold;
   }
 
   // Sincronizza l'oggetto di osservazione associato alla sotto-competenza (1 a 1)
@@ -560,11 +613,14 @@ export class CompetenciesManagementService {
     const result: T[] = [];
     const local_cache = cache ?? new Map<string, T>();
 
-    // 1. Se ci hanno passato degli ID numerici, li andiamo a pescare dal DB
+    // id numerici da db
     if (ids?.length) {
-      const existing = (await manager.findBy(entity_class as unknown as { new (): T }, {
-        id: In(ids),
-      } as never)) as unknown as T[];
+      const existing = (await manager.findBy(
+        entity_class as unknown as { new (): T },
+        {
+          id: In(ids),
+        } as never,
+      )) as unknown as T[];
 
       if (existing.length !== ids.length) {
         const found_ids = new Set(existing.map((e) => e.id));
@@ -579,7 +635,7 @@ export class CompetenciesManagementService {
       }
     }
 
-    // 2. Se ci hanno passato oggetti inline con il nome, facciamo un find-or-create con cache locale
+    // cache locale
     if (dtos?.length) {
       for (const dto of dtos) {
         const cached = local_cache.get(dto.name);
@@ -676,7 +732,7 @@ export class CompetenciesManagementService {
         throw new BadRequestException('Il set di rubriche deve contenere almeno un livello');
       }
 
-      // 1. Controlliamo se un set identico è già stato istanziato in questa transazione
+      // controlliamo se un set identico è già stato istanziato in questa transazione
       const cached = rubric_sets_cache.find((set) => {
         if (!set.levels || set.levels.length !== levels.length) return false;
         return set.levels.every((existing_level) =>
@@ -691,14 +747,14 @@ export class CompetenciesManagementService {
         return cached;
       }
 
-      // 2. Verifichiamo se esiste già a database un set con gli stessi identici livelli
+      // verifichiamo se esiste già a database un set con gli stessi identici livelli
       const existing_in_db = await this.rubricService.findMatchingRubricSet(levels);
       if (existing_in_db) {
         rubric_sets_cache.push(existing_in_db);
         return existing_in_db;
       }
 
-      // 3. Se non esiste da nessuna parte, ne creiamo uno nuovo con i suoi livelli
+      // se non esiste da nessuna parte, ne creiamo uno nuovo con i suoi livelli
       const rubric_set = manager.create(RubricSetEntity, {
         yes_no: indicator_dto.rubricSet.yes_no,
       });
