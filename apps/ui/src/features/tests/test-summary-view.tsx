@@ -53,32 +53,32 @@ export function TestSummaryView({
       <div className="flex flex-col gap-3">
         <div className="flex flex-col gap-0.5">
           <h4 className="text-lg font-semibold text-slate-800">Sottocompetenze</h4>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm font-medium text-slate-500">
             {subcompetencies.length} {subcompetencies.length === 1 ? 'elemento' : 'elementi'}
           </p>
         </div>
         <div className="border rounded-md overflow-hidden bg-white shadow-sm">
           <Table>
             <TableHeader>
-              <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-                <TableHead>Titolo</TableHead>
-                <TableHead>Soglia</TableHead>
-                <TableHead>Peso</TableHead>
+              <TableRow>
+                <TableHead className="px-4 font-semibold text-slate-900">Titolo</TableHead>
+                <TableHead className="px-4 font-semibold text-slate-900">Soglia</TableHead>
+                <TableHead className="px-4 font-semibold text-slate-900">Peso</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {subcompetencies.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="h-20 text-center text-slate-400">
+                  <TableCell colSpan={3} className="h-20 text-center text-slate-400 font-normal">
                     Nessuna sottocompetenza associata
                   </TableCell>
                 </TableRow>
               ) : (
                 subcompetencies.map((sub) => (
                   <TableRow key={sub.id}>
-                    <TableCell>{sub.title}</TableCell>
-                    <TableCell>{sub.threshold}</TableCell>
-                    <TableCell>{sub.weight}</TableCell>
+                    <TableCell className="px-4 py-1.5 font-normal">{sub.title}</TableCell>
+                    <TableCell className="px-4 py-1.5 font-normal">{sub.threshold}</TableCell>
+                    <TableCell className="px-4 py-1.5 font-normal">{sub.weight}</TableCell>
                   </TableRow>
                 ))
               )}
@@ -93,30 +93,30 @@ export function TestSummaryView({
       <div className="flex flex-col gap-3">
         <div className="flex flex-col gap-0.5">
           <h4 className="text-lg font-semibold text-slate-800">Utenti</h4>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm font-medium text-slate-500">
             {students.length} {students.length === 1 ? 'elemento' : 'elementi'}
           </p>
         </div>
         <div className="border rounded-md overflow-hidden bg-white shadow-sm">
           <Table>
             <TableHeader>
-              <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-                <TableHead>Nome</TableHead>
-                <TableHead>Email</TableHead>
+              <TableRow>
+                <TableHead className="px-4 font-semibold text-slate-900">Nome</TableHead>
+                <TableHead className="px-4 font-semibold text-slate-900">Email</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {students.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={2} className="h-16 text-center text-slate-400">
+                  <TableCell colSpan={2} className="h-16 text-center text-slate-400 font-normal">
                     Nessuno utente assegnato
                   </TableCell>
                 </TableRow>
               ) : (
                 students.map((user) => (
                   <TableRow key={user.id}>
-                    <TableCell>{user.name}</TableCell>
-                    <TableCell className="text-slate-500">{user.email}</TableCell>
+                    <TableCell className="px-4 py-1.5 font-normal">{user.name}</TableCell>
+                    <TableCell className="px-4 py-1.5 font-normal text-slate-500">{user.email}</TableCell>
                   </TableRow>
                 ))
               )}
@@ -131,30 +131,30 @@ export function TestSummaryView({
       <div className="flex flex-col gap-3">
         <div className="flex flex-col gap-0.5">
           <h4 className="text-lg font-semibold text-slate-800">Valutatori</h4>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm font-medium text-slate-500">
             {evaluators.length} {evaluators.length === 1 ? 'elemento' : 'elementi'}
           </p>
         </div>
         <div className="border rounded-md overflow-hidden bg-white shadow-sm">
           <Table>
             <TableHeader>
-              <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-                <TableHead>Nome</TableHead>
-                <TableHead>Email</TableHead>
+              <TableRow>
+                <TableHead className="px-4 font-semibold text-slate-900">Nome</TableHead>
+                <TableHead className="px-4 font-semibold text-slate-900">Email</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {evaluators.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={2} className="h-16 text-center text-slate-400">
+                  <TableCell colSpan={2} className="h-16 text-center text-slate-400 font-normal">
                     Nessun valutatore assegnato
                   </TableCell>
                 </TableRow>
               ) : (
                 evaluators.map((evaluator) => (
                   <TableRow key={evaluator.id}>
-                    <TableCell>{evaluator.name}</TableCell>
-                    <TableCell className="text-slate-500">{evaluator.email}</TableCell>
+                    <TableCell className="px-4 py-1.5 font-normal">{evaluator.name}</TableCell>
+                    <TableCell className="px-4 py-1.5 font-normal text-slate-500">{evaluator.email}</TableCell>
                   </TableRow>
                 ))
               )}

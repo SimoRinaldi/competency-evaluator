@@ -24,8 +24,6 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
 import {
@@ -36,6 +34,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import {
   Empty,
   EmptyDescription,
@@ -52,8 +56,6 @@ import {
   RefreshCw,
   Search,
   TriangleAlert,
-  ChevronLeft,
-  ChevronRight,
 } from 'lucide-react';
 import {
   AlertDialog,
@@ -275,25 +277,30 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
   const columns = useMemo<ColumnDef<ApiTest>[]>(() => {
     const baseCols: ColumnDef<ApiTest>[] = [
       {
+        accessorKey: 'id',
+        header: 'Numero',
+        cell: ({ row }) => (
+          <span className="text-sm font-normal text-slate-600">
+            #{row.original.id}
+          </span>
+        ),
+      },
+      {
         accessorKey: 'assessment_situation',
         header: 'Descrizione test',
         cell: ({ row }) => (
           <HoverCard>
             <HoverCardTrigger asChild>
               <span
-                className="block truncate max-w-150 text-slate-700
-  cursor-pointer hover:text-primary hover:underline"
+                className="block truncate max-w-150 font-normal text-slate-700 cursor-pointer hover:text-primary hover:underline"
                 onClick={() => setViewingTestId(row.original.id)}
               >
                 {row.original.assessment_situation}
               </span>
             </HoverCardTrigger>
-            <HoverCardContent
-              className="w-96 bg-white text-sm text-slate-700 shadow-lg
-  border border-slate-200"
-            >
+            <HoverCardContent className="w-96 bg-white text-sm text-slate-700 shadow-lg border border-slate-200">
               <p className="font-semibold text-slate-900 mb-1">Descrizione test</p>
-              <p className="leading-relaxed">{row.original.assessment_situation}</p>
+              <p className="leading-relaxed whitespace-pre-wrap font-normal">{row.original.assessment_situation}</p>
             </HoverCardContent>
           </HoverCard>
         ),
@@ -303,7 +310,7 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
         header: () => <div className="text-center">Utenti</div>,
         cell: ({ row }) => (
           <div className="flex justify-center">
-            <span className="inline-flex items-center justify-center bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full text-xs font-semibold border border-slate-200">
+            <span className="inline-flex items-center justify-center bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full text-xs font-normal border border-slate-200">
               {row.original.evaluated_users_count || 0}
             </span>
           </div>
@@ -314,7 +321,7 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
         header: () => <div className="text-center">Valutatori</div>,
         cell: ({ row }) => (
           <div className="flex justify-center">
-            <span className="inline-flex items-center justify-center bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full text-xs font-semibold border border-slate-200">
+            <span className="inline-flex items-center justify-center bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full text-xs font-normal border border-slate-200">
               {row.original.evaluators_count || 0}
             </span>
           </div>
@@ -325,7 +332,7 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
         header: () => <div className="text-center">Sottocompetenze</div>,
         cell: ({ row }) => (
           <div className="flex justify-center">
-            <span className="inline-flex items-center justify-center bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full text-xs font-semibold border border-slate-200">
+            <span className="inline-flex items-center justify-center bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full text-xs font-normal border border-slate-200">
               {row.original.subcompetencies?.length || 0}
             </span>
           </div>
@@ -338,30 +345,46 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
         id: 'actions',
         header: () => <div className="text-right">Azioni</div>,
         cell: ({ row }) => (
-          <div className="flex items-center justify-end gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-slate-500 hover:text-sky-600 cursor-pointer"
-              title="Modifica"
-              onClick={() => handleEditClick(row.original.id)}
-            >
-              <Edit className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-slate-500 hover:text-red-600 cursor-pointer"
-              title="Elimina"
-              onClick={() => handleDeleteClick(row.original)}
-              disabled={isDeletingId === row.original.id}
-            >
-              {isDeletingId === row.original.id ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Trash2 className="h-4 w-4" />
-              )}
-            </Button>
+          <div className="flex items-center justify-end gap-1">
+            <TooltipProvider delayDuration={150}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-slate-500 hover:text-slate-900 cursor-pointer"
+                    onClick={() => handleEditClick(row.original.id)}
+                  >
+                    <Edit className="h-4 w-4" />
+                    <span className="sr-only">Modifica test</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">
+                  <p>Modifica test</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-slate-500 hover:text-red-600 cursor-pointer"
+                    onClick={() => handleDeleteClick(row.original)}
+                    disabled={isDeletingId === row.original.id}
+                  >
+                    {isDeletingId === row.original.id ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-4 w-4" />
+                    )}
+                    <span className="sr-only">Elimina test</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">
+                  <p>Elimina test</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         ),
       });
@@ -375,17 +398,10 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
     columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     state: {
       globalFilter,
     },
     onGlobalFilterChange: setGlobalFilter,
-    initialState: {
-      pagination: {
-        pageSize: 10,
-      },
-    },
   });
 
   return (
@@ -400,13 +416,13 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4">
         <div className="flex items-center gap-3 w-full max-w-md">
           <div className="relative w-full">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="text"
               placeholder="Cerca test per descrizione..."
               value={globalFilter}
               onChange={(e) => setGlobalFilter(e.target.value)}
-              className="pl-9 h-9 w-full bg-white"
+              className="!pl-10 bg-white"
             />
           </div>
           <Button
@@ -440,11 +456,11 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
       <div className="rounded-md border bg-card text-card-foreground shadow-sm overflow-hidden flex flex-col">
         <div className="overflow-x-auto">
           <Table>
-            <TableHeader className="bg-slate-50/50">
+            <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id} className="px-4 whitespace-nowrap">
+                    <TableHead key={header.id} className="px-4 font-semibold text-slate-900 whitespace-nowrap">
                       {header.isPlaceholder
                         ? null
                         : flexRender(header.column.columnDef.header, header.getContext())}
@@ -468,7 +484,7 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
                     className="hover:bg-slate-50/50 group"
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className="px-4 py-3 align-middle">
+                      <TableCell key={cell.id} className="px-4 py-1.5 align-middle">
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </TableCell>
                     ))}
@@ -499,30 +515,7 @@ export function TestsManagementPage({ readOnly = false }: TestsManagementPagePro
       </div>
 
       <div className="flex items-center justify-between py-4 px-1">
-        <div className="text-sm font-medium text-slate-500">{tests.length} elementi</div>
-        {table.getPageCount() > 1 && (
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              <ChevronLeft className="h-4 w-4 mr-1" /> Precedente
-            </Button>
-            <div className="text-sm font-medium text-slate-600 px-2">
-              Pagina {table.getState().pagination.pageIndex + 1} di {table.getPageCount()}
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              Successiva <ChevronRight className="h-4 w-4 ml-1" />
-            </Button>
-          </div>
-        )}
+        <div className="text-sm font-medium text-slate-500">{table.getFilteredRowModel().rows.length} elementi</div>
       </div>
 
       {/* MODALS */}

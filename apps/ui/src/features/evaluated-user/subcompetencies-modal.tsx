@@ -13,6 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
 
 export interface SubcompetenciesModalProps {
   isOpen: boolean;
@@ -53,23 +54,23 @@ export function SubcompetenciesModal({
             {error}
           </div>
         ) : (
-          <div className="overflow-x-auto border border-slate-200 rounded-md">
+          <div className="rounded-md border bg-card text-card-foreground shadow-sm overflow-hidden">
             <Table>
               <TableHeader>
-                <TableRow className="hover:bg-transparent">
-                  <TableHead className="font-medium text-slate-500 py-3">
+                <TableRow>
+                  <TableHead className="px-4 font-semibold text-slate-900">
                     Sotto-competenza
                   </TableHead>
-                  <TableHead className="text-center font-medium text-slate-500 py-3">
+                  <TableHead className="text-center px-4 font-semibold text-slate-900">
                     Stato
                   </TableHead>
-                  <TableHead className="text-center font-medium text-slate-500 py-3">
+                  <TableHead className="text-center px-4 font-semibold text-slate-900">
                     Soglia
                   </TableHead>
-                  <TableHead className="text-center font-medium text-slate-500 py-3">
+                  <TableHead className="text-center px-4 font-semibold text-slate-900">
                     Punteggio / Max
                   </TableHead>
-                  <TableHead className="text-center font-medium text-slate-500 py-3">
+                  <TableHead className="text-center px-4 font-semibold text-slate-900">
                     Punteggio %
                   </TableHead>
                 </TableRow>
@@ -77,7 +78,7 @@ export function SubcompetenciesModal({
               <TableBody>
                 {subcompetencies.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="h-24 text-center text-slate-500 text-sm">
+                    <TableCell colSpan={5} className="h-24 text-center text-muted-foreground text-sm font-normal">
                       Nessuna sotto-competenza disponibile.
                     </TableCell>
                   </TableRow>
@@ -91,29 +92,23 @@ export function SubcompetenciesModal({
                         : null;
 
                     return (
-                      <TableRow key={sc.subcompetency_id ?? sc.id} className="hover:bg-slate-50">
-                        <TableCell className="text-sm font-medium text-slate-900">
+                      <TableRow key={sc.subcompetency_id ?? sc.id}>
+                        <TableCell className="text-sm font-normal text-slate-800 px-4 py-1.5">
                           {sc.title}
                         </TableCell>
-                        <TableCell className="text-center text-sm">
-                          <span
-                            className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${
-                              sc.acquired
-                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200/80'
-                                : 'bg-slate-100 text-slate-700 border-slate-200'
-                            }`}
-                          >
+                        <TableCell className="text-center text-sm px-4 py-1.5">
+                          <span className="inline-flex items-center justify-center bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full text-xs font-normal border border-slate-200">
                             {sc.acquired ? 'Acquisita' : 'Non acquisita'}
                           </span>
                         </TableCell>
-                        <TableCell className="text-center text-sm text-slate-700 tabular-nums">
+                        <TableCell className="text-center text-sm text-slate-600 px-4 py-1.5 font-normal">
                           {sc.threshold}%
                         </TableCell>
-                        <TableCell className="text-center text-sm text-slate-700 tabular-nums">
+                        <TableCell className="text-center text-sm text-slate-600 px-4 py-1.5 font-normal">
                           {sc.score_absolute !== null ? sc.score_absolute : '—'} /{' '}
                           {maxScore !== null ? `${maxScore} pt` : '—'}
                         </TableCell>
-                        <TableCell className="text-center text-sm text-slate-900 font-semibold tabular-nums">
+                        <TableCell className="text-center text-sm text-slate-800 px-4 py-1.5 font-normal">
                           {scorePercent !== null ? `${scorePercent.toFixed(0)}%` : '—'}
                         </TableCell>
                       </TableRow>
@@ -126,13 +121,13 @@ export function SubcompetenciesModal({
         )}
 
         <DialogFooter className="sm:justify-end">
-          <button
+          <Button
             type="button"
+            variant="outline"
             onClick={onClose}
-            className="text-sm text-slate-600 hover:text-slate-900 font-medium py-2 px-4 rounded-md border border-slate-200 hover:bg-slate-50 transition-colors cursor-pointer"
           >
             Chiudi
-          </button>
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -535,25 +535,25 @@ export function CreateTestModal({
                               onChange={toggleAllVisibleSubcompetencies}
                             />
                           </TableHead>
-                          <TableHead className="font-semibold text-slate-700 py-3">
+                          <TableHead className="font-semibold text-slate-900 py-3">
                             Titolo
                           </TableHead>
-                          <TableHead className="font-semibold text-slate-700 py-3">
+                          <TableHead className="font-semibold text-slate-900 py-3">
                             Competenza
                           </TableHead>
-                          <TableHead className="font-semibold text-slate-700 py-3 hidden md:table-cell">
+                          <TableHead className="font-semibold text-slate-900 py-3 hidden md:table-cell">
                             Input
                           </TableHead>
-                          <TableHead className="font-semibold text-slate-700 py-3 hidden md:table-cell">
+                          <TableHead className="font-semibold text-slate-900 py-3 hidden md:table-cell">
                             Azione
                           </TableHead>
-                          <TableHead className="font-semibold text-slate-700 py-3 hidden lg:table-cell">
+                          <TableHead className="font-semibold text-slate-900 py-3 hidden lg:table-cell">
                             Output
                           </TableHead>
-                          <TableHead className="w-16 text-center font-semibold text-slate-700 py-3">
+                          <TableHead className="w-16 text-center font-semibold text-slate-900 py-3">
                             Peso
                           </TableHead>
-                          <TableHead className="w-16 text-center font-semibold text-slate-700 py-3">
+                          <TableHead className="w-16 text-center font-semibold text-slate-900 py-3">
                             Soglia
                           </TableHead>
                         </TableRow>
@@ -561,7 +561,7 @@ export function CreateTestModal({
                       <TableBody>
                         {paginatedSubcompetencies.length === 0 ? (
                           <TableRow>
-                            <TableCell colSpan={7} className="h-32 text-center text-slate-400">
+                            <TableCell colSpan={8} className="h-32 text-center text-slate-400 font-normal">
                               Nessuna sottocompetenza trovata
                             </TableCell>
                           </TableRow>
@@ -586,7 +586,7 @@ export function CreateTestModal({
                                     onChange={() => toggleSubcompetency(sub.id)}
                                   />
                                 </TableCell>
-                                <TableCell className="font-medium text-slate-900 py-3">
+                                <TableCell className="font-normal text-slate-900 py-3">
                                   {sub.title}
                                 </TableCell>
                                 <TableCell className="text-slate-600 py-3">
@@ -693,14 +693,14 @@ export function CreateTestModal({
                               onChange={toggleAllVisibleUsers}
                             />
                           </TableHead>
-                          <TableHead className="font-semibold text-slate-700 py-3">Nome</TableHead>
-                          <TableHead className="font-semibold text-slate-700 py-3">Email</TableHead>
+                          <TableHead className="font-semibold text-slate-900 py-3">Nome</TableHead>
+                          <TableHead className="font-semibold text-slate-900 py-3">Email</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {paginatedUsers.length === 0 ? (
                           <TableRow>
-                            <TableCell colSpan={3} className="h-32 text-center text-slate-400">
+                            <TableCell colSpan={3} className="h-32 text-center text-slate-400 font-normal">
                               Nessun utente trovato
                             </TableCell>
                           </TableRow>
@@ -725,10 +725,10 @@ export function CreateTestModal({
                                     onChange={() => toggleUser(user.id)}
                                   />
                                 </TableCell>
-                                <TableCell className="font-medium text-slate-900 py-3">
+                                <TableCell className="font-normal text-slate-900 py-3">
                                   {user.name}
                                 </TableCell>
-                                <TableCell className="text-slate-600 py-3">{user.email}</TableCell>
+                                <TableCell className="text-slate-600 py-3 font-normal">{user.email}</TableCell>
                               </TableRow>
                             );
                           })
@@ -806,14 +806,14 @@ export function CreateTestModal({
                               onChange={toggleAllVisibleEvaluators}
                             />
                           </TableHead>
-                          <TableHead className="font-semibold text-slate-700 py-3">Nome</TableHead>
-                          <TableHead className="font-semibold text-slate-700 py-3">Email</TableHead>
+                          <TableHead className="font-semibold text-slate-900 py-3">Nome</TableHead>
+                          <TableHead className="font-semibold text-slate-900 py-3">Email</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {paginatedEvaluators.length === 0 ? (
                           <TableRow>
-                            <TableCell colSpan={3} className="h-32 text-center text-slate-400">
+                            <TableCell colSpan={3} className="h-32 text-center text-slate-400 font-normal">
                               Nessun valutatore trovato
                             </TableCell>
                           </TableRow>
@@ -838,10 +838,10 @@ export function CreateTestModal({
                                     onChange={() => toggleEvaluator(ev.id)}
                                   />
                                 </TableCell>
-                                <TableCell className="font-medium text-slate-900 py-3">
+                                <TableCell className="font-normal text-slate-900 py-3">
                                   {ev.name}
                                 </TableCell>
-                                <TableCell className="text-slate-600 py-3">{ev.email}</TableCell>
+                                <TableCell className="text-slate-600 py-3 font-normal">{ev.email}</TableCell>
                               </TableRow>
                             );
                           })
