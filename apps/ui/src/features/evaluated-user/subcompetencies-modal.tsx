@@ -106,14 +106,14 @@ export function SubcompetenciesModal({
                             {sc.acquired ? 'Acquisita' : 'Non acquisita'}
                           </span>
                         </TableCell>
-                        <TableCell className="text-center text-sm text-slate-700 font-mono">
+                        <TableCell className="text-center text-sm text-slate-700 tabular-nums">
                           {sc.threshold}%
                         </TableCell>
-                        <TableCell className="text-center text-sm text-slate-700 font-mono">
+                        <TableCell className="text-center text-sm text-slate-700 tabular-nums">
                           {sc.score_absolute !== null ? sc.score_absolute : '—'} /{' '}
                           {maxScore !== null ? `${maxScore} pt` : '—'}
                         </TableCell>
-                        <TableCell className="text-center text-sm text-slate-900 font-semibold font-mono">
+                        <TableCell className="text-center text-sm text-slate-900 font-semibold tabular-nums">
                           {scorePercent !== null ? `${scorePercent.toFixed(0)}%` : '—'}
                         </TableCell>
                       </TableRow>

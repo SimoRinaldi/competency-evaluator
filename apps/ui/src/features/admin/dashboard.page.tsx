@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getCompetencies } from "../competencies/competencies.api";
+import { getCompetencies, checkCompetencyAssociations, deleteCompetency } from "../competencies/competencies.api";
 import { PageContainer } from "../../components/page-container";
 import {
   ColumnDef,
@@ -37,7 +37,18 @@ import {
 } from "@/components/ui/dialog";
 import { CreateCompetencyPage } from "../competencies/create-competency.page";
 import { EditCompetencyPage } from "../competencies/edit-competency.page";
-import { Pencil, Plus, Search, RefreshCw, BookX, ArrowUpRight } from "lucide-react";
+import { Edit, Trash2, Plus, Search, RefreshCw, BookX, ArrowUpRight, TriangleAlert, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type Competency = {
   id: number;
@@ -63,31 +74,134 @@ const columns: ColumnDef<Competency>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => {
+    header: () => <div className="text-right">Azioni</div>,
+    cell: ({ row, table }) => {
       const comp = row.original;
-      return (
-        <div className="flex justify-end">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                <span className="sr-only">Modifica</span>
-                <Pencil className="h-4 w-4" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-[95vw] xl:max-w-[1400px] w-full h-[90vh] p-0 flex flex-col md:flex-row overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
-              <EditCompetencyPage competencyId={comp.id.toString()} />
-            </DialogContent>
-          </Dialog>
-        </div>
-      );
+      const refreshData = (table.options.meta as any)?.refreshData;
+      return <CompetencyRowActions comp={comp} refreshData={refreshData} />;
     },
   },
 ];
+
+function CompetencyRowActions({ comp, refreshData }: { comp: Competency, refreshData?: () => void }) {
+  const [open, setOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleEditClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    try {
+      const { isAssociated } = await checkCompetencyAssociations(comp.id);
+      if (isAssociated) {
+        toast.error("Impossibile modificare: la competenza è associata ad uno o più test");
+        return;
+      }
+      setOpen(true);
+    } catch (err: any) {
+      toast.error(err.message || "Errore durante la verifica della competenza");
+    }
+  };
+
+  const handleDeleteClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    try {
+      const { isAssociated } = await checkCompetencyAssociations(comp.id);
+      if (isAssociated) {
+        toast.error("Impossibile eliminare: la competenza è associata ad uno o più test");
+        return;
+      }
+      setDeleteOpen(true);
+    } catch (err: any) {
+      toast.error(err.message || "Errore durante la verifica della competenza");
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    setIsDeleting(true);
+    try {
+      await deleteCompetency(comp.id);
+      toast.success("Competenza eliminata con successo");
+      setDeleteOpen(false);
+      if (refreshData) refreshData();
+    } catch (e: any) {
+      toast.error(e.message || "Errore durante l'eliminazione della competenza");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-end gap-2">
+      <Dialog open={open} onOpenChange={setOpen}>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="h-8 w-8 text-slate-500 hover:text-sky-600 cursor-pointer"
+          title="Modifica"
+          onClick={handleEditClick}
+        >
+          <span className="sr-only">Modifica</span>
+          <Edit className="h-4 w-4" />
+        </Button>
+        <DialogContent className="max-w-[95vw] xl:max-w-[1400px] w-full h-[90vh] p-0 flex flex-col md:flex-row overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
+          <EditCompetencyPage 
+            competencyId={comp.id.toString()} 
+            onSuccess={() => {
+              setOpen(false);
+              if (refreshData) refreshData();
+            }} 
+          />
+        </DialogContent>
+      </Dialog>
+
+      <Button
+        variant="ghost"
+        size="sm"
+        className="h-8 w-8 p-0 text-slate-500 hover:text-red-600"
+        onClick={handleDeleteClick}
+        disabled={isDeleting}
+      >
+        <span className="sr-only">Elimina</span>
+        <Trash2 className="h-4 w-4" />
+      </Button>
+
+      <AlertDialog open={deleteOpen} onOpenChange={(openVal) => !openVal && setDeleteOpen(false)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+              <TriangleAlert className="h-5 w-5 text-destructive" />
+              Conferma Eliminazione
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-600 space-y-2 mt-2">
+              <p>Sei sicuro di voler eliminare questa competenza compresa di tutte le sue sottocompetenze?</p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Annulla</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              disabled={isDeleting}
+              onClick={async (e) => {
+                e.preventDefault();
+                await handleDeleteConfirm();
+              }}
+              className="flex items-center gap-2"
+            >
+              {isDeleting && <Loader2 className="h-4 w-4 animate-spin" />}
+              Elimina competenza
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}
 
 export function AdminDashboardPage() {
   const [data, setData] = useState<Competency[]>([]);
   const [loading, setLoading] = useState(true);
   const [globalFilter, setGlobalFilter] = useState("");
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   async function loadData() {
       setLoading(true);
@@ -114,6 +228,9 @@ export function AdminDashboardPage() {
       globalFilter,
     },
     onGlobalFilterChange: setGlobalFilter,
+    meta: {
+      refreshData: () => loadData(),
+    }
   });
 
   if (!loading && data.length === 0) {
@@ -134,23 +251,17 @@ export function AdminDashboardPage() {
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent className="flex-row justify-center gap-2">
-            <Dialog>
+            <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
               <DialogTrigger asChild>
                 <Button>
                   <Plus className="mr-2 h-4 w-4" /> Nuovo
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-[95vw] xl:max-w-[1400px] w-full h-[90vh] p-0 flex flex-col md:flex-row overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
-                <CreateCompetencyPage />
+                <CreateCompetencyPage onSuccess={() => { setIsCreateOpen(false); loadData(); }} />
               </DialogContent>
             </Dialog>
-            <Button variant="outline">Importa</Button>
           </EmptyContent>
-          <Button variant="link" className="text-muted-foreground" size="sm" asChild>
-            <a href="#">
-              Scopri di più <ArrowUpRight className="ml-1 h-3 w-3" />
-            </a>
-          </Button>
         </Empty>
       </PageContainer>
     );
@@ -178,14 +289,14 @@ export function AdminDashboardPage() {
       </div>
         <div className="flex items-center gap-4">
           
-          <Dialog>
+          <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
             <DialogTrigger asChild>
               <Button>
                 <Plus className="mr-2 h-4 w-4" /> Nuovo
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-[95vw] xl:max-w-[1400px] w-full h-[90vh] p-0 flex flex-col md:flex-row overflow-hidden rounded-2xl bg-white shadow-2xl gap-0">
-              <CreateCompetencyPage />
+              <CreateCompetencyPage onSuccess={() => { setIsCreateOpen(false); loadData(); }} />
             </DialogContent>
           </Dialog>
         </div>

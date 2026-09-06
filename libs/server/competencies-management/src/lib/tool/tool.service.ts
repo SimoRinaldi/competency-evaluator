@@ -24,10 +24,7 @@ export class ToolService {
   async findAll(): Promise<ToolEntity[]> {
     const tools = await this.toolRepository.findAll();
 
-    if (tools && tools.length === 0) {
-      throw new NotFoundException(`No tools found.`);
-    }
-    return tools;
+    return tools || [];
   }
 
   async create(dto: CreateToolDto): Promise<ToolEntity> {

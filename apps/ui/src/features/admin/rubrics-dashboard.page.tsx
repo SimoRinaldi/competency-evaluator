@@ -142,9 +142,9 @@ export function RubricsDashboardPage() {
         { description: '', rank: 5 },
       ]);
       setIsPopoverOpen(false);
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
-      alert('Errore durante la creazione della rubrica');
+      toast.error(e.message || 'Errore durante la creazione della rubrica');
     }
   };
 
@@ -301,13 +301,13 @@ export function RubricsDashboardPage() {
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent className="flex-row justify-center gap-2">
-            <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-              <PopoverTrigger asChild>
+            <Dialog open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+              <DialogTrigger asChild>
                 <Button>
                   <Plus className="mr-2 h-4 w-4" /> Nuovo
                 </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-[600px] p-8 max-h-[85vh] overflow-y-auto" align="center">
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto p-8">
                 <h3 className="font-semibold text-lg mb-4">Nuova Rubrica</h3>
                 <CreateRubricForm
                   onSave={handleSaveNewRubric}
@@ -317,14 +317,9 @@ export function RubricsDashboardPage() {
                   levels={draftLevels}
                   setLevels={setDraftLevels}
                 />
-              </PopoverContent>
-            </Popover>
+              </DialogContent>
+            </Dialog>
           </EmptyContent>
-          <Button variant="link" className="text-muted-foreground" size="sm" asChild>
-            <a href="#">
-              Scopri di più <ArrowUpRight className="ml-1 h-3 w-3" />
-            </a>
-          </Button>
         </Empty>
       </PageContainer>
     );
@@ -358,13 +353,13 @@ export function RubricsDashboardPage() {
           </Button>
         </div>
         <div className="flex items-center gap-4">
-          <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-            <PopoverTrigger asChild>
+          <Dialog open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+            <DialogTrigger asChild>
               <Button>
                 <Plus className="mr-2 h-4 w-4" /> Nuovo
               </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[600px] p-8 max-h-[85vh] overflow-y-auto" align="end">
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto p-8">
               <h3 className="font-semibold text-lg mb-4">Nuova Rubrica</h3>
               <CreateRubricForm
                 onSave={handleSaveNewRubric}
@@ -374,8 +369,8 @@ export function RubricsDashboardPage() {
                 levels={draftLevels}
                 setLevels={setDraftLevels}
               />
-            </PopoverContent>
-          </Popover>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 

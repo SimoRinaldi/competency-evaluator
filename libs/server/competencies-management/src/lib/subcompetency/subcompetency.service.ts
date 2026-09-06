@@ -26,10 +26,7 @@ export class SubCompetencyService {
   async findAll(): Promise<SubCompetencyEntity[]> {
     const subCompetencies = await this.subCompetencyRepository.findAll();
 
-    if (subCompetencies && subCompetencies.length === 0) {
-      throw new NotFoundException(`No subcompetencies found.`);
-    }
-    return subCompetencies;
+    return subCompetencies || [];
   }
 
   async create(dto: CreateSubCompetencyDto): Promise<SubCompetencyEntity> {

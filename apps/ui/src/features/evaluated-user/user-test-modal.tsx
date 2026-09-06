@@ -325,7 +325,7 @@ export function UserTestModal({
               {saving ? (
                 <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Invio in corso...</>
               ) : (
-                <><Send className="mr-2 h-4 w-4" /> Consegna</>
+                "Consegna"
               )}
             </Button>
           )}
@@ -346,8 +346,8 @@ export function UserTestModal({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={saving}>Annulla</AlertDialogCancel>
-          <AlertDialogAction onClick={executeSubmit} disabled={saving} className="bg-sky-600 hover:bg-sky-700">
-            {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Send className="h-4 w-4 mr-2" />}
+          <AlertDialogAction onClick={executeSubmit} disabled={saving} className="bg-primary hover:bg-primary/90 text-primary-foreground">
+            {saving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
             Conferma e Consegna
           </AlertDialogAction>
         </AlertDialogFooter>

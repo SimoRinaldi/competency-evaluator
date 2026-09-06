@@ -39,13 +39,23 @@ export function Step3Summary({
           </button>
         </div>
         <div className="p-4 space-y-3">
-          <div>
-            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-              Titolo
-            </span>
-            <p className="text-foreground font-medium text-sm mt-0.5">
-              {competencyData.title || 'Nessun titolo'}
-            </p>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                Titolo
+              </span>
+              <p className="text-foreground font-medium text-sm mt-0.5">
+                {competencyData.title || 'Nessun titolo'}
+              </p>
+            </div>
+            <div>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                Peso
+              </span>
+              <p className="text-foreground font-medium text-sm mt-0.5">
+                {competencyData.weight || 'Nessun peso'}
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -154,7 +164,14 @@ export function Step3Summary({
       </div>
 
       {/* BOTTONE FINALE */}
-      <div className="pt-4 flex justify-end">
+      <div className="pt-4 flex justify-between items-center w-full">
+        <button
+          type="button"
+          onClick={onEditStep2}
+          className="inline-flex h-11 items-center justify-center rounded-md border border-gray-300 bg-white px-6 text-sm font-medium hover:bg-gray-100 shadow-sm"
+        >
+          Torna a Sottocompetenze
+        </button>
         <button
           type="button"
           onClick={onSave}

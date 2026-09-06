@@ -23,10 +23,7 @@ export class SkillService {
   async findAll(): Promise<SkillEntity[]> {
     const skills = await this.skillRepository.findAll();
 
-    if (skills && skills.length === 0) {
-      throw new NotFoundException(`No skills found.`);
-    }
-    return skills;
+    return skills || [];
   }
 
   async create(dto: CreateSkillDto): Promise<SkillEntity> {

@@ -23,10 +23,7 @@ export class MethodService {
   async findAll(): Promise<MethodEntity[]> {
     const methods = await this.methodRepository.findAll();
 
-    if (methods && methods.length === 0) {
-      throw new NotFoundException(`No methods found.`);
-    }
-    return methods;
+    return methods || [];
   }
 
   async create(dto: CreateMethodDto): Promise<MethodEntity> {
