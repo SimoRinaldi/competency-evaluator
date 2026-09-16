@@ -22,7 +22,7 @@ import { RubricsDashboardPage } from '../features/rubrics/rubrics-table.page';
 import { useAuth } from '../features/auth/auth-context';
 
 const Placeholder = ({ title }: { title: string }) => (
-  <PageContainer title={title} description="Questa pagina � in costruzione.">
+  <PageContainer title={title} description="Questa pagina è in costruzione.">
     <div className="flex items-center justify-center h-64 bg-slate-50 border border-dashed rounded-lg text-slate-500">
       Contenuto in arrivo...
     </div>
