@@ -165,7 +165,7 @@ Using the workspace's Nx tooling:
 Developed as a university academic project by:
 
 - **Simone Rinaldi** - [@SimoRinaldi](https://github.com/SimoRinaldi)
-- **Matteo Legati** - [@MatteoLegati](https://github.com/MatteoLegati)
+- **Matteo Legati** - [@legatimatteo](https://github.com/legatimatteo)
 
 ---
 
