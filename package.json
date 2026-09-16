@@ -76,8 +76,6 @@
     "packages/*",
     "apps/*",
     "libs/server/*",
-    "libs/server/users/src/lib/libs/db/*",
-    "libs/db/*",
     "libs/*"
   ],
   "dependencies": {
