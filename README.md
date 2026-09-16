@@ -1,105 +1,174 @@
-# New Nx Repository
+# Competency Evaluator (Tool di Valutazione delle Competenze)
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+[![Nx](https://img.shields.io/badge/monorepo-Nx-blue.svg)](https://nx.dev)
+[![NestJS](https://img.shields.io/badge/backend-NestJS-red.svg)](https://nestjs.com)
+[![React](https://img.shields.io/badge/frontend-React_19-blue.svg)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/language-TypeScript-blue.svg)](https://www.typescriptlang.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+A modern full-stack web application designed for managing, structuring, and evaluating competencies and sub-competencies through observation objects, indicators, evaluation rubrics, and tests.
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/js?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
-## Try the full Nx platform
-🚀 If you haven't connected to Nx Cloud yet, [complete your setup here](https://cloud.nx.app/setup/connect-workspace/guide). Get faster builds with remote caching, distributed task execution, and self-healing CI. [See how your workspace can benefit](#nx-cloud).
-## Generate a library
+This project was developed as an **academic university project** at the **University of Brescia (UniBS)** by **Simone Rinaldi** and **Matteo Legati**.
 
-```sh
-npx nx g @nx/js:lib packages/pkg1 --publishable --importPath=@my-org/pkg1
+---
+
+## User Roles & Features
+
+The application provides dedicated features tailored to four distinct personas:
+
+- **Administrator (`ADMIN`)**
+
+  - **Competencies & Sub-competencies Management**: Comprehensive visualization, step-by-step creation wizard, association of observation objects with their corresponding indicators (at least one) and rubrics, editing, and deletion.
+  - **Evaluation Rubrics Management**: Creation and configuration of custom evaluation rubrics with 2 or 5 proficiency levels.
+  - **User Management**: User creation, editing, role assignment (`ADMIN`, `TEST_DESIGNER`, `EVALUATOR`, `USER`), credential management, and password updates.
+  - **Global Tests Overview**: Read-only monitoring of all active tests in the system, with details on assessment situations, users to evaluate, and assigned evaluators.
+
+- **Test Designer (`TEST_DESIGNER`)**
+
+  - **Test Creation & Configuration**: Definition of the assessment situation, duration, instructions, and objectives.
+  - **Competencies & Indicators Association**: Linking tests to specific competencies and sub-competencies with their observation objects, indicators, and rubrics.
+  - **Participant Assignment**: Selection and assignment of users to evaluate and the pool of evaluators responsible for evaluation.
+  - **Observation Objects Management**: Dedicated interface to modify observation objects and their associated indicators.
+
+- **Evaluator (`EVALUATOR`)**
+
+  - Dashboard of tests assigned for evaluation (pending / completed).
+  - Guided evaluation interface.
+
+- **Evaluated User (`USER`)**
+  - Personal test dashboard (tests to take and completed tests).
+  - Score history and mastery tracking (_Best Scores_ across competencies and sub-competencies).
+
+---
+
+## Architecture & Tech Stack
+
+The system is organized as an **Nx Monorepo**:
+
+- **Backend (`apps/api`)**:
+
+  - **Framework**: [NestJS](https://nestjs.com/).
+  - **Database & ORM**: [PostgreSQL](https://www.postgresql.org/) with [TypeORM](https://typeorm.io/).
+  - **Authentication**: JWT (JSON Web Tokens) with Passport strategies and bcrypt password hashing.
+  - **API Documentation**: Automated OpenAPI specification via [Swagger UI](https://swagger.io/).
+  - **Modular Server Libraries (`libs/server/*`)**: Clean separation between `auth`, `users`, `competencies-management`, `tests-management`, `tests-execution`, `tests-evaluation`, and `best-scores`.
+
+- **Frontend (`apps/ui`)**:
+
+  - **Framework**: [React](https://react.dev/) bundled with [Vite](https://vitejs.dev/).
+  - **UI & Styling**: [TailwindCSS](https://tailwindcss.com/) and [shadcn/ui](https://ui.shadcn.com/) components with [Lucide React](https://lucide.dev/) icons.
+
+- **DevOps**:
+  - **Docker Compose**: Containerized PostgreSQL database for local development.
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+Make sure you have the following installed on your machine:
+
+- [Node.js](https://nodejs.org/) (v20 or later recommended)
+- [npm](https://www.npmjs.com/)
+- [Docker](https://www.docker.com/) & Docker Compose
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/SimoRinaldi/competency-evaluator.git
+cd competency-evaluator
 ```
 
-## Run tasks
+### 2. Install dependencies
 
-To build the library use:
-
-```sh
-npx nx build pkg1
+```bash
+npm install
 ```
 
-To run any task with Nx use:
+### 3. Setup environment variables
 
-```sh
-npx nx <target> <project-name>
+Copy the template `.env.example` file to `.env`:
+
+- **Linux / macOS / Git Bash**:
+  ```bash
+  cp .env.example .env
+  ```
+- **Windows (PowerShell)**:
+  ```powershell
+  Copy-Item .env.example .env
+  ```
+
+Review `.env` and fill in the database credentials and a secure `SECRET_KEY`.
+
+### 4. Start the database (Docker)
+
+Start the PostgreSQL container:
+
+```bash
+npm run start:docker-db
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+### 5. Run the applications
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+Start the **Backend API**:
 
-## Versioning and releasing
-
-To version and release the library use
-
-```
-npx nx release
+```bash
+npm run start:api
 ```
 
-Pass `--dry-run` to see what would happen without actually releasing the library.
+The API will be available at `http://localhost:3333`.  
+You can view the interactive **Swagger API Documentation** at: `http://localhost:3333/api/docs`
 
-[Learn more about Nx release &raquo;](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+Start the **Frontend UI**:
 
-## Keep TypeScript project references up to date
-
-Nx automatically updates TypeScript [project references](https://www.typescriptlang.org/docs/handbook/project-references.html) in `tsconfig.json` files to ensure they remain accurate based on your project dependencies (`import` or `require` statements). This sync is automatically done when running tasks such as `build` or `typecheck`, which require updated references to function correctly.
-
-To manually trigger the process to sync the project graph dependencies information to the TypeScript project references, run the following command:
-
-```sh
-npx nx sync
+```bash
+npm run start:ui
 ```
 
-You can enforce that the TypeScript project references are always in the correct state when running in CI by adding a step to your CI job configuration that runs the following command:
+The web application will open at `http://localhost:4200`.
 
-```sh
-npx nx sync:check
-```
+---
 
-[Learn more about nx sync](https://nx.dev/reference/nx-commands#sync)
+## Default Credentials
 
-## Nx Cloud
+On initial startup, if the database is empty, an initial administrator account is automatically seeded:
 
-Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
+- **Email**: `admin@coeva.local`
+- **Password**: `Password!`
 
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+_(These can be customized in `.env` before starting the application via `SEED_ADMIN_EMAIL` and `SEED_ADMIN_PASSWORD`)._
 
-### Set up CI (non-Github Actions CI)
+---
 
-**Note:** This is only required if your CI provider is not GitHub Actions.
+## Useful Commands
 
-Use the following command to configure a CI workflow for your workspace:
+Using the workspace's Nx tooling:
 
-```sh
-npx nx g ci-workflow
-```
+- **Lint workspace**:
+  ```bash
+  npx nx run-many -t lint
+  ```
+- **Build production bundles**:
+  ```bash
+  npx nx run-many -t build
+  ```
+- **Inspect project dependency graph**:
+  ```bash
+  npx nx graph
+  ```
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+---
 
-## Install Nx Console
+## Authors
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+Developed as a university academic project by:
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+- **Simone Rinaldi** - [@SimoRinaldi](https://github.com/SimoRinaldi)
+- **Matteo Legati** - [@MatteoLegati](https://github.com/MatteoLegati)
 
-## Useful links
+---
 
-Learn more:
+## License
 
-- [Learn more about this workspace setup](https://nx.dev/nx-api/js?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-And join the Nx community:
-
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
