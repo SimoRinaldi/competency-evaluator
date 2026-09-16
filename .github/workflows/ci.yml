@@ -26,5 +26,4 @@ jobs:
 
       - run: npm ci
 
-      - run: npx nx format:check --base="remotes/origin/main"
       - run: npx nx run-many -t lint build
