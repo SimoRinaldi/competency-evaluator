@@ -12,7 +12,6 @@ import { CreateTestDto } from './dto/create-test.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
 import { TestRepository } from './test.repository';
 import { SubCompetencyEntity } from '@server/competencies-management';
-import { EvaluatedUserService } from '@server/tests-evaluation';
 
 @Injectable()
 export class TestService {
